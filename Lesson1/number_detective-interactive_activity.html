@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab · Grade 4 · Unit 1 · Lesson 1 · Number Detective</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --burnt: #D96B38; --burnt-dk: #AE4E1C; --burnt-lt: #EFA878; --burnt-pale: #FEF0E7;
+  --teal: #007878; --teal-dk: #005555; --teal-md: #009898; --teal-lt: #CDEAEA; --teal-xlt: #EBF7F7;
+  --gold: #E8A818; --gold-pale: #FFF7D6; --gold-dk: #9B7000;
+  --green: #169A62; --green-pale: #E2F9EE; --green-dk: #0C6840;
+  --red: #D43535; --red-pale: #FDECEC;
+  --purple: #7450CC; --purple-pale: #F0ECFC;
+  --sky: #3888D6; --sky-pale: #E5F0FC;
+  --bg: #FBE7D4; --surface: #FFFFFF; --border: #E4D5C8; --text: #2A1808; --muted: #7A6258;
+  --r-xl: 22px; --r-lg: 16px; --r-md: 12px; --r-sm: 8px;
+  --sh-sm: 0 2px 8px rgba(140,60,10,.10); --sh-md: 0 6px 24px rgba(140,60,10,.15); --sh-lg: 0 12px 40px rgba(140,60,10,.20);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(ellipse 65% 50% at 5% 5%, rgba(217,107,56,.12) 0%, transparent 60%), radial-gradient(ellipse 55% 50% at 95% 90%, rgba(0,120,120,.09) 0%, transparent 60%);
+  min-height: 100vh; padding: 0 0 6rem; overflow-x: hidden; position: relative; color: var(--text);
+}
+
+body::before {
+  content: 'MyMasteryLab'; position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) rotate(-25deg);
+  font-family: 'Fredoka One', cursive; font-size: clamp(60px,12vw,120px);
+  color: rgba(217,107,56,.048); white-space: nowrap; pointer-events: none; z-index: 0; user-select: none;
+}
+
+.page { max-width: 800px; margin: 0 auto; padding: 0 1rem; position: relative; z-index: 1; }
+
+/* HEADER */
+.site-header {
+  background: linear-gradient(135deg, var(--teal-dk) 0%, var(--teal-md) 60%, #00AAAA 100%);
+  padding: 1.6rem 2rem 3.5rem; position: relative; overflow: hidden;
+}
+.site-header::before { content:''; position:absolute; top:-50px; right:-50px; width:220px; height:220px; background:rgba(255,255,255,.06); border-radius:50%; }
+.site-header::after  { content:''; position:absolute; bottom:-70px; left:25%; width:320px; height:320px; background:rgba(255,255,255,.04); border-radius:50%; }
+.hdr-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; position:relative; z-index:1; flex-wrap:wrap; gap:8px; }
+.logo-wrap { display:flex; align-items:center; gap:10px; }
+.logo-mark { width:42px; height:42px; background:rgba(255,255,255,.18); border:1.5px solid rgba(255,255,255,.3); border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Fredoka One',cursive; font-size:22px; color:white; }
+.logo-name { font-family:'Fredoka One',cursive; font-size:18px; color:rgba(255,255,255,.95); }
+.hdr-badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); color:white; font-size:11px; font-weight:700; padding:4px 13px; border-radius:20px; letter-spacing:.05em; text-transform:uppercase; }
+.hdr-body { position:relative; z-index:1; }
+.hdr-crumb { font-size:12px; font-weight:700; color:rgba(255,255,255,.65); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+.hdr-title { font-family:'Fredoka One',cursive; font-size:clamp(28px,6vw,42px); color:white; line-height:1.15; margin-bottom:8px; }
+.hdr-sub { font-size:13.5px; color:rgba(255,255,255,.8); font-weight:600; line-height:1.5; max-width:500px; }
+
+/* PROGRESS */
+.prog-ribbon { background:var(--surface); border-radius:0 0 var(--r-xl) var(--r-xl); padding:.9rem 1.5rem; box-shadow:var(--sh-md); margin-bottom:1.5rem; position:relative; z-index:2; }
+.prog-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:.7rem; }
+.prog-stat { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+.prog-stat strong { color:var(--teal); font-family:'Fredoka One',cursive; font-size:20px; }
+.prog-divider { width:1px; height:30px; background:var(--border); }
+.prog-bar-wrap { flex:1; min-width:160px; }
+.prog-track { height:10px; background:var(--burnt-pale); border-radius:10px; overflow:hidden; border:1px solid var(--burnt-lt); }
+.prog-fill { height:100%; background:linear-gradient(90deg,var(--burnt),var(--gold)); border-radius:10px; transition:width .5s cubic-bezier(.4,0,.2,1); width:0; }
+.prog-pct { font-size:12px; font-weight:800; color:var(--burnt); margin-top:3px; text-align:right; }
+.obj-row { display:flex; gap:8px; flex-wrap:wrap; padding-top:.7rem; border-top:1px solid var(--border); }
+.obj-chip { display:flex; align-items:center; gap:5px; background:var(--teal-lt); border-radius:20px; padding:4px 12px; font-size:11.5px; font-weight:700; color:var(--teal-dk); }
+
+/* REFERENCE ROW */
+.ref-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.5rem; }
+.ref-card { background:var(--surface); border-radius:var(--r-lg); padding:1rem 1.1rem; box-shadow:var(--sh-sm); border:1.5px solid var(--border); text-align:center; transition:transform .2s,box-shadow .2s; }
+.ref-card:hover { transform:translateY(-2px); box-shadow:var(--sh-md); }
+.ref-glyph { font-size:34px; font-weight:900; line-height:1; margin-bottom:5px; }
+.ref-gt .ref-glyph { color:var(--teal); } .ref-gt { border-color:var(--teal-lt); }
+.ref-lt .ref-glyph { color:var(--burnt); } .ref-lt { border-color:var(--burnt-lt); }
+.ref-eq .ref-glyph { color:var(--gold); } .ref-eq { border-color:#EDD080; }
+.ref-name { font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; margin-bottom:3px; }
+.ref-gt .ref-name { color:var(--teal-dk); } .ref-lt .ref-name { color:var(--burnt-dk); } .ref-eq .ref-name { color:var(--gold-dk); }
+.ref-ex { font-size:12px; font-weight:700; color:var(--muted); }
+
+/* QUESTION CARDS */
+.q-card { background:var(--surface); border-radius:var(--r-xl); box-shadow:var(--sh-md); border:1.5px solid var(--border); margin-bottom:1.25rem; overflow:hidden; transition:box-shadow .2s; }
+.q-card:hover { box-shadow:var(--sh-lg); }
+.q-card.challenge { border:2.5px solid var(--purple); }
+.q-accent { height:5px; background:linear-gradient(90deg,var(--burnt),var(--gold)); }
+.q-card.challenge .q-accent { background:linear-gradient(90deg,var(--purple),#A87FE8); }
+.q-body { padding:1.4rem 1.7rem; }
+.q-meta { display:flex; align-items:center; gap:8px; margin-bottom:.9rem; flex-wrap:wrap; }
+.q-num  { font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+.q-tag  { font-size:11px; font-weight:800; padding:3px 11px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+.tag-e  { background:var(--green-pale); color:var(--green-dk); }
+.tag-m  { background:var(--gold-pale);  color:var(--gold-dk);  }
+.tag-h  { background:var(--sky-pale);   color:#1A5AA0;          }
+.tag-ch { background:var(--purple-pale);color:var(--purple);    }
+.tag-v  { background:var(--teal-lt);    color:var(--teal-dk);   }
+.q-format { margin-left:auto; font-size:11px; color:var(--muted); font-style:italic; font-weight:600; }
+.q-prompt { font-size:15.5px; font-weight:700; color:var(--text); line-height:1.55; margin-bottom:.85rem; }
+.q-instr  { font-size:12.5px; color:var(--muted); font-style:italic; margin-bottom:.8rem; }
+
+/* PV CHART */
+.pv-chart { display:grid; grid-template-columns:repeat(3,1fr); border-radius:var(--r-md); overflow:hidden; border:2px solid var(--teal); margin-bottom:1rem; }
+.pvc-hdr  { background:var(--teal); color:white; text-align:center; padding:7px 4px; font-weight:800; font-size:12.5px; border-right:1px solid rgba(255,255,255,.25); }
+.pvc-hdr:last-child { border-right:none; }
+.pvc-cell { text-align:center; padding:12px 4px; font-family:'Fredoka One',cursive; font-size:28px; color:var(--text); border-right:1px solid var(--border); border-top:2px solid var(--teal); }
+.pvc-cell:last-child { border-right:none; }
+.pvc-hl   { background:var(--gold-pale); color:var(--gold-dk); }
+
+/* BASE-10 BLOCKS */
+.blocks-vis { background:#F9F4EF; border:1.5px solid var(--border); border-radius:var(--r-md); padding:1rem 1.25rem; margin-bottom:1rem; }
+.blocks-label { font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:12px; }
+.blocks-row { display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+.block-group { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.flat-grid { display:grid; grid-template-columns:repeat(10,1fr); gap:2px; width:72px; }
+.flat-cell { width:6.5px; height:6.5px; background:#6366F1; border-radius:1px; }
+.rod-stack { display:flex; flex-direction:column; gap:2px; }
+.rod-cell  { width:10px; height:6.5px; background:#059669; border-radius:1px; }
+.unit-wrap { display:flex; flex-wrap:wrap; gap:2px; max-width:40px; }
+.unit-cell { width:10px; height:10px; background:#E8A818; border-radius:2px; }
+.block-lbl { font-size:11px; font-weight:700; color:var(--muted); text-align:center; line-height:1.3; }
+.block-num { font-family:'Fredoka One',cursive; font-size:22px; color:var(--text); }
+.blocks-plus { font-family:'Fredoka One',cursive; font-size:20px; color:var(--muted); align-self:center; }
+
+/* NL VISUAL */
+.nl-vis { background:var(--teal-xlt); border:1.5px solid var(--teal-lt); border-radius:var(--r-md); padding:1rem 1.1rem; margin-bottom:1rem; }
+.nl-lbl { font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:var(--teal-dk); margin-bottom:12px; }
+.nl-svg { width:100%; overflow:visible; display:block; }
+
+/* OPTIONS */
+.options { display:flex; flex-direction:column; gap:9px; }
+.opt { display:flex; align-items:center; gap:10px; padding:11px 15px; border:1.5px solid var(--border); border-radius:var(--r-md); background:var(--surface); cursor:pointer; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; color:var(--text); text-align:left; transition:all .15s; width:100%; }
+.opt:hover:not(:disabled) { border-color:var(--burnt); background:var(--burnt-pale); }
+.opt.selected { border-color:var(--burnt); background:var(--burnt-pale); }
+.opt.correct  { border-color:var(--green); background:var(--green-pale); color:var(--green-dk); }
+.opt.wrong    { border-color:var(--red);   background:var(--red-pale);   color:#7A0F0F; }
+.opt:disabled { cursor:default; }
+.opt-circle { width:28px; height:28px; border-radius:50%; background:#F0EBE5; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s,color .15s; }
+.opt.selected .opt-circle { background:var(--burnt); color:white; }
+.opt.correct  .opt-circle { background:var(--green); color:white; }
+.opt.wrong    .opt-circle { background:var(--red);   color:white; }
+
+.tf-row { display:flex; gap:10px; }
+.tf-btn { flex:1; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--r-md); background:var(--surface); cursor:pointer; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; color:var(--text); text-align:center; transition:all .15s; }
+.tf-btn:hover:not(:disabled) { border-color:var(--burnt); background:var(--burnt-pale); }
+.tf-btn.selected { border-color:var(--burnt); background:var(--burnt-pale); }
+.tf-btn.correct  { border-color:var(--green); background:var(--green-pale); color:var(--green-dk); }
+.tf-btn.wrong    { border-color:var(--red);   background:var(--red-pale);   color:#7A0F0F; }
+.tf-btn:disabled { cursor:default; }
+
+.multi-note { font-size:12px; color:var(--muted); font-style:italic; font-weight:600; margin-bottom:8px; }
+
+/* SYM BUTTONS for comparison */
+.sym-opts { display:flex; gap:10px; flex-wrap:wrap; }
+.sym-btn { flex:1; min-width:80px; padding:14px 10px; border:2px solid var(--border); border-radius:var(--r-md); background:var(--surface); cursor:pointer; font-family:'Fredoka One',cursive; font-size:32px; color:var(--text); text-align:center; transition:all .15s; }
+.sym-btn:hover:not(:disabled) { border-color:var(--burnt); background:var(--burnt-pale); transform:scale(1.04); }
+.sym-btn.sel-sym { border-color:var(--burnt); background:var(--burnt-pale); }
+.sym-btn.cor-sym { border-color:var(--green); background:var(--green-pale); }
+.sym-btn.wrg-sym { border-color:var(--red);   background:var(--red-pale); }
+.sym-btn:disabled { cursor:default; transform:none; }
+
+.num-display { display:flex; align-items:center; gap:14px; font-family:'Fredoka One',cursive; font-size:40px; color:var(--text); margin-bottom:1rem; flex-wrap:wrap; }
+.num-box { background:var(--teal-lt); border:2px solid var(--teal); border-radius:var(--r-sm); padding:6px 20px; color:var(--teal-dk); }
+.sym-slot { width:64px; height:60px; border:3px dashed var(--burnt-lt); border-radius:var(--r-sm); background:var(--burnt-pale); display:flex; align-items:center; justify-content:center; font-size:36px; color:var(--burnt-lt); transition:all .2s; }
+.sym-slot.filled { border-style:solid; border-color:var(--burnt); color:var(--burnt); background:white; }
+.sym-slot.cor-slot { border-color:var(--green); color:var(--green); background:var(--green-pale); }
+.sym-slot.wrg-slot { border-color:var(--red); color:var(--red); background:var(--red-pale); }
+
+/* FILL BOXES */
+.fill-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:.5rem; }
+.fill-box { border:2px solid var(--burnt); border-radius:var(--r-sm); padding:8px 10px; font-size:20px; font-weight:900; font-family:'Fredoka One',cursive; width:100px; text-align:center; background:white; color:var(--text); outline:none; transition:border-color .15s,box-shadow .15s; }
+.fill-box:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(0,120,120,.15); }
+.fill-box.correct { border-color:var(--green); background:var(--green-pale); }
+.fill-box.wrong   { border-color:var(--red);   background:var(--red-pale); }
+.fill-label { font-family:'Fredoka One',cursive; font-size:22px; color:var(--muted); }
+
+.check-btn { margin-top:.85rem; padding:10px 26px; background:linear-gradient(135deg,var(--burnt),var(--burnt-dk)); color:white; border:none; border-radius:30px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:all .2s; box-shadow:0 4px 14px rgba(174,78,28,.30); letter-spacing:.02em; }
+.check-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 7px 20px rgba(174,78,28,.40); }
+.check-btn:disabled { opacity:.35; cursor:default; transform:none; box-shadow:none; }
+
+.feedback { margin-top:.85rem; padding:12px 15px; border-radius:var(--r-md); font-size:13.5px; font-weight:700; line-height:1.55; display:none; }
+.feedback.show { display:block; }
+.feedback.correct { background:var(--green-pale); color:var(--green-dk); border:1.5px solid #8ADEC0; }
+.feedback.wrong   { background:var(--red-pale);   color:#7A0F0F;          border:1.5px solid #F5A0A0; }
+
+.money-badge { display:inline-flex; align-items:center; gap:6px; background:var(--gold-pale); border:1.5px solid #EDD080; border-radius:var(--r-sm); padding:5px 12px; font-size:13px; font-weight:800; color:var(--gold-dk); margin-bottom:.75rem; }
+.challenge-banner { display:flex; align-items:center; gap:7px; background:var(--purple-pale); border-radius:var(--r-sm); padding:7px 13px; margin-bottom:.85rem; font-size:12.5px; font-weight:800; color:var(--purple); flex-wrap:wrap; }
+
+.sec-div { display:flex; align-items:center; gap:12px; margin:.5rem 0 1.5rem; }
+.sec-div::before,.sec-div::after { content:''; flex:1; height:2px; background:repeating-linear-gradient(90deg,var(--burnt-lt) 0,var(--burnt-lt) 6px,transparent 6px,transparent 12px); border-radius:2px; }
+.sec-div-label { display:flex; align-items:center; gap:6px; background:var(--purple-pale); color:var(--purple); border-radius:20px; padding:5px 16px; font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; white-space:nowrap; }
+
+.score-card { background:linear-gradient(135deg,var(--teal-dk),var(--teal-md),#00AAAA); border-radius:var(--r-xl); padding:2.5rem 2rem; text-align:center; color:white; margin-top:1.5rem; display:none; box-shadow:0 12px 40px rgba(0,100,100,.30); }
+.score-card.show { display:block; }
+.score-trophy { font-size:52px; margin-bottom:.5rem; }
+.score-num { font-family:'Fredoka One',cursive; font-size:72px; line-height:1; margin-bottom:8px; }
+.score-msg { font-size:18px; font-weight:800; margin-bottom:.4rem; }
+.score-sub { font-size:14px; opacity:.8; margin-bottom:1.5rem; }
+.retry-btn { padding:12px 32px; background:white; color:var(--teal-dk); border:none; border-radius:30px; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; cursor:pointer; transition:all .2s; }
+.retry-btn:hover { transform:translateY(-2px); }
+
+@media(max-width:580px){
+  .site-header{padding:1.25rem 1.25rem 3rem;}
+  .q-body{padding:1.25rem;}
+  .ref-strip{grid-template-columns:1fr;}
+  .num-display{font-size:30px;}
+  .sym-btn{font-size:26px;padding:11px 8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div class="hdr-top">
+    <div class="logo-wrap">
+      <div class="logo-mark">M</div>
+      <div class="logo-name">MyMasteryLab</div>
+    </div>
+    <div class="hdr-badges">
+      <div class="badge">Grade 4</div>
+      <div class="badge">Unit 1 · Lesson 1</div>
+      <div class="badge">CCSS.4.NBT.A</div>
+    </div>
+  </div>
+  <div class="hdr-body">
+    <div class="hdr-crumb">Place Value &amp; Number Sense › Lesson 1</div>
+    <div class="hdr-title">🔍 Number Detective</div>
+    <div class="hdr-sub">Read, write, compare, and explore 3-digit numbers — activate your place value superpower!</div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- PROGRESS -->
+<div class="prog-ribbon">
+  <div class="prog-row">
+    <div class="prog-stat"><strong id="ans-count">0</strong><br>Answered</div>
+    <div class="prog-divider"></div>
+    <div class="prog-stat"><strong id="cor-count">0</strong><br>Correct</div>
+    <div class="prog-divider"></div>
+    <div class="prog-stat"><strong>10</strong><br>Total</div>
+    <div class="prog-bar-wrap">
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+      <div class="prog-pct" id="prog-pct">0% complete</div>
+    </div>
+  </div>
+  <div class="obj-row">
+    <div class="obj-chip">🔢 Read & write to 1,000</div>
+    <div class="obj-chip">⚖️ Compare with &gt; &lt; =</div>
+    <div class="obj-chip">📍 Identify place value</div>
+    <div class="obj-chip">🎯 Round to nearest 10</div>
+  </div>
+</div>
+
+<!-- REFERENCE STRIP -->
+<div class="ref-strip">
+  <div class="ref-card ref-gt">
+    <div class="ref-glyph">&gt;</div>
+    <div class="ref-name">Greater Than</div>
+    <div class="ref-ex">750 &gt; 509</div>
+  </div>
+  <div class="ref-card ref-lt">
+    <div class="ref-glyph">&lt;</div>
+    <div class="ref-name">Less Than</div>
+    <div class="ref-ex">342 &lt; 378</div>
+  </div>
+  <div class="ref-card ref-eq">
+    <div class="ref-glyph">=</div>
+    <div class="ref-name">Equal To</div>
+    <div class="ref-ex">620 = 620</div>
+  </div>
+</div>
+
+<!-- Q1 MCQ Easy -->
+<div class="q-card" id="q1">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 1</span>
+      <span class="q-tag tag-e">Easy</span>
+      <span class="q-format">Single Choice</span>
+    </div>
+    <div class="q-prompt">What is the value of the digit <strong>7</strong> in the number <strong>473</strong>?</div>
+    <div class="q-instr">💡 Find where the digit 7 sits — its place tells you its value!</div>
+    <div class="options" id="q1-opts">
+      <button class="opt" onclick="selOpt('q1','a')"><span class="opt-circle">A</span> 7</button>
+      <button class="opt" onclick="selOpt('q1','b')"><span class="opt-circle">B</span> 70</button>
+      <button class="opt" onclick="selOpt('q1','c')"><span class="opt-circle">C</span> 700</button>
+      <button class="opt" onclick="selOpt('q1','d')"><span class="opt-circle">D</span> 7,000</button>
+    </div>
+    <button class="check-btn" id="q1-check" onclick="chkMCQ('q1','b','In 473, the digit 7 is in the tens place. Tens place value = 7 × 10 = 70. Same digit, different position = different value!')" disabled>Check Answer</button>
+    <div class="feedback" id="q1-fb"></div>
+  </div>
+</div>
+
+<!-- Q2 Visual PV Chart -->
+<div class="q-card" id="q2">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 2</span>
+      <span class="q-tag tag-e">Easy</span>
+      <span class="q-tag tag-v">Visual</span>
+      <span class="q-format">Single Choice</span>
+    </div>
+    <div class="q-prompt">The place value chart shows a number. What is the <strong>standard form</strong> of this number?</div>
+    <div class="q-instr">🔑 Hundreds + Tens + Ones = the standard form number!</div>
+    <div class="pv-chart">
+      <div class="pvc-hdr">Hundreds</div>
+      <div class="pvc-hdr">Tens</div>
+      <div class="pvc-hdr">Ones</div>
+      <div class="pvc-cell">5</div>
+      <div class="pvc-cell">0</div>
+      <div class="pvc-cell">8</div>
+    </div>
+    <div style="font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:.85rem;">💡 Notice the 0 in the tens place — zero is a placeholder!</div>
+    <div class="options" id="q2-opts">
+      <button class="opt" onclick="selOpt('q2','a')"><span class="opt-circle">A</span> 58</button>
+      <button class="opt" onclick="selOpt('q2','b')"><span class="opt-circle">B</span> 580</button>
+      <button class="opt" onclick="selOpt('q2','c')"><span class="opt-circle">C</span> 508</button>
+      <button class="opt" onclick="selOpt('q2','d')"><span class="opt-circle">D</span> 5,008</button>
+    </div>
+    <button class="check-btn" id="q2-check" onclick="chkMCQ('q2','c','5 hundreds + 0 tens + 8 ones = 508. The zero in the tens place is a placeholder — it keeps the 5 in the hundreds position and the 8 in the ones position!')" disabled>Check Answer</button>
+    <div class="feedback" id="q2-fb"></div>
+  </div>
+</div>
+
+<!-- Q3 True/False -->
+<div class="q-card" id="q3">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 3</span>
+      <span class="q-tag tag-e">Easy</span>
+      <span class="q-format">True or False</span>
+    </div>
+    <div class="q-prompt">True or False: <strong>632 &gt; 623</strong></div>
+    <div class="q-instr">💡 Compare digit by digit from left to right — hundreds first, then tens, then ones!</div>
+    <div class="tf-row" id="q3-opts">
+      <button class="tf-btn" onclick="selTF('q3','true')">👍 True</button>
+      <button class="tf-btn" onclick="selTF('q3','false')">👎 False</button>
+    </div>
+    <button class="check-btn" id="q3-check" onclick="chkTF('q3','true','Hundreds: 6=6 (tie) → Tens: 3>2 — we stop here! Since 3 tens > 2 tens, 632 > 623. The statement is TRUE!')" disabled>Check Answer</button>
+    <div class="feedback" id="q3-fb"></div>
+  </div>
+</div>
+
+<!-- Q4 Visual Base-10 Blocks -->
+<div class="q-card" id="q4">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 4</span>
+      <span class="q-tag tag-e">Easy</span>
+      <span class="q-tag tag-v">Visual</span>
+      <span class="q-format">Single Choice</span>
+    </div>
+    <div class="q-prompt">Look at the base-10 blocks below. What number do they represent?</div>
+    <div class="q-instr">🟪 Purple = hundreds · 🟩 Green = tens · 🟨 Yellow = ones</div>
+    <div class="blocks-vis">
+      <div class="blocks-label">Base-10 Blocks</div>
+      <div class="blocks-row">
+        <!-- 3 hundreds flats -->
+        <div class="block-group">
+          <div style="display:flex;gap:5px;">
+            <div class="flat-grid">
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+            </div>
+            <div class="flat-grid">
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+            </div>
+            <div class="flat-grid">
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+              <div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div><div class="flat-cell"></div>
+            </div>
+          </div>
+          <div class="block-lbl">3 flats<br>(hundreds)</div>
+        </div>
+        <div class="blocks-plus">+</div>
+        <!-- 4 rods -->
+        <div class="block-group">
+          <div style="display:flex;gap:4px;">
+            <div class="rod-stack"><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div></div>
+            <div class="rod-stack"><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div></div>
+            <div class="rod-stack"><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div></div>
+            <div class="rod-stack"><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div><div class="rod-cell"></div></div>
+          </div>
+          <div class="block-lbl">4 rods<br>(tens)</div>
+        </div>
+        <div class="blocks-plus">+</div>
+        <!-- 6 units -->
+        <div class="block-group">
+          <div class="unit-wrap"><div class="unit-cell"></div><div class="unit-cell"></div><div class="unit-cell"></div><div class="unit-cell"></div><div class="unit-cell"></div><div class="unit-cell"></div></div>
+          <div class="block-lbl">6 cubes<br>(ones)</div>
+        </div>
+        <div class="blocks-plus">=</div>
+        <div class="block-group" style="justify-content:center;">
+          <div class="block-num">?</div>
+          <div class="block-lbl">Standard<br>Form</div>
+        </div>
+      </div>
+    </div>
+    <div class="options" id="q4-opts">
+      <button class="opt" onclick="selOpt('q4','a')"><span class="opt-circle">A</span> 346</button>
+      <button class="opt" onclick="selOpt('q4','b')"><span class="opt-circle">B</span> 436</button>
+      <button class="opt" onclick="selOpt('q4','c')"><span class="opt-circle">C</span> 364</button>
+      <button class="opt" onclick="selOpt('q4','d')"><span class="opt-circle">D</span> 634</button>
+    </div>
+    <button class="check-btn" id="q4-check" onclick="chkMCQ('q4','a','3 flats = 300, 4 rods = 40, 6 cubes = 6. So 300 + 40 + 6 = 346. Always count from left to right: hundreds → tens → ones!')" disabled>Check Answer</button>
+    <div class="feedback" id="q4-fb"></div>
+  </div>
+</div>
+
+<!-- Q5 Fill expanded to standard -->
+<div class="q-card" id="q5">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 5</span>
+      <span class="q-tag tag-m">Medium</span>
+      <span class="q-format">Fill in the Blank</span>
+    </div>
+    <div class="q-prompt">Write the standard form of: <strong>700 + 20 + 9</strong></div>
+    <div class="q-instr">💡 Add the place value parts together to build the standard form number!</div>
+    <div class="fill-row">
+      <div class="fill-label">700 + 20 + 9 =</div>
+      <input class="fill-box" id="q5-in" type="number" placeholder="___">
+    </div>
+    <button class="check-btn" onclick="chkFill1('q5','q5-in',729,'700 is 7 hundreds · 20 is 2 tens · 9 is 9 ones. Put them together: 7 in hundreds, 2 in tens, 9 in ones → 729!')">Check Answer</button>
+    <div class="feedback" id="q5-fb"></div>
+  </div>
+</div>
+
+<!-- Q6 Symbol comparison (medium) -->
+<div class="q-card" id="q6">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 6</span>
+      <span class="q-tag tag-m">Medium</span>
+      <span class="q-format">Symbol Fill-in</span>
+    </div>
+    <div class="q-prompt">🏫 School A has <strong>485 students</strong> and School B has <strong>458 students</strong>. Place the correct symbol between them.</div>
+    <div class="q-instr">💡 Compare hundreds first, then tens, then ones — stop when you find a difference!</div>
+    <div class="num-display">
+      <div class="num-box">485</div>
+      <div class="sym-slot" id="q6-slot">?</div>
+      <div class="num-box">458</div>
+    </div>
+    <div class="sym-opts" id="q6-sym-opts">
+      <button class="sym-btn" onclick="selSym('q6','>')">&gt;</button>
+      <button class="sym-btn" onclick="selSym('q6','<')">&lt;</button>
+      <button class="sym-btn" onclick="selSym('q6','=')">=</button>
+    </div>
+    <button class="check-btn" id="q6-check" onclick="chkSym('q6','>','Hundreds: 4=4 (tie) → Tens: 8>5 — stop here! 8 tens > 5 tens, so 485 > 458. School A has more students!')" disabled>Check Answer</button>
+    <div class="feedback" id="q6-fb"></div>
+  </div>
+</div>
+
+<!-- Q7 Select All Medium -->
+<div class="q-card" id="q7">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 7</span>
+      <span class="q-tag tag-m">Medium</span>
+      <span class="q-format">Select All That Apply</span>
+    </div>
+    <div class="q-prompt">Which of the following numbers are <strong>greater than 650</strong>?</div>
+    <div class="multi-note">☑️ Select ALL answers that apply — there may be more than one!</div>
+    <div class="options" id="q7-opts">
+      <button class="opt multi-opt" onclick="togMulti('q7','a',this)"><span class="opt-circle">A</span> 605</button>
+      <button class="opt multi-opt" onclick="togMulti('q7','b',this)"><span class="opt-circle">B</span> 651</button>
+      <button class="opt multi-opt" onclick="togMulti('q7','c',this)"><span class="opt-circle">C</span> 649</button>
+      <button class="opt multi-opt" onclick="togMulti('q7','d',this)"><span class="opt-circle">D</span> 700</button>
+    </div>
+    <button class="check-btn" onclick="chkMulti('q7',['b','d'],'B ✓: 651 > 650 (tens: 5=5, ones: 1>0). D ✓: 700 > 650 (hundreds: 7>6). A ✗: 605 < 650 (tens: 0<5). C ✗: 649 < 650 (ones: 9... wait, tens: 4<5 — so 649 < 650).')">Check Answer</button>
+    <div class="feedback" id="q7-fb"></div>
+  </div>
+</div>
+
+<!-- Q8 Rounding Medium -->
+<div class="q-card" id="q8">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 8</span>
+      <span class="q-tag tag-m">Medium</span>
+      <span class="q-format">Single Choice</span>
+    </div>
+    <div class="money-badge">💰 Real-World: Money</div>
+    <div class="q-prompt">A bookstore had <strong>$847</strong> in sales on Saturday. The manager rounds to the nearest $10 for the report. What does she write?</div>
+    <div class="q-instr">💡 Look at the ones digit — is it less than 5 (round down) or 5 or more (round up)?</div>
+    <div class="options" id="q8-opts">
+      <button class="opt" onclick="selOpt('q8','a')"><span class="opt-circle">A</span> $840</button>
+      <button class="opt" onclick="selOpt('q8','b')"><span class="opt-circle">B</span> $850</button>
+      <button class="opt" onclick="selOpt('q8','c')"><span class="opt-circle">C</span> $900</button>
+      <button class="opt" onclick="selOpt('q8','d')"><span class="opt-circle">D</span> $800</button>
+    </div>
+    <button class="check-btn" id="q8-check" onclick="chkMCQ('q8','b','Ones digit of 847 is 7. Since 7 ≥ 5, round UP. Tens digit 4 + 1 = 5, ones become 0 → $850. Rounding ones digit ≥ 5 always rounds up!')" disabled>Check Answer</button>
+    <div class="feedback" id="q8-fb"></div>
+  </div>
+</div>
+
+<!-- Q9 Hard Fill expanded form -->
+<div class="q-card" id="q9">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="q-meta">
+      <span class="q-num">Question 9</span>
+      <span class="q-tag tag-h">Hard</span>
+      <span class="q-format">Fill in the Blank</span>
+    </div>
+    <div class="q-prompt">Write the <strong>expanded form</strong> of <strong>906</strong>. Fill in each missing value.</div>
+    <div class="q-instr">💡 Break the number apart by place value — hundreds, tens, and ones!</div>
+    <div class="fill-row" style="margin-bottom:10px;">
+      <div class="fill-label">906 =</div>
+      <input class="fill-box" id="q9a" type="number" placeholder="?00">
+      <div class="fill-label">+</div>
+      <input class="fill-box" id="q9b" type="number" placeholder="?0">
+      <div class="fill-label">+</div>
+      <input class="fill-box" id="q9c" type="number" placeholder="?">
+    </div>
+    <button class="check-btn" onclick="chkFill3('q9','q9a','q9b','q9c',900,0,6,'906 = 9 hundreds + 0 tens + 6 ones = 900 + 0 + 6. The zero in the tens place is a placeholder — it shows there are no tens but keeps the 9 in the hundreds position!')">Check Answer</button>
+    <div class="feedback" id="q9-fb"></div>
+  </div>
+</div>
+
+<!-- CHALLENGE DIVIDER -->
+<div class="sec-div"><div class="sec-div-label">⭐ Challenge Question</div></div>
+
+<!-- Q10 Challenge -->
+<div class="q-card challenge" id="q10">
+  <div class="q-accent"></div>
+  <div class="q-body">
+    <div class="challenge-banner"><span>⭐</span> Challenge — Think Like a Real Detective! <span>⭐</span><span style="margin-left:auto;font-size:11px;opacity:.7;">Multi-step reasoning</span></div>
+    <div class="q-meta">
+      <span class="q-num">Question 10</span>
+      <span class="q-tag tag-ch">Challenge</span>
+      <span class="q-format">Single Choice</span>
+    </div>
+    <div class="q-prompt">🔍 Detective Sara found a mystery 3-digit number with these clues:
+      <span style="display:block;margin:10px 0;padding:10px 14px;background:var(--purple-pale);border-radius:var(--r-sm);font-size:14px;color:var(--purple);line-height:1.8;">
+        📌 Clue 1: The hundreds digit is <strong>5</strong>.<br>
+        📌 Clue 2: The number is <strong>greater than 560</strong>.<br>
+        📌 Clue 3: When rounded to the nearest 10, it gives <strong>570</strong>.<br>
+        📌 Clue 4: The ones digit is <strong>3</strong>.
+      </span>
+      What is the mystery number?
+    </div>
+    <div class="q-instr">💡 Work through each clue step by step — eliminate options that don't fit all four clues!</div>
+    <div class="options" id="q10-opts">
+      <button class="opt" onclick="selOpt('q10','a')"><span class="opt-circle">A</span> 563</button>
+      <button class="opt" onclick="selOpt('q10','b')"><span class="opt-circle">B</span> 573</button>
+      <button class="opt" onclick="selOpt('q10','c')"><span class="opt-circle">C</span> 553</button>
+      <button class="opt" onclick="selOpt('q10','d')"><span class="opt-circle">D</span> 583</button>
+    </div>
+    <button class="check-btn" id="q10-check" onclick="chkMCQ('q10','b','Clue 1: hundreds=5 → all options qualify. Clue 2: > 560 → eliminates 553 (C). Clue 4: ones=3 → all remaining qualify. Clue 3: rounds to 570 → tens digit must be 7 (tens=7, ones=3 → 7<5? No — ones=3<5 so round down to 570 ✓). 573 rounds to 570 ✓. Answer: 573!')" disabled>Check Answer</button>
+    <div class="feedback" id="q10-fb"></div>
+  </div>
+</div>
+
+<!-- SCORE CARD -->
+<div class="score-card" id="score-card">
+  <div class="score-trophy" id="score-trophy">🏆</div>
+  <div class="score-num" id="score-num">0/10</div>
+  <div class="score-msg" id="score-msg">Keep going!</div>
+  <div class="score-sub" id="score-sub"></div>
+  <button class="retry-btn" onclick="location.reload()">↺ Try Again</button>
+</div>
+
+</div><!-- /page -->
+
+<script>
+const state={q1:{sel:null,done:false},q2:{sel:null,done:false},q3:{sel:null,done:false},q4:{sel:null,done:false},q5:{done:false},q6:{sel:null,done:false},q7:{sel:[],done:false},q8:{sel:null,done:false},q9:{done:false},q10:{sel:null,done:false}};
+let answered=0,correct=0;
+const TOTAL=10;
+const LTRS=['a','b','c','d'];
+
+function updProg(){
+  document.getElementById('ans-count').textContent=answered;
+  document.getElementById('cor-count').textContent=correct;
+  const pct=Math.round((answered/TOTAL)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'% complete';
+  if(answered===TOTAL)setTimeout(showScore,700);
+}
+
+function showFB(id,ok,msg){
+  const el=document.getElementById(id+'-fb');
+  el.className='feedback show '+(ok?'correct':'wrong');
+  el.innerHTML=(ok?'<strong>✅ Correct!</strong> ':'<strong>❌ Not quite.</strong> ')+msg;
+}
+
+function showScore(){
+  const sc=document.getElementById('score-card');sc.classList.add('show');
+  const p=Math.round((correct/TOTAL)*100);
+  const [t,m,s]=p>=90?['🌟','Outstanding Detective Work!','You mastered place value, comparing, and rounding!']:
+    p>=70?['🥈','Great Detecting!','You have strong number sense — review a couple of clues and try again!']:
+    p>=50?['🥉','Good Effort!','Revisit your place value chart and try once more!']:
+           ['📖','Keep Investigating!','Review the reference strip at the top and give it another shot!'];
+  document.getElementById('score-num').textContent=correct+'/'+TOTAL;
+  document.getElementById('score-trophy').textContent=t;
+  document.getElementById('score-msg').textContent=m;
+  document.getElementById('score-sub').textContent='You answered '+correct+' out of '+TOTAL+' correctly ('+p+'%).';
+  sc.scrollIntoView({behavior:'smooth'});
+}
+
+function selOpt(qid,val){
+  if(state[qid].done)return;
+  state[qid].sel=val;
+  document.querySelectorAll('#'+qid+'-opts .opt').forEach((b,i)=>b.classList.toggle('selected',LTRS[i]===val));
+  document.getElementById(qid+'-check').disabled=false;
+}
+
+function chkMCQ(qid,ca,explanation){
+  if(state[qid].done)return;
+  state[qid].done=true;answered++;
+  const ok=state[qid].sel===ca;if(ok)correct++;
+  document.querySelectorAll('#'+qid+'-opts .opt').forEach((b,i)=>{
+    b.classList.remove('selected');b.disabled=true;
+    if(LTRS[i]===ca)b.classList.add('correct');
+    else if(LTRS[i]===state[qid].sel&&!ok)b.classList.add('wrong');
+  });
+  document.getElementById(qid+'-check').disabled=true;
+  showFB(qid,ok,explanation);updProg();
+}
+
+function selTF(qid,val){
+  if(state[qid].done)return;
+  state[qid].sel=val;
+  document.querySelectorAll('#'+qid+'-opts .tf-btn').forEach((b,i)=>b.classList.toggle('selected',(i===0&&val==='true')||(i===1&&val==='false')));
+  document.getElementById(qid+'-check').disabled=false;
+}
+
+function chkTF(qid,ca,explanation){
+  if(state[qid].done)return;
+  state[qid].done=true;answered++;
+  const sel=state[qid].sel,ok=sel===ca;if(ok)correct++;
+  document.querySelectorAll('#'+qid+'-opts .tf-btn').forEach((b,i)=>{
+    b.disabled=true;b.classList.remove('selected');
+    const bv=i===0?'true':'false';
+    if(bv===ca)b.classList.add('correct');
+    else if(bv===sel&&!ok)b.classList.add('wrong');
+  });
+  document.getElementById(qid+'-check').disabled=true;
+  showFB(qid,ok,explanation);updProg();
+}
+
+function togMulti(qid,val,btn){
+  if(state[qid].done)return;
+  const idx=state[qid].sel.indexOf(val);
+  if(idx===-1){state[qid].sel.push(val);btn.classList.add('selected');}
+  else{state[qid].sel.splice(idx,1);btn.classList.remove('selected');}
+}
+
+function chkMulti(qid,ca,explanation){
+  if(state[qid].done)return;
+  state[qid].done=true;answered++;
+  const sel=state[qid].sel;
+  const ok=ca.length===sel.length&&ca.every(x=>sel.includes(x));if(ok)correct++;
+  document.querySelectorAll('#'+qid+'-opts .opt').forEach((b,i)=>{
+    b.classList.remove('selected');b.disabled=true;
+    if(ca.includes(LTRS[i]))b.classList.add('correct');
+    else if(sel.includes(LTRS[i]))b.classList.add('wrong');
+  });
+  showFB(qid,ok,explanation);updProg();
+}
+
+/* Symbol comparison */
+const symState={q6:{sel:null}};
+
+function selSym(qid,val){
+  if(state[qid].done)return;
+  symState[qid].sel=val;
+  state[qid].sel=val;
+  const slot=document.getElementById(qid+'-slot');
+  slot.textContent=val==='>'?'>':val==='<'?'<':'=';
+  slot.className='sym-slot filled';
+  document.querySelectorAll('#'+qid+'-sym-opts .sym-btn').forEach(b=>b.classList.remove('sel-sym'));
+  const btns=document.querySelectorAll('#'+qid+'-sym-opts .sym-btn');
+  const map={'>':0,'<':1,'=':2};
+  btns[map[val]].classList.add('sel-sym');
+  document.getElementById(qid+'-check').disabled=false;
+}
+
+function chkSym(qid,ca,explanation){
+  if(state[qid].done)return;
+  state[qid].done=true;answered++;
+  const sel=state[qid].sel,ok=sel===ca;if(ok)correct++;
+  const slot=document.getElementById(qid+'-slot');
+  slot.className='sym-slot '+(ok?'cor-slot':'wrg-slot');
+  const btns=document.querySelectorAll('#'+qid+'-sym-opts .sym-btn');
+  const map={'>':0,'<':1,'=':2};
+  btns.forEach(b=>{b.disabled=true;b.classList.remove('sel-sym');});
+  btns[map[ca]].classList.add('cor-sym');
+  if(!ok&&sel&&map[sel]!==undefined)btns[map[sel]].classList.add('wrg-sym');
+  document.getElementById(qid+'-check').disabled=true;
+  showFB(qid,ok,explanation);updProg();
+}
+
+function chkFill1(qid,inputId,correctVal,explanation){
+  if(state[qid].done)return;
+  state[qid].done=true;answered++;
+  const inp=document.getElementById(inputId);
+  const ok=parseInt(inp.value)===correctVal;if(ok)correct++;
+  inp.classList.add(ok?'correct':'wrong');inp.disabled=true;
+  showFB(qid,ok,(ok?'':('The answer is '+correctVal+'. '))+explanation);updProg();
+}
+
+function chkFill3(qid,idA,idB,idC,vA,vB,vC,explanation){
+  if(state[qid].done)return;
+  state[qid].done=true;answered++;
+  const a=document.getElementById(idA),b=document.getElementById(idB),c=document.getElementById(idC);
+  const okA=parseInt(a.value)===vA,okB=parseInt(b.value)===vB,okC=parseInt(c.value)===vC;
+  const ok=okA&&okB&&okC;if(ok)correct++;
+  a.classList.add(okA?'correct':'wrong');a.disabled=true;
+  b.classList.add(okB?'correct':'wrong');b.disabled=true;
+  c.classList.add(okC?'correct':'wrong');c.disabled=true;
+  showFB(qid,ok,(ok?'':('Correct: '+vA+' + '+vB+' + '+vC+'. '))+explanation);updProg();
+}
+</script>
+</body>
+</html>
