@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Detective — MyMasteryLab Revision Cards</title>
+<style>
+  :root{
+    --teal:#008080;
+    --light-teal:#C3EAED;
+    --dark-teal:#0B6162;
+    --light-orange:#FFA07A;
+    --burnt-orange:#D97745;
+    --white:#ffffff;
+    --ink:#1c3a3a;
+    --ink-soft:#4a6666;
+    --success:#2f9e5b;
+    --error:#d9534f;
+    --radius-lg:22px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    --shadow-soft:0 10px 30px rgba(11,97,98,0.12);
+    --shadow-card:0 6px 18px rgba(11,97,98,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Trebuchet MS','Segoe UI',system-ui,-apple-system,sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(195,234,237,0.9), transparent 45%),
+      radial-gradient(circle at 85% 0%, rgba(255,160,122,0.25), transparent 40%),
+      linear-gradient(180deg,#f4fbfb 0%, #eef8f8 100%);
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:80px;
+    font-size:16px;
+  }
+  a{color:inherit;}
+  .app{max-width:1040px;margin:0 auto;padding:20px 20px 48px;}
+
+  /* ---------- HEADER / HUD ---------- */
+  .hud{
+    position:sticky; top:0; z-index:50;
+    background:linear-gradient(135deg,var(--teal),var(--dark-teal));
+    color:#fff; border-radius:0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow:var(--shadow-soft);
+    padding:18px 22px 20px;
+    margin:-20px -20px 26px;
+  }
+  .hud-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .hud-title{display:flex;align-items:center;gap:12px;}
+  .hud-badge{
+    width:52px;height:52px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, var(--light-orange) 70%);
+    display:flex;align-items:center;justify-content:center;font-size:27px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.25);
+    flex:none;
+  }
+  .hud-title h1{font-size:19px;margin:0;line-height:1.3;}
+  .hud-title p{font-size:12.5px;margin:4px 0 0;opacity:0.88;}
+  .hud-stats{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .stat-pill{
+    background:rgba(255,255,255,0.16);
+    border:1px solid rgba(255,255,255,0.3);
+    border-radius:999px; padding:9px 15px;
+    font-size:14px; font-weight:700; display:flex; align-items:center; gap:7px;
+    backdrop-filter:blur(2px);
+  }
+  .progress-track{
+    margin-top:16px; height:12px; border-radius:999px;
+    background:rgba(255,255,255,0.22); overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg,var(--light-orange),#ffd166);
+    border-radius:999px; transition:width .5s ease;
+  }
+  .section-nav{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;}
+  .section-dot{
+    font-size:12.5px; font-weight:700; letter-spacing:.2px;
+    padding:9px 14px; border-radius:999px; cursor:pointer;
+    background:rgba(255,255,255,0.14); color:#fff; border:1px solid rgba(255,255,255,0.28);
+    transition:background .2s ease, transform .15s ease;
+    min-height:38px; display:flex; align-items:center;
+  }
+  .section-dot.active{background:#fff; color:var(--dark-teal);}
+  .section-dot.done::after{content:" ✓";}
+  .section-dot:hover{transform:translateY(-1px); background:rgba(255,255,255,0.24);}
+
+  /* ---------- STORY INTRO ---------- */
+  .story-intro{
+    background:var(--white); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-soft); padding:28px 28px 26px;
+    margin-bottom:28px; position:relative; overflow:hidden;
+    border:1px solid rgba(0,128,128,0.08);
+  }
+  .story-intro::before{
+    content:"🔎"; position:absolute; right:-10px; top:-18px; font-size:120px; opacity:0.07;
+  }
+  .story-intro h2{color:var(--dark-teal); margin:0 0 12px; font-size:23px; line-height:1.35;}
+  .story-intro p{color:var(--ink-soft); line-height:1.65; font-size:15.5px; margin:0 0 12px; max-width:640px;}
+  .goals{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+  .goal-chip{
+    background:var(--light-teal); color:var(--dark-teal); font-size:13.5px; font-weight:700;
+    padding:9px 15px; border-radius:999px; border:1px solid rgba(11,97,98,0.12);
+  }
+  .start-btn{
+    margin-top:22px; background:linear-gradient(135deg,var(--burnt-orange),var(--light-orange));
+    color:#fff; border:none; padding:15px 28px; border-radius:999px; font-weight:800;
+    font-size:16px; cursor:pointer; box-shadow:0 6px 16px rgba(217,119,69,0.35);
+    transition:transform .15s ease; min-height:52px;
+  }
+  .start-btn:hover{transform:translateY(-2px);}
+
+  /* ---------- SECTION BLOCK ---------- */
+  .section-block{margin-bottom:44px;}
+  .section-story{
+    display:flex; gap:14px; align-items:flex-start;
+    background:linear-gradient(135deg, var(--light-teal), #eaf7f7);
+    border-left:5px solid var(--teal);
+    border-radius:var(--radius-md);
+    padding:18px 20px; margin-bottom:22px;
+    box-shadow:var(--shadow-card);
+  }
+  .section-story .icon{font-size:30px; flex:none;}
+  .section-story h3{margin:0 0 5px; color:var(--dark-teal); font-size:18px;}
+  .section-story p{margin:0; font-size:14px; color:var(--ink-soft); line-height:1.6;}
+
+  .cards-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:22px;
+  }
+
+  /* ---------- CARD ---------- */
+  .card{
+    background:var(--white); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-card); padding:24px 24px 22px;
+    border:1px solid rgba(0,128,128,0.08);
+    display:flex; flex-direction:column; gap:14px;
+    min-height:260px; position:relative;
+    transition:box-shadow .2s ease, transform .2s ease;
+  }
+  .card:hover{box-shadow:0 12px 26px rgba(11,97,98,0.16); transform:translateY(-2px);}
+  .card.solved{border-color:rgba(47,158,91,0.4); background:linear-gradient(180deg,#fff, #f3fbf5);}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .type-tag{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.4px;
+    color:var(--burnt-orange); background:#fff2ea; padding:5px 10px; border-radius:999px;
+    border:1px solid rgba(217,119,69,0.25);
+  }
+  .xp-tag{font-size:12px; font-weight:700; color:var(--dark-teal); opacity:.75;}
+  .card h4{margin:0; font-size:17.5px; color:var(--dark-teal); line-height:1.35;}
+  .card-body{font-size:15px; color:var(--ink); line-height:1.6; flex:1; display:flex; flex-direction:column; gap:10px;}
+  .card-body > p{margin:0;}
+  .card-visual{
+    background:var(--light-teal); border-radius:var(--radius-sm); padding:12px;
+    font-family:'Consolas','Courier New',monospace; font-size:14px; color:var(--dark-teal);
+    margin:2px 0;
+  }
+
+  /* place value chart */
+  .pv-chart{display:flex; gap:12px; margin:10px 0 4px;}
+  .pv-col{flex:1; text-align:center;}
+  .pv-col label{display:block; font-size:11px; font-weight:800; color:var(--dark-teal); margin-bottom:6px; text-transform:uppercase; letter-spacing:.3px;}
+  .pv-col input{
+    width:100%; text-align:center; font-size:24px; font-weight:800; padding:12px 0;
+    border-radius:14px; border:2px solid var(--light-teal); color:var(--dark-teal);
+    background:#fbfffe; min-height:52px;
+  }
+  .pv-col input:focus{outline:none; border-color:var(--teal);}
+
+  /* number line */
+  .numline{position:relative; height:78px; margin:26px 6px 6px;}
+  .numline .line{position:absolute; left:0; right:0; top:34px; height:4px; background:var(--light-teal); border-radius:4px;}
+  .numline .tick{
+    position:absolute; top:18px; transform:translateX(-50%);
+    width:34px; height:34px; border-radius:50%; background:#fff; border:2.5px solid var(--teal);
+    color:var(--dark-teal); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:transform .15s ease, background .15s ease;
+  }
+  .numline .tick:hover{transform:translateX(-50%) scale(1.12);}
+  .numline .tick.picked{background:var(--burnt-orange); border-color:var(--burnt-orange); color:#fff;}
+  .numline .marker{
+    position:absolute; top:-14px; transform:translateX(-50%); font-size:16px;
+  }
+
+  /* option buttons (mcq / truefalse / compare) */
+  .opts{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;}
+  .opt-btn{
+    background:#fff; border:2px solid var(--light-teal); color:var(--dark-teal);
+    padding:12px 18px; border-radius:14px; font-weight:700; font-size:14.5px;
+    cursor:pointer; transition:all .15s ease; min-height:46px;
+  }
+  .opt-btn:hover{border-color:var(--teal); background:var(--light-teal);}
+  .opt-btn.correct{background:var(--success); border-color:var(--success); color:#fff;}
+  .opt-btn.wrong{background:var(--error); border-color:var(--error); color:#fff; animation:shake .35s;}
+  .opt-btn[disabled]{cursor:default;}
+
+  .compare-row{display:flex; align-items:center; justify-content:center; gap:18px; margin:14px 0 4px; flex-wrap:wrap;}
+  .compare-num{font-size:28px; font-weight:800; color:var(--dark-teal);}
+  .compare-sym{display:flex; gap:8px;}
+  .sym-btn{
+    width:52px; height:52px; border-radius:14px; border:2.5px solid var(--light-teal);
+    background:#fff; color:var(--dark-teal); font-size:23px; font-weight:800; cursor:pointer;
+  }
+  .sym-btn:hover{background:var(--light-teal); border-color:var(--teal);}
+  .sym-btn.correct{background:var(--success); border-color:var(--success); color:#fff;}
+  .sym-btn.wrong{background:var(--error); border-color:var(--error); color:#fff; animation:shake .35s;}
+
+  .fill-row{display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;}
+  .fill-row input{
+    flex:1; min-width:160px; padding:13px 15px; border-radius:14px; border:2px solid var(--light-teal);
+    font-size:15px; color:var(--dark-teal); font-weight:700; background:#fbfffe; min-height:48px;
+  }
+  .fill-row input:focus{outline:none; border-color:var(--teal);}
+  .check-btn{
+    background:var(--teal); color:#fff; border:none; padding:13px 20px; border-radius:14px;
+    font-weight:800; cursor:pointer; font-size:14.5px; transition:background .15s ease; min-height:48px;
+  }
+  .check-btn:hover{background:var(--dark-teal);}
+
+  .feedback{font-size:13.5px; font-weight:700; min-height:18px; margin-top:2px;}
+  .feedback.ok{color:var(--success);}
+  .feedback.bad{color:var(--error);}
+
+  .reveal-btn{
+    margin-top:auto; width:100%;
+    background:#fff2ea; color:var(--burnt-orange); border:2px solid rgba(217,119,69,0.35);
+    border-top:1px dashed rgba(217,119,69,0.3);
+    padding:16px 16px 13px; border-radius:14px; font-weight:800; font-size:14px; cursor:pointer;
+    min-height:48px;
+  }
+  .reveal-btn:hover{background:#ffe6d6; border-color:var(--burnt-orange);}
+
+  .back-panel{
+    display:none; background:linear-gradient(135deg,#fff, var(--light-teal));
+    border-radius:var(--radius-md); padding:16px 18px; font-size:14px; color:var(--ink);
+    border:1px solid rgba(0,128,128,0.15); line-height:1.6;
+  }
+  .back-panel.show{display:block; animation:flipIn .35s ease;}
+  .back-panel .story-line{
+    margin-top:10px; padding-top:10px; border-top:1px dashed rgba(11,97,98,0.25);
+    font-style:italic; color:var(--dark-teal); font-size:13.5px;
+  }
+
+  .stars{position:absolute; top:16px; right:18px; font-size:14px; color:var(--burnt-orange); opacity:0; transition:opacity .3s ease;}
+  .stars.show{opacity:1;}
+
+  @keyframes shake{
+    0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}
+  }
+  @keyframes flipIn{
+    from{opacity:0; transform:rotateX(-8deg) translateY(4px);}
+    to{opacity:1; transform:rotateX(0) translateY(0);}
+  }
+  @keyframes pop{
+    0%{transform:scale(1);} 50%{transform:scale(1.18);} 100%{transform:scale(1);}
+  }
+  .pop{animation:pop .4s ease;}
+
+  /* confetti */
+  .confetti-piece{
+    position:fixed; top:-10px; width:8px; height:14px; z-index:200; pointer-events:none;
+    border-radius:2px; animation:fall linear forwards;
+  }
+  @keyframes fall{ to{ transform:translateY(105vh) rotate(540deg); opacity:0.2; } }
+
+  /* ---------- FINAL REVIEW ---------- */
+  .final-card{
+    background:linear-gradient(135deg,var(--dark-teal), var(--teal));
+    color:#fff; border-radius:var(--radius-lg); padding:34px 28px;
+    text-align:center; box-shadow:var(--shadow-soft); position:relative; overflow:hidden;
+  }
+  .final-card::before{content:"⭐"; position:absolute; font-size:140px; opacity:.08; left:-20px; top:-30px;}
+  .final-card h2{margin:4px 0 12px; font-size:25px;}
+  .final-card p{opacity:.92; font-size:15px; line-height:1.65; max-width:560px; margin:0 auto 16px;}
+  .badge-unlock{
+    display:inline-flex; flex-direction:column; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.35);
+    padding:20px 32px; border-radius:var(--radius-md); margin:18px 0;
+  }
+  .badge-unlock .medal{font-size:50px;}
+  .badge-unlock .label{font-weight:800; font-size:15px;}
+  .final-stats{display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-top:12px;}
+  .final-stats .fstat{background:rgba(255,255,255,0.14); padding:12px 18px; border-radius:var(--radius-sm); font-size:14px; font-weight:700;}
+  .restart-btn{
+    margin-top:20px; background:#fff; color:var(--dark-teal); border:none; padding:14px 26px;
+    border-radius:999px; font-weight:800; cursor:pointer; font-size:14.5px; min-height:48px;
+  }
+
+  @media (max-width:520px){
+    .app{padding:16px 14px 40px;}
+    .hud{padding:16px 16px 18px; margin:-16px -14px 22px;}
+    .hud-top{flex-direction:column; align-items:flex-start;}
+    .cards-grid{grid-template-columns:1fr;}
+    .compare-row{gap:10px;}
+    .compare-num{font-size:22px;}
+    .card{padding:20px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= HUD ================= -->
+  <div class="hud">
+    <div class="hud-top">
+      <div class="hud-title">
+        <div class="hud-badge">🕵️</div>
+        <div>
+          <h1>Number Detective: The Case of the Missing Digits</h1>
+          <p>Grade 4 · Place Value &amp; Number Sense · MyMasteryLab</p>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <div class="stat-pill">⭐ <span id="starCount">0</span></div>
+        <div class="stat-pill">🏅 <span id="xpCount">0</span> XP</div>
+        <div class="stat-pill">📁 <span id="caseCount">0</span>/<span id="caseTotal">0</span> Clues</div>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="section-nav" id="sectionNav"></div>
+  </div>
+
+  <!-- ================= STORY INTRO ================= -->
+  <div class="story-intro" id="storyIntro">
+    <h2>🗂️ Case File #372: The Detective Bureau Needs You</h2>
+    <p>Detective, a mysterious note arrived at MyMasteryLab HQ. Someone has been mixing up numbers all over town — comparing them wrong, misplacing digits, rounding to the wrong stop! Only a sharp-eyed Number Detective can crack each clue, restore the digits to their rightful places, and close the case.</p>
+    <p>Every card you solve uncovers a new clue. Flip it, solve it, and the case file grows. Ready to pick up your badge and magnifying glass?</p>
+    <div class="goals">
+      <span class="goal-chip">🔢 Read &amp; write numbers to 1,000</span>
+      <span class="goal-chip">⚖️ Compare using &gt;, &lt;, =</span>
+      <span class="goal-chip">📍 Identify place value</span>
+      <span class="goal-chip">🎯 Round to the nearest 10</span>
+    </div>
+    <button class="start-btn" id="startBtn">🔦 Begin the Investigation</button>
+  </div>
+
+  <div id="sectionsContainer"></div>
+
+</div>
+
+<script>
+/* ================= CARD DATA ================= */
+const SECTIONS = [
+  {key:'remember', title:'Section 1 · Remember', icon:'🗃️',
+    story:'You step into the Detective Bureau archive room. Dusty case files line the shelves — first, brush up on your detective vocabulary before the real clues begin.'},
+  {key:'understand', title:'Section 2 · Understand', icon:'🔬',
+    story:'The Chief Detective hands you a magnifying glass. "Look closely," she says. "Every digit has a secret role depending on where it stands."'},
+  {key:'visualize', title:'Section 3 · Visualize', icon:'🧩',
+    story:'You unlock the Evidence Room. Place value charts and number lines are pinned to the wall — map out exactly where each digit and each number belongs.'},
+  {key:'tryit', title:'Section 4 · Try It', icon:'🕵️',
+    story:'Time for fieldwork! Real case files land on your desk — compare suspects\' numbers and translate mystery digits into words.'},
+  {key:'challenge', title:'Section 5 · Challenge Yourself', icon:'🧠',
+    story:'A tougher case arrives from Headquarters. These clues need sharper reasoning — read every detail before you decide.'},
+  {key:'master', title:'Section 6 · Master Check', icon:'🏆',
+    story:'Final interrogation! A suspect named Emma claims she compared two numbers correctly... but something is off. Can you catch every mistake?'}
+];
+
+const CARDS = [
+/* ---------------- SECTION 1: REMEMBER ---------------- */
+{section:'remember', type:'Vocabulary Card', title:'Case Term: Place Value',
+  front:'What does "place value" mean?',
+  interaction:{kind:'mcq', options:['The value of a digit based on its position','How many digits a number has','The color used to write a number','The sound a number makes'], correct:0},
+  back:'Place value is the value a digit has because of where it sits in a number — hundreds, tens, or ones.',
+  story:'Clue #1 filed: every digit has an address, and that address is its value.'},
+
+{section:'remember', type:'Vocabulary Card', title:'Case Term: Digit',
+  front:'Which of these is a single digit?',
+  interaction:{kind:'mcq', options:['372','45','7','1,000'], correct:2},
+  back:'A digit is one single number symbol, 0–9. "7" is a digit — "372" is a 3-digit number made of three digits: 3, 7, and 2.',
+  story:'Clue #2 filed: digits are the building blocks detectives use to construct every number.'},
+
+{section:'remember', type:'Vocabulary Card', title:'Case Term: Comparing Symbols',
+  front:'Fill in the blank: The symbol > means "________ than."',
+  interaction:{kind:'fillblank', accept:['greater','greater than'], placeholder:'type your answer'},
+  back:'"Greater than" (>) shows the first number is bigger. "Less than" (<) shows it\'s smaller. "Equal to" (=) shows they match exactly.',
+  story:'Clue #3 filed: symbols are secret detective code for "bigger," "smaller," and "the same."'},
+
+{section:'remember', type:'Quick Recall Card', title:'True or False',
+  front:'320 = 320',
+  interaction:{kind:'truefalse', correct:true},
+  back:'True! Both numbers have exactly the same digits in exactly the same positions, so they are equal.',
+  story:'Clue #4 filed: matching numbers, matching case files — equal every time.'},
+
+{section:'remember', type:'Quick Recall Card', title:'Rounding Recall',
+  front:'Round 67 to the nearest 10. Tap the correct stop on the number line.',
+  interaction:{kind:'numline', min:60, max:80, step:10, target:'over', number:67, correct:70},
+  back:'67 is closer to 70 than to 60 (because the ones digit, 7, is 5 or more), so it rounds up to 70.',
+  story:'Clue #5 filed: when the ones digit is 5 or higher, round up to the next stop.'},
+
+/* ---------------- SECTION 2: UNDERSTAND ---------------- */
+{section:'understand', type:'Concept Card', title:'Big Idea: Numbers Have Structure',
+  front:'Tap to reveal the Chief Detective\'s big idea about numbers.',
+  interaction:{kind:'reveal'},
+  back:'Every digit has a position, and that position gives it meaning. In 456: the 4 is worth 400 (hundreds), the 5 is worth 50 (tens), and the 6 is worth 6 (ones). 400 + 50 + 6 = 456.',
+  story:'The Chief taps the evidence board: "Read the position first. The value follows."'},
+
+{section:'understand', type:'Think Card', title:'The Actor on a Stage',
+  front:'Tap to reveal the detective\'s memory trick for place value.',
+  interaction:{kind:'reveal'},
+  back:'A digit is like an actor on a stage 🎭 — its role changes depending on where it stands. The digit 4 is worth 400 in 456, only 40 in 245, and just 4 in 324. Same actor, different role!',
+  story:'You pin the "Actor on a Stage" sketch to your case board — it\'ll help crack tricky clues later.'},
+
+{section:'understand', type:'Example Card', title:'Worked Example: Same Digit, New Role',
+  front:'In the number 245, what is the value of the digit 4?',
+  interaction:{kind:'mcq', options:['4','40','400','4,000'], correct:1},
+  back:'In 245, the 4 sits in the tens place, so it is worth 40 — not 400 like it was in 456. Position changes value!',
+  story:'Clue confirmed: the same digit "4" gave two different testimonies depending on where it stood.'},
+
+{section:'understand', type:'Real Life Card', title:'The Fruit Basket Clue',
+  front:'A fruit basket has 300 apples, 70 oranges, and 2 bananas. Tap to reveal the total.',
+  interaction:{kind:'reveal'},
+  back:'300 + 70 + 2 = 372 pieces of fruit — the hundreds, tens, and ones add up exactly like a place value chart.',
+  story:'Even fruit baskets follow detective logic: hundreds + tens + ones = the whole number.',
+  },
+
+/* ---------------- SECTION 3: VISUALIZE ---------------- */
+{section:'visualize', type:'Visual Card', title:'Place Value Chart: 372',
+  front:'Sort the digits of 372 into the correct evidence boxes.',
+  interaction:{kind:'placevalue', number:372},
+  back:'372 = 3 hundreds, 7 tens, 2 ones (300 + 70 + 2).',
+  story:'Evidence logged: 3 in the hundreds box, 7 in the tens box, 2 in the ones box.'},
+
+{section:'visualize', type:'Visual Card', title:'Place Value Chart: 618',
+  front:'Sort the digits of 618 into the correct evidence boxes.',
+  interaction:{kind:'placevalue', number:618},
+  back:'618 = 6 hundreds, 1 ten, 8 ones (600 + 10 + 8).',
+  story:'Second chart complete — your evidence board is filling up fast, Detective.'},
+
+{section:'visualize', type:'Visual Card', title:'Number Line Clue: Round 83',
+  front:'Round 83 to the nearest 10 using the number line.',
+  interaction:{kind:'numline', min:80, max:90, step:10, number:83, correct:80},
+  back:'83 is closer to 80 than 90 (the ones digit, 3, is less than 5), so it rounds down to 80.',
+  story:'The trail leads back toward 80 — a rounding-down clue.'},
+
+{section:'visualize', type:'Visual Card', title:'Number Line Clue: Round 48',
+  front:'Round 48 to the nearest 10 using the number line.',
+  interaction:{kind:'numline', min:40, max:50, step:10, number:48, correct:50},
+  back:'48 is closer to 50 than 40 (the ones digit, 8, is 5 or more), so it rounds up to 50.',
+  story:'This trail leads forward to 50 — a rounding-up clue.'},
+
+{section:'visualize', type:'Compare Card', title:'Visual Comparison: 234 vs 243',
+  front:'Which symbol correctly compares these two numbers?',
+  interaction:{kind:'compare', left:234, right:243},
+  back:'234 < 243. The hundreds digits match (2 = 2), but in the tens place, 3 is less than 4 — so 234 is smaller.',
+  story:'Same hundreds digit, different tens digit — that\'s where the real clue was hiding.'},
+
+/* ---------------- SECTION 4: TRY IT ---------------- */
+{section:'tryit', type:'Compare Card', title:'Field Case: 412 vs 398',
+  front:'Which symbol correctly compares these two numbers?',
+  interaction:{kind:'compare', left:412, right:398},
+  back:'412 > 398. 412 has 4 hundreds while 398 has only 3 hundreds — more hundreds means a bigger number.',
+  story:'Case closed: always check the hundreds digit first.'},
+
+{section:'tryit', type:'Compare Card', title:'Field Case: 521 vs 512',
+  front:'Which symbol correctly compares these two numbers?',
+  interaction:{kind:'compare', left:521, right:512},
+  back:'521 > 512. Hundreds match (5 = 5), but in the tens place, 2 is greater than 1.',
+  story:'A close call — the tens digit was the deciding clue.'},
+
+{section:'tryit', type:'Quick Recall Card', title:'Field Case: Round 94',
+  front:'Round 94 to the nearest 10 using the number line.',
+  interaction:{kind:'numline', min:90, max:100, step:10, number:94, correct:90},
+  back:'94 is closer to 90 than 100 (the ones digit, 4, is less than 5), so it rounds down to 90.',
+  story:'Clue filed: 94 rounds back down to 90.'},
+
+{section:'tryit', type:'Puzzle Card', title:'Decode the Number: 456',
+  front:'Write 456 in words.',
+  interaction:{kind:'fillblank', accept:['four hundred fifty-six','four hundred fifty six','four hundred and fifty-six','four hundred and fifty six'], placeholder:'type the number in words'},
+  back:'456 = four hundred fifty-six.',
+  story:'Decoded and filed in the case report.'},
+
+{section:'tryit', type:'Puzzle Card', title:'Decode the Number: 345',
+  front:'Write 345 in words.',
+  interaction:{kind:'fillblank', accept:['three hundred forty-five','three hundred forty five','three hundred and forty-five','three hundred and forty five'], placeholder:'type the number in words'},
+  back:'345 = three hundred forty-five.',
+  story:'Decoded and filed — this number will matter again in the final interrogation.'},
+
+{section:'tryit', type:'Common Mistake Card', title:'Suspect Statement Check',
+  front:'True or False: 345 > 354',
+  interaction:{kind:'truefalse', correct:false},
+  back:'False! In 345 vs 354, the hundreds digits match (3 = 3), but in the tens place, 4 is less than 5. So 345 < 354, not greater.',
+  story:'A false statement caught red-handed — remember this one for the final interrogation.'},
+
+/* ---------------- SECTION 5: CHALLENGE YOURSELF ---------------- */
+{section:'challenge', type:'Puzzle Card', title:'The Library Case',
+  front:'A classroom has 486 books. What is the value of the digit 8?',
+  interaction:{kind:'mcq', options:['8','80','800','8,000'], correct:1},
+  back:'In 486, the 8 sits in the tens place, so it is worth 80.',
+  story:'The library case is closed — 8 stood in the tens box this time.'},
+
+{section:'challenge', type:'Compare Card', title:'The Switched-Digit Case: 607 vs 670',
+  front:'Which symbol correctly compares these two numbers?',
+  interaction:{kind:'compare', left:607, right:670},
+  back:'607 < 670. Hundreds match (6 = 6), but in the tens place, 0 is less than 7 — a classic switched-digit trick.',
+  story:'The digits 0 and 7 swapped places, and that changed everything.'},
+
+{section:'challenge', type:'Puzzle Card', title:'Rounding Stakeout: 148',
+  front:'Round 148 to the nearest 10 using the number line.',
+  interaction:{kind:'numline', min:140, max:150, step:10, number:148, correct:150},
+  back:'148 is closer to 150 than 140 (the ones digit, 8, is 5 or more), so it rounds up to 150.',
+  story:'Even three-digit numbers follow the same rounding rule.'},
+
+{section:'challenge', type:'Puzzle Card', title:'Decode the Number: 728',
+  front:'Write 728 in words.',
+  interaction:{kind:'fillblank', accept:['seven hundred twenty-eight','seven hundred twenty eight','seven hundred and twenty-eight','seven hundred and twenty eight'], placeholder:'type the number in words'},
+  back:'728 = seven hundred twenty-eight.',
+  story:'One more decoded number for the case file.'},
+
+{section:'challenge', type:'Puzzle Card', title:'Build the Suspect Number',
+  front:'A number has 5 hundreds, 2 tens, and 9 ones. Type the number, then compare it to 539.',
+  interaction:{kind:'combo', buildAnswer:'529', compareRight:539, compareCorrect:'<'},
+  back:'The number is 529. Comparing: 529 < 539 (hundreds match, but 2 tens is less than 3 tens).',
+  story:'You constructed the suspect number from scratch and then cracked the comparison — sharp work, Detective.'},
+
+{section:'challenge', type:'Puzzle Card', title:'The Largest Number Challenge (Bonus)',
+  front:'Using the digits 3, 6, and 8 exactly once each, what is the largest 3-digit number you can build?',
+  interaction:{kind:'fillblank', accept:['863'], placeholder:'type the largest number'},
+  back:'863 — put the biggest digit in the hundreds place, next biggest in the tens, smallest in the ones.',
+  story:'Bonus clue cracked — early finishers get extra detective credit!'},
+
+/* ---------------- SECTION 6: MASTER CHECK ---------------- */
+{section:'master', type:'Common Mistake Card', title:'Interrogation: Emma\'s Case File',
+  front:'Emma wrote: 345 > 354. Tap to reveal what went wrong in her reasoning.',
+  interaction:{kind:'reveal'},
+  back:'Emma only glanced at the digits without comparing place by place. She should compare hundreds first (3 = 3), then tens (4 < 5) — which proves 345 < 354, not greater.',
+  story:'Emma\'s mistake: comparing without checking place value from left to right.'},
+
+{section:'master', type:'Common Mistake Card', title:'Interrogation: The Ones-Digit Trap',
+  front:'Which is greater: 612 or 621? (Careful — don\'t just look at the ones digit!)',
+  interaction:{kind:'mcq', options:['612','621','They are equal','Cannot tell'], correct:1},
+  back:'621 > 612. Hundreds match (6 = 6), but in the tens place, 2 is greater than 1. Comparing only the ones digit is a common trap — always start from the left.',
+  story:'Trap avoided — you compared from the hundreds place first, just like a real detective.'},
+
+{section:'master', type:'Think Card', title:'Detective\'s Final Reflection',
+  front:'Think about it: can two numbers use the exact same digits but mean completely different things? Tap to reveal the detective\'s answer.',
+  interaction:{kind:'reveal'},
+  back:'Yes! 345 and 354 use the very same digits (3, 4, 5), but because the digits sit in different positions, the numbers have completely different values. Position is everything.',
+  story:'Case theory confirmed — you now think like a true Number Detective.'},
+
+{section:'master', type:'Puzzle Card', title:'Edge-of-the-Map Case',
+  front:'Which symbol correctly compares these two numbers?',
+  interaction:{kind:'compare', left:999, right:1000},
+  back:'999 < 1,000. 999 has only 3 digits (all 9s) while 1,000 has 4 digits — more digits (when both are positive) means a bigger number.',
+  story:'Even at the edge of 3-digit numbers, the same comparison rule holds.'},
+
+{section:'master', type:'Quick Recall Card', title:'Rapid-Fire: One Last Value Check',
+  front:'What is the value of the digit 4 in 456?',
+  interaction:{kind:'mcq', options:['4','40','400','4,000'], correct:2},
+  back:'400 — the 4 sits in the hundreds place.',
+  story:'Final clue logged. The case file is complete!'}
+];
+
+/* ================= STATE ================= */
+let stars = 0, xp = 0, solvedCount = 0;
+const totalCards = CARDS.length;
+
+/* ================= RENDER SECTION NAV ================= */
+const navEl = document.getElementById('sectionNav');
+SECTIONS.forEach(s=>{
+  const d = document.createElement('div');
+  d.className='section-dot'; d.id='nav-'+s.key; d.textContent=s.icon+' '+s.title.split('·')[1].trim();
+  d.onclick=()=>{document.getElementById('block-'+s.key).scrollIntoView({behavior:'smooth', block:'start'});};
+  navEl.appendChild(d);
+});
+document.getElementById('caseTotal').textContent = totalCards;
+
+document.getElementById('startBtn').onclick = ()=>{
+  document.getElementById('block-'+SECTIONS[0].key).scrollIntoView({behavior:'smooth'});
+};
+
+/* ================= RENDER SECTIONS & CARDS ================= */
+const container = document.getElementById('sectionsContainer');
+
+SECTIONS.forEach(sec=>{
+  const block = document.createElement('div');
+  block.className='section-block'; block.id='block-'+sec.key;
+
+  const storyDiv = document.createElement('div');
+  storyDiv.className='section-story';
+  storyDiv.innerHTML = `<div class="icon">${sec.icon}</div><div><h3>${sec.title}</h3><p>${sec.story}</p></div>`;
+  block.appendChild(storyDiv);
+
+  const grid = document.createElement('div');
+  grid.className='cards-grid';
+
+  CARDS.filter(c=>c.section===sec.key).forEach((cardData, idx)=>{
+    grid.appendChild(buildCard(cardData, sec.key, idx));
+  });
+
+  block.appendChild(grid);
+  container.appendChild(block);
+});
+
+/* Final Mastery Review */
+const finalBlock = document.createElement('div');
+finalBlock.className='section-block';
+finalBlock.id='block-final';
+finalBlock.innerHTML = `
+  <div class="final-card">
+    <h2>🎉 Case Closed, Detective!</h2>
+    <p>You compared, decoded, rounded, and reasoned your way through every clue in the Number Detective case file. The Chief Detective is impressed — place value has no secrets left to hide from you.</p>
+    <div class="badge-unlock">
+      <div class="medal">🥇</div>
+      <div class="label">Badge Unlocked: Master Number Detective</div>
+    </div>
+    <div class="final-stats">
+      <div class="fstat">⭐ <span id="finalStars">0</span> Stars Earned</div>
+      <div class="fstat">🏅 <span id="finalXP">0</span> XP Earned</div>
+      <div class="fstat">📁 <span id="finalCases">0</span>/${totalCards} Clues Solved</div>
+    </div>
+    <p style="margin-top:14px; font-size:13px;">Key takeaway: a digit's position decides its value — read every number left to right, place by place, and you'll never be fooled by a switched digit again.</p>
+    <button class="restart-btn" onclick="location.reload()">🔁 Reopen the Case</button>
+  </div>
+`;
+container.appendChild(finalBlock);
+navEl.appendChild(Object.assign(document.createElement('div'), {
+  className:'section-dot', id:'nav-final', textContent:'🏆 Final Review',
+  onclick:()=>document.getElementById('block-final').scrollIntoView({behavior:'smooth'})
+}));
+
+/* ================= CARD BUILDER ================= */
+function buildCard(data, sectionKey, idx){
+  const card = document.createElement('div');
+  card.className='card';
+  const uid = sectionKey+'-'+idx;
+
+  card.innerHTML = `
+    <div class="stars" id="stars-${uid}">✨✨✨</div>
+    <div class="card-top">
+      <span class="type-tag">${data.type}</span>
+      <span class="xp-tag">+10 XP</span>
+    </div>
+    <h4>${data.title}</h4>
+    <div class="card-body">
+      <p>${data.front}</p>
+      <div class="interaction" id="int-${uid}"></div>
+      <div class="feedback" id="fb-${uid}"></div>
+    </div>
+    <button class="reveal-btn" id="reveal-${uid}">📖 Reveal Case Notes</button>
+    <div class="back-panel" id="back-${uid}">
+      <strong>Case Notes:</strong> ${data.back}
+      <div class="story-line">${data.story}</div>
+    </div>
+  `;
+
+  renderInteraction(data, uid, card);
+
+  card.querySelector('#reveal-'+uid).onclick = ()=>{
+    const panel = card.querySelector('#back-'+uid);
+    panel.classList.toggle('show');
+  };
+
+  return card;
+}
+
+/* ================= INTERACTION RENDERERS ================= */
+function renderInteraction(data, uid, card){
+  const host = card.querySelector('#int-'+uid);
+  const kind = data.interaction.kind;
+
+  if(kind==='mcq'){
+    const wrap = document.createElement('div'); wrap.className='opts';
+    data.interaction.options.forEach((opt,i)=>{
+      const b = document.createElement('button'); b.className='opt-btn'; b.textContent=opt;
+      b.onclick=()=>{
+        if(b.disabled) return;
+        const buttons = wrap.querySelectorAll('.opt-btn');
+        if(i===data.interaction.correct){
+          buttons.forEach(x=>x.disabled=true);
+          b.classList.add('correct');
+          markSolved(uid, true);
+        } else {
+          b.classList.add('wrong');
+          setTimeout(()=>b.classList.remove('wrong'), 500);
+          setFeedback(uid, 'Not quite — try another option!', false);
+        }
+      };
+      wrap.appendChild(b);
+    });
+    host.appendChild(wrap);
+  }
+
+  else if(kind==='truefalse'){
+    const wrap = document.createElement('div'); wrap.className='opts';
+    [['True',true],['False',false]].forEach(([label,val])=>{
+      const b=document.createElement('button'); b.className='opt-btn'; b.textContent=label;
+      b.onclick=()=>{
+        if(b.disabled) return;
+        const buttons = wrap.querySelectorAll('.opt-btn');
+        if(val===data.interaction.correct){
+          buttons.forEach(x=>x.disabled=true);
+          b.classList.add('correct');
+          markSolved(uid, true);
+        } else {
+          b.classList.add('wrong');
+          setTimeout(()=>b.classList.remove('wrong'),500);
+          setFeedback(uid,'Check the place values again!',false);
+        }
+      };
+      wrap.appendChild(b);
+    });
+    host.appendChild(wrap);
+  }
+
+  else if(kind==='compare'){
+    const row=document.createElement('div'); row.className='compare-row';
+    const leftSpan=document.createElement('span'); leftSpan.className='compare-num'; leftSpan.textContent=data.interaction.left;
+    const symWrap=document.createElement('div'); symWrap.className='compare-sym';
+    const rightSpan=document.createElement('span'); rightSpan.className='compare-num'; rightSpan.textContent=data.interaction.right;
+    const answer = data.interaction.left>data.interaction.right?'>':(data.interaction.left<data.interaction.right?'<':'=');
+    ['>','<','='].forEach(sym=>{
+      const b=document.createElement('button'); b.className='sym-btn'; b.textContent=sym;
+      b.onclick=()=>{
+        if(b.disabled) return;
+        if(sym===answer){
+          symWrap.querySelectorAll('.sym-btn').forEach(x=>x.disabled=true);
+          b.classList.add('correct');
+          markSolved(uid, true);
+        } else {
+          b.classList.add('wrong');
+          setTimeout(()=>b.classList.remove('wrong'),500);
+          setFeedback(uid,'Compare hundreds first, then tens, then ones.',false);
+        }
+      };
+      symWrap.appendChild(b);
+    });
+    row.appendChild(leftSpan);
+    row.appendChild(symWrap);
+    row.appendChild(rightSpan);
+    host.appendChild(row);
+  }
+
+  else if(kind==='fillblank'){
+    const wrap=document.createElement('div'); wrap.className='fill-row';
+    const input=document.createElement('input'); input.type='text'; input.placeholder=data.interaction.placeholder||'type your answer';
+    const btn=document.createElement('button'); btn.className='check-btn'; btn.textContent='Check';
+    btn.onclick=()=>{
+      const norm = v=>v.trim().toLowerCase().replace(/,/g,'');
+      const val = norm(input.value);
+      const ok = data.interaction.accept.map(norm).includes(val);
+      if(ok){
+        input.disabled=true; btn.disabled=true;
+        markSolved(uid, true);
+      } else {
+        setFeedback(uid,'Not quite — double-check and try again.',false);
+      }
+    };
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ btn.click(); }});
+    wrap.appendChild(input); wrap.appendChild(btn);
+    host.appendChild(wrap);
+  }
+
+  else if(kind==='numline'){
+    const wrap=document.createElement('div'); wrap.className='numline';
+    wrap.innerHTML='<div class="line"></div><div class="marker" id="mk-'+uid+'" style="left:0%">🔍</div>';
+    const {min,max,step,number,correct} = data.interaction;
+    const ticks=[]; for(let v=min; v<=max; v+=step) ticks.push(v);
+    const pos = v => ((v-min)/(max-min))*100;
+    ticks.forEach(v=>{
+      const t=document.createElement('div'); t.className='tick'; t.style.left=pos(v)+'%'; t.textContent=v;
+      t.onclick=()=>{
+        if(t.classList.contains('lock')) return;
+        wrap.querySelectorAll('.tick').forEach(x=>x.classList.remove('picked'));
+        t.classList.add('picked');
+        if(v===correct){
+          wrap.querySelectorAll('.tick').forEach(x=>x.classList.add('lock'));
+          markSolved(uid, true);
+        } else {
+          setFeedback(uid,'Which stop is number '+number+' actually closer to?',false);
+        }
+      };
+      wrap.appendChild(t);
+    });
+    const marker = document.createElement('div'); marker.className='marker'; marker.style.left=pos(number)+'%'; marker.textContent='📍'+number;
+    marker.style.top='-32px'; marker.style.fontSize='11px'; marker.style.fontWeight='800'; marker.style.color='var(--burnt-orange)';
+    wrap.appendChild(marker);
+    host.appendChild(wrap);
+  }
+
+  else if(kind==='placevalue'){
+    const num = String(data.interaction.number);
+    const digits = num.split('').map(Number);
+    const wrap=document.createElement('div'); wrap.className='pv-chart';
+    const cols=[['Hundreds',digits[0]],['Tens',digits[1]],['Ones',digits[2]]];
+    cols.forEach(([label,correctVal],i)=>{
+      const col=document.createElement('div'); col.className='pv-col';
+      col.innerHTML = `<label>${label}</label><input type="text" maxlength="1" id="pv-${uid}-${i}">`;
+      wrap.appendChild(col);
+    });
+    host.appendChild(wrap);
+    const inputs = cols.map((c,i)=>wrap.querySelector(`#pv-${uid}-${i}`));
+    const btn=document.createElement('button'); btn.className='check-btn'; btn.style.marginTop='8px'; btn.textContent='Check the Evidence';
+    btn.onclick=()=>{
+      const vals = inputs.map(inp=>inp.value.trim());
+      const ok = vals.every((v,i)=>Number(v)===cols[i][1]);
+      if(ok){
+        inputs.forEach(inp=>inp.disabled=true);
+        btn.disabled=true;
+        markSolved(uid, true);
+      } else {
+        setFeedback(uid,'One or more boxes need a second look.',false);
+      }
+    };
+    host.appendChild(btn);
+  }
+
+  else if(kind==='combo'){
+    const wrap=document.createElement('div');
+    wrap.innerHTML = `
+      <div class="fill-row">
+        <input type="text" id="combo-num-${uid}" placeholder="type the number">
+        <button class="check-btn" id="combo-btn1-${uid}">Check Number</button>
+      </div>
+      <div class="compare-row" id="combo-compare-${uid}" style="display:none; margin-top:12px;">
+        <span class="compare-num">${data.interaction.buildAnswer}</span>
+        <div class="compare-sym" id="combo-sym-${uid}"></div>
+        <span class="compare-num">${data.interaction.compareRight}</span>
+      </div>
+    `;
+    host.appendChild(wrap);
+    const numInput = wrap.querySelector(`#combo-num-${uid}`);
+    const btn1 = wrap.querySelector(`#combo-btn1-${uid}`);
+    const compareRow = wrap.querySelector(`#combo-compare-${uid}`);
+    const symWrap = wrap.querySelector(`#combo-sym-${uid}`);
+    btn1.onclick=()=>{
+      const val = numInput.value.trim();
+      if(val===data.interaction.buildAnswer){
+        numInput.disabled=true;
+        btn1.disabled=true;
+        compareRow.style.display='flex';
+        ['>','<','='].forEach(sym=>{
+          const b=document.createElement('button'); b.className='sym-btn'; b.textContent=sym;
+          b.onclick=()=>{
+            if(b.disabled) return;
+            if(sym===data.interaction.compareCorrect){
+              symWrap.querySelectorAll('.sym-btn').forEach(x=>x.disabled=true);
+              b.classList.add('correct');
+              markSolved(uid, true);
+            } else {
+              b.classList.add('wrong');
+              setTimeout(()=>b.classList.remove('wrong'),500);
+              setFeedback(uid,'Compare place by place, starting with hundreds.',false);
+            }
+          };
+          symWrap.appendChild(b);
+        });
+      } else {
+        setFeedback(uid,'Rebuild the number: 5 hundreds, 2 tens, 9 ones.',false);
+      }
+    };
+  }
+
+  else if(kind==='reveal'){
+    const wrap=document.createElement('div');
+    wrap.innerHTML = `<button class="check-btn" id="rv-${uid}">🔎 Tap to Investigate</button>`;
+    host.appendChild(wrap);
+    const rvBtn = wrap.querySelector(`#rv-${uid}`);
+    rvBtn.onclick=()=>{
+      card.querySelector('#back-'+uid).classList.add('show');
+      rvBtn.disabled=true;
+      rvBtn.textContent='✅ Investigated';
+      markSolved(uid, true, true);
+    };
+  }
+}
+
+/* ================= FEEDBACK / SCORING ================= */
+function setFeedback(uid, msg, ok){
+  const el = document.getElementById('fb-'+uid);
+  if(!el) return;
+  el.textContent = msg;
+  el.className = 'feedback '+(ok?'ok':'bad');
+}
+
+const solvedSet = new Set();
+function markSolved(uid, ok, skipStars){
+  if(solvedSet.has(uid)) return;
+  solvedSet.add(uid);
+  solvedCount++;
+  xp += 10;
+  if(!skipStars) stars += 1;
+  document.getElementById('xpCount').textContent = xp;
+  document.getElementById('starCount').textContent = stars;
+  document.getElementById('caseCount').textContent = solvedCount;
+  const pct = Math.round((solvedCount/totalCards)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  setFeedback(uid, 'Correct! Case notes unlocked below. ✅', true);
+
+  const starsEl = document.getElementById('stars-'+uid);
+  if(starsEl){ starsEl.classList.add('show','pop'); }
+
+  const card = document.getElementById('int-'+uid).closest('.card');
+  if(card){ card.classList.add('solved'); }
+
+  fireConfettiBurst();
+  updateSectionDots();
+
+  if(solvedCount===totalCards){
+    document.getElementById('finalStars').textContent = stars;
+    document.getElementById('finalXP').textContent = xp;
+    document.getElementById('finalCases').textContent = solvedCount;
+  }
+}
+
+function updateSectionDots(){
+  SECTIONS.forEach(sec=>{
+    const cardsInSection = CARDS.filter(c=>c.section===sec.key);
+    const doneInSection = cardsInSection.filter((c,i)=>solvedSet.has(sec.key+'-'+i)).length;
+    const dot = document.getElementById('nav-'+sec.key);
+    if(doneInSection===cardsInSection.length && cardsInSection.length>0){
+      dot.classList.add('done');
+    }
+  });
+  if(solvedCount===totalCards){
+    document.getElementById('nav-final').classList.add('done');
+  }
+}
+
+/* ================= CONFETTI (light touch) ================= */
+function fireConfettiBurst(){
+  const colors = ['#008080','#D97745','#FFA07A','#C3EAED','#0B6162'];
+  for(let i=0;i<10;i++){
+    const p = document.createElement('div');
+    p.className='confetti-piece';
+    p.style.left = (45 + Math.random()*10) + 'vw';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration = (0.9 + Math.random()*0.6)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 1600);
+  }
+}
+</script>
+</body>
+</html>
