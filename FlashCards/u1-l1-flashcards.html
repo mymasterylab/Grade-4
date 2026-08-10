@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | Number Detectives — Session 1 Recap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16223d;
+    --ink-2:#0e1830;
+    --parchment:#f7f0dc;
+    --parchment-2:#efe4c4;
+    --gold:#c79a3e;
+    --gold-bright:#e6bb6a;
+    --teal:#2f8f86;
+    --teal-dark:#1f5f59;
+    --coral:#d6553a;
+    --coral-dark:#9c3a26;
+    --charcoal:#2b2620;
+    --cream:#f3ecda;
+    --line: rgba(199,154,62,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at top, #1d2c4d 0%, var(--ink) 45%, var(--ink-2) 100%);
+    font-family:'Nunito',sans-serif;
+    color:var(--cream);
+    display:flex;
+    justify-content:center;
+    padding:24px 12px 40px;
+  }
+  .app{
+    width:100%;
+    max-width:460px;
+  }
+  .brandbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    padding:0 4px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'Special Elite',monospace;
+    letter-spacing:0.5px;
+    font-size:13px;
+    color:var(--gold-bright);
+    text-transform:uppercase;
+  }
+  .brand svg{width:20px;height:20px;flex-shrink:0;}
+  .session-tag{
+    font-size:11px;
+    color:var(--cream);
+    opacity:0.55;
+    font-weight:700;
+    letter-spacing:0.5px;
+  }
+  .progress-wrap{
+    margin-bottom:16px;
+  }
+  .progress-track{
+    height:5px;
+    background:rgba(255,255,255,0.12);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--gold) 0%, var(--gold-bright) 100%);
+    border-radius:4px;
+    transition:width .35s ease;
+  }
+  .progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    opacity:0.6;
+    margin-top:6px;
+    font-weight:700;
+    letter-spacing:0.3px;
+  }
+
+  .stage{
+    position:relative;
+    perspective:1400px;
+  }
+  .card{
+    position:relative;
+    background:var(--parchment);
+    color:var(--charcoal);
+    border-radius:14px;
+    min-height:420px;
+    padding:22px 20px 20px;
+    box-shadow:0 18px 40px rgba(0,0,0,0.35), 0 2px 0 rgba(0,0,0,0.15) inset;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(199,154,62,0.05) 0px, rgba(199,154,62,0.05) 1px, transparent 1px, transparent 34px);
+    overflow:hidden;
+  }
+  .card::before{
+    content:'';
+    position:absolute;
+    left:0;top:0;right:0;
+    height:6px;
+    background:linear-gradient(90deg,var(--coral),var(--gold),var(--teal));
+    opacity:0.75;
+  }
+  .clip{
+    position:absolute;
+    top:-10px; left:26px;
+    width:26px; height:52px;
+    z-index:3;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,0.35));
+  }
+  .tab{
+    display:inline-block;
+    font-family:'Special Elite',monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:var(--gold-bright);
+    padding:5px 12px 4px;
+    border-radius:0 0 6px 6px;
+    margin:0 0 14px 44px;
+  }
+  .card-title{
+    font-family:'Special Elite',monospace;
+    font-size:clamp(19px,5vw,23px);
+    margin:0 0 4px;
+    line-height:1.25;
+  }
+  .card-sub{
+    font-size:13.5px;
+    color:#5c5646;
+    margin:0 0 16px;
+    font-weight:600;
+  }
+  .body-area{ min-height:250px; }
+
+  /* nav */
+  .navbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:16px;
+  }
+  .navbtn{
+    flex:0 0 auto;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(230,187,106,0.4);
+    color:var(--cream);
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    padding:11px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:transform .12s ease, background .2s ease;
+    letter-spacing:0.3px;
+  }
+  .navbtn:active{transform:scale(0.96);}
+  .navbtn:hover{background:rgba(230,187,106,0.15);}
+  .navbtn.primary{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:#241a05;
+  }
+  .navbtn.primary:hover{background:var(--gold-bright);}
+  .navbtn[disabled]{opacity:0.25;cursor:default;pointer-events:none;}
+  .dots{
+    display:flex;
+    gap:5px;
+    flex-wrap:wrap;
+    justify-content:center;
+    max-width:150px;
+  }
+  .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:rgba(255,255,255,0.25);
+  }
+  .dot.active{background:var(--gold-bright); width:16px; border-radius:4px;}
+
+  /* --- generic components used inside cards --- */
+  .objectives{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;}
+  .objectives li{
+    display:flex; gap:10px; align-items:flex-start;
+    background:var(--parchment-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:11px 12px;
+    font-size:14.5px;
+    font-weight:700;
+    line-height:1.4;
+  }
+  .objectives li svg{width:20px;height:20px;flex-shrink:0;margin-top:1px;color:var(--teal-dark);}
+
+  .vocab-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .flip-tile{
+    perspective:800px;
+    height:104px;
+    cursor:pointer;
+  }
+  .flip-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .5s;
+    transform-style:preserve-3d;
+  }
+  .flip-tile.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{
+    position:absolute; inset:0;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    padding:8px;
+    backface-visibility:hidden;
+    font-weight:800;
+  }
+  .flip-front{
+    background:var(--ink);
+    color:var(--gold-bright);
+    font-family:'Special Elite',monospace;
+    font-size:13.5px;
+    border:1px solid var(--gold);
+  }
+  .flip-back{
+    background:var(--teal);
+    color:#eafffb;
+    transform:rotateY(180deg);
+    font-size:11.5px;
+    font-weight:700;
+    line-height:1.35;
+  }
+  .tap-hint{font-size:9.5px; opacity:0.65; display:block; margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px;}
+
+  table.pv{
+    width:100%; border-collapse:collapse; margin:6px 0 10px;
+    font-family:'Special Elite',monospace;
+  }
+  table.pv th{
+    background:var(--ink); color:var(--gold-bright);
+    font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px;
+    padding:7px 2px; font-weight:400;
+  }
+  table.pv td{
+    text-align:center; font-size:22px; font-weight:700;
+    padding:10px 2px;
+    background:#fffdf5;
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+    color:var(--charcoal);
+  }
+  table.pv td.selected{background:var(--gold); color:#241a05;}
+  .value-readout{
+    min-height:52px;
+    background:var(--ink);
+    border-radius:10px;
+    color:var(--cream);
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    font-size:13.5px; font-weight:700;
+    padding:10px;
+  }
+  .value-readout b{color:var(--gold-bright); font-size:16px;}
+
+  .barchart{display:flex; align-items:flex-end; gap:10px; height:150px; margin:14px 0 6px; padding:0 4px;}
+  .bar-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+  .bar{
+    width:100%;
+    border-radius:6px 6px 0 0;
+    background:linear-gradient(180deg, var(--gold-bright), var(--gold));
+    transition:height .6s ease;
+  }
+  .bar-label{margin-top:6px; font-size:12px; font-weight:800; font-family:'Special Elite',monospace;}
+  .bar-label .g{color:var(--coral-dark);}
+
+  .rule-box{
+    background:var(--parchment-2);
+    border:1px dashed var(--gold);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13.5px;
+    font-weight:700;
+    line-height:1.5;
+    text-align:center;
+    margin-top:10px;
+  }
+
+  .flip-card{
+    background:var(--parchment-2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px;
+    cursor:pointer;
+    min-height:120px;
+    display:flex; flex-direction:column; justify-content:center;
+    position:relative;
+  }
+  .flip-card .q{font-size:15px; font-weight:800; line-height:1.4;}
+  .flip-card .a{
+    margin-top:10px; padding-top:10px; border-top:1px dashed var(--gold);
+    font-size:14px; font-weight:700; color:var(--teal-dark);
+    display:none; line-height:1.4;
+  }
+  .flip-card.open .a{display:block;}
+  .flip-card .peek{
+    position:absolute; top:10px; right:12px;
+    font-size:10px; text-transform:uppercase; letter-spacing:0.5px;
+    opacity:0.55; font-weight:700;
+  }
+
+  .subpager{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .subpager .lvl-label{
+    font-family:'Special Elite',monospace; font-size:11px;
+    background:var(--ink); color:var(--gold-bright);
+    padding:4px 10px; border-radius:6px;
+  }
+  .subnav-btn{
+    background:none; border:1px solid var(--charcoal);
+    width:28px; height:28px; border-radius:50%;
+    cursor:pointer; font-size:14px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--charcoal);
+  }
+  .subnav-btn[disabled]{opacity:0.2; pointer-events:none;}
+
+  .mcq-opt{
+    display:block; width:100%; text-align:left;
+    background:#fffdf5; border:1.5px solid var(--line);
+    border-radius:9px; padding:11px 13px; margin-bottom:8px;
+    font-size:14px; font-weight:700; cursor:pointer;
+    font-family:'Nunito',sans-serif; color:var(--charcoal);
+  }
+  .mcq-opt.correct{background:var(--teal); border-color:var(--teal-dark); color:#eafffb;}
+  .mcq-opt.incorrect{background:var(--coral); border-color:var(--coral-dark); color:#fff0ea;}
+  .mcq-opt[disabled]{cursor:default;}
+  .feedback{
+    margin-top:8px; font-size:13px; font-weight:700; line-height:1.4;
+    padding:9px 11px; border-radius:8px; display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.good{background:var(--teal); color:#eafffb;}
+  .feedback.bad{background:var(--coral); color:#fff0ea;}
+
+  .checklist{list-style:none; margin:10px 0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .checklist li{
+    display:flex; gap:9px; align-items:center;
+    background:#fffdf5; border:1px solid var(--line);
+    border-radius:9px; padding:9px 11px; font-size:13px; font-weight:700;
+    cursor:pointer;
+  }
+  .checklist li .box{
+    width:18px; height:18px; border-radius:4px; border:2px solid var(--charcoal);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .checklist li.done .box{background:var(--teal); border-color:var(--teal-dark); color:#fff;}
+  .checklist li.done{text-decoration:line-through; opacity:0.65;}
+
+  .example-reveal{
+    margin-top:10px; background:var(--ink); color:var(--gold-bright);
+    border-radius:10px; padding:13px 13px 14px; font-size:13px; font-weight:700;
+    text-align:center; display:none;
+  }
+  .example-reveal.show{display:block;}
+  .example-reveal .headline{
+    font-family:'Special Elite',monospace; font-size:16px; letter-spacing:0.5px;
+    margin-bottom:12px;
+  }
+  .breakdown{display:flex; flex-direction:column; gap:9px; text-align:left; margin:0 0 4px;}
+  .breakdown-row{
+    display:flex; align-items:center; gap:11px;
+    background:rgba(255,255,255,0.07);
+    border-radius:8px; padding:8px 10px;
+  }
+  .breakdown-row .bdigit{
+    width:30px; height:30px; border-radius:7px; flex-shrink:0;
+    background:var(--gold-bright); color:#241a05;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-family:'Special Elite',monospace; font-size:14px;
+  }
+  .breakdown-row .btext{flex:1; font-size:11.5px; font-weight:700; color:var(--cream); line-height:1.4;}
+  .breakdown-row .btext b{color:var(--gold-bright);}
+  .breakdown-row .bvalue{font-size:12.5px; font-weight:800; color:var(--gold-bright); white-space:nowrap;}
+  .breakdown-note{
+    margin-top:10px; padding-top:10px; border-top:1px dashed rgba(230,187,106,0.4);
+    font-size:11.5px; font-weight:700; color:var(--cream); line-height:1.5; text-align:left;
+  }
+  .reveal-btn{
+    margin-top:10px; width:100%;
+    background:var(--teal); color:#eafffb; border:none;
+    padding:10px; border-radius:9px; font-weight:800; font-size:13px;
+    cursor:pointer; font-family:'Nunito',sans-serif;
+  }
+
+  .traffic{display:flex; gap:10px; justify-content:center; margin:14px 0;}
+  .tlight{
+    width:64px;height:64px;border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; cursor:pointer; border:3px solid transparent;
+    background:#fffdf5;
+  }
+  .tlight.sel{border-color:var(--charcoal); transform:scale(1.08);}
+  .traffic-desc{
+    background:var(--parchment-2); border:1px solid var(--line);
+    border-radius:10px; padding:12px; font-size:13px; font-weight:700;
+    line-height:1.4; min-height:60px; display:flex; align-items:center; text-align:center; justify-content:center;
+  }
+
+  .stamp{
+    text-align:center; margin-top:8px;
+  }
+  .stamp svg{width:120px; height:120px;}
+
+  .cover-wrap{text-align:center; padding:14px 4px;}
+  .cover-icon{margin:6px auto 14px;}
+  .cover-title{
+    font-family:'Special Elite',monospace;
+    font-size:clamp(26px,7.5vw,32px);
+    line-height:1.15; margin:0 0 6px;
+    color:var(--ink);
+  }
+  .cover-sub{font-size:14px; font-weight:800; color:var(--coral-dark); margin:0 0 20px; letter-spacing:0.3px;}
+  .cover-mission{
+    background:var(--ink); color:var(--cream); border-radius:12px;
+    padding:14px 16px; font-size:13.5px; font-weight:700; line-height:1.5; margin-bottom:8px;
+  }
+  .cover-mission b{color:var(--gold-bright);}
+  .cover-target{font-size:11.5px; opacity:0.7; margin-top:22px; font-weight:700;}
+
+  .hint{font-size:12px; color:#6b6350; font-weight:700; margin-top:6px; font-style:italic;}
+  .small-note{font-size:12.5px; color:#5c5646; line-height:1.5; margin-top:10px;}
+  @media (max-width:360px){ .card{padding:18px 14px 16px;} }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brandbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="2"/><line x1="14.5" y1="14.5" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      MyMasteryLab
+    </div>
+    <div class="session-tag">SESSION 1 · RECAP</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <div class="progress-label"><span id="progText">Card 1 of 13</span><span id="cardTag">COVER</span></div>
+  </div>
+
+  <div class="stage">
+    <div class="card" id="cardEl">
+      <svg class="clip" viewBox="0 0 26 52" fill="none"><path d="M13 4v34a7 7 0 0 1-14 0V14a4.5 4.5 0 0 1 9 0v20a2 2 0 0 1-4 0V16" stroke="#c79a3e" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <div id="tabEl"></div>
+      <div id="titleEl"></div>
+      <div id="subEl"></div>
+      <div class="body-area" id="bodyEl"></div>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <button class="navbtn" id="btnBack" onclick="go(-1)">◂ Back</button>
+    <div class="dots" id="dots"></div>
+    <button class="navbtn primary" id="btnNext" onclick="go(1)">Next ▸</button>
+  </div>
+</div>
+
+<script>
+const MAGNIFY_ICON = '<svg viewBox="0 0 24 24" fill="none" width="60" height="60"><circle cx="10" cy="10" r="7" stroke="#16223d" stroke-width="2.4"/><line x1="15" y1="15" x2="21" y2="21" stroke="#16223d" stroke-width="2.4" stroke-linecap="round"/><circle cx="10" cy="10" r="3.4" stroke="#c79a3e" stroke-width="1.6"/></svg>';
+
+const UI = {
+  selectedDigit: null,
+  vocabFlips: [false,false,false,false,false],
+  sub: {level1:0, level2:0, level3:0, critical:0, exit:0},
+  mcq: {}, flip: {}, checks:{bonus:[false,false,false,false,false]},
+  mastery: null, exampleShown:{}, ct2q1:null
+};
+
+const digits4372 = [
+  {d:4, place:'Thousands', val:'4,000', words:'4 thousands'},
+  {d:3, place:'Hundreds', val:'300', words:'3 hundreds'},
+  {d:7, place:'Tens', val:'70', words:'7 tens'},
+  {d:2, place:'Ones', val:'2', words:'2 ones'}
+];
+
+const vocab = [
+  {t:'Digit', d:'One symbol from 0–9 used to write a number.'},
+  {t:'Place value', d:'The value a digit has because of where it sits.'},
+  {t:'Value', d:'How much a digit is really worth.'},
+  {t:'Standard form', d:'A number written with numerals, e.g. 4,372.'},
+  {t:'Expanded form', d:'A number written as the sum of its parts, e.g. 4,000+300+70+2.'}
+];
+
+function checkmarkIcon(){return '<svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+
+function renderVocabTile(i){
+  const v = vocab[i];
+  const flipped = UI.vocabFlips[i];
+  return `<div class="flip-tile ${flipped?'flipped':''}" onclick="toggleVocab(${i})">
+    <div class="flip-inner">
+      <div class="flip-face flip-front">${v.t}<span class="tap-hint">tap to reveal</span></div>
+      <div class="flip-face flip-back">${v.d}</div>
+    </div>
+  </div>`;
+}
+function toggleVocab(i){ UI.vocabFlips[i]=!UI.vocabFlips[i]; render(); }
+
+function renderPVTable(){
+  let head = digits4372.map(x=>`<th>${x.place}</th>`).join('');
+  let cells = digits4372.map((x,i)=>`<td class="${UI.selectedDigit===i?'selected':''}" onclick="pickDigit(${i})">${x.d}</td>`).join('');
+  let readout = UI.selectedDigit===null
+    ? 'Tap a digit above to see what it is really worth.'
+    : `The <b>${digits4372[UI.selectedDigit].d}</b> sits in the ${digits4372[UI.selectedDigit].place.toLowerCase()} place, so it is worth <b>${digits4372[UI.selectedDigit].val}</b> (${digits4372[UI.selectedDigit].words}).`;
+  return `<table class="pv"><tr>${head}</tr><tr>${cells}</tr></table>
+    <div class="value-readout">${readout}</div>
+    <p class="hint">Same digit, different job — it all depends on where it stands!</p>`;
+}
+function pickDigit(i){ UI.selectedDigit = i; render(); }
+
+function renderBarChart(){
+  const data = [{v:3,label:'3'},{v:30,label:'30'},{v:300,label:'300'},{v:3000,label:'3,000'}];
+  const max = Math.log10(3000)+1;
+  let bars = data.map(x=>{
+    const h = ((Math.log10(x.v)+1)/max*100).toFixed(0);
+    const lbl = x.label.replace('3', '<span class="g">3</span>');
+    return `<div class="bar-col"><div class="bar" style="height:${h}%"></div><div class="bar-label">${lbl}</div></div>`;
+  }).join('');
+  return `<div class="barchart">${bars}</div>
+  <div class="rule-box">Each step to the LEFT makes the digit <b>10 times bigger</b>.</div>
+  <div class="flip-card" id="fc-why7" onclick="toggleFlip('why7')">
+    <span class="peek">tap</span>
+    <div class="q">Look at the chart — why is the SAME digit 3 worth so much more in 3,000 than in 3?</div>
+    <div class="a">Because of where it sits! In 3,000 the 3 is in the thousands place. In 3 it's in the ones place — no other places to make it bigger.</div>
+  </div>`;
+}
+
+function toggleFlip(id){
+  UI.flip[id] = !UI.flip[id];
+  const el = document.getElementById('fc-'+id);
+  if(el){ el.classList.toggle('open', UI.flip[id]); }
+}
+
+function flipCardHTML(id,q,a){
+  const open = UI.flip[id];
+  return `<div class="flip-card ${open?'open':''}" id="fc-${id}" onclick="toggleFlip('${id}')">
+    <span class="peek">tap</span>
+    <div class="q">${q}</div>
+    <div class="a">${a}</div>
+  </div>`;
+}
+
+function subpagerHTML(key, label, total, contentFn){
+  const i = UI.sub[key];
+  const body = contentFn(i);
+  return `<div class="subpager">
+      <button class="subnav-btn" ${i===0?'disabled':''} onclick="subNav('${key}',-1)">‹</button>
+      <span class="lvl-label">${label} ${i+1} / ${total}</span>
+      <button class="subnav-btn" ${i===total-1?'disabled':''} onclick="subNav('${key}',1)">›</button>
+    </div>${body}`;
+}
+function subNav(key, delta){
+  const totals = {level1:3, level2:3, level3:3, critical:2, exit:3};
+  UI.sub[key] = Math.min(totals[key]-1, Math.max(0, UI.sub[key]+delta));
+  render();
+}
+
+function level1Body(i){
+  const items = [
+    ['What is the value of 7 in 4,725?', 'It is in the hundreds place → worth 700.'],
+    ['What is the value of 3 in 8,341?', 'It is in the hundreds place → worth 300.'],
+    ['What place is the 6 in 6,204?', 'The thousands place.']
+  ];
+  return flipCardHTML('l1_'+i, items[i][0], items[i][1]);
+}
+function level2Body(i){
+  const items = [
+    ['What is the value of 8 in 58,321?', 'It is in the thousands place → worth 8,000.'],
+    ['Write 72,405 in expanded form.', '70,000 + 2,000 + 400 + 5'],
+    ['Write 300,000 + 20,000 + 500 + 6 in standard form.', '320,506']
+  ];
+  return flipCardHTML('l2_'+i, items[i][0], items[i][1]);
+}
+function level3Body(i){
+  if(i===0){
+    return mcqHTML('l3q1', 'Which number has the greater 4?', [
+      {t:'4,125', ok:true, why:'Here the 4 is in the thousands place — worth 4,000.'},
+      {t:'2,436', ok:false, why:'Here the 4 is only in the hundreds place — worth 400.'}
+    ]);
+  }
+  if(i===1){
+    return flipCardHTML('l3_2', "Fix the mistake: \"In 50,204, the 2 is worth 2.\"", "Not quite — the 2 is in the hundreds place, so it is really worth 200.");
+  }
+  return `<div class="flip-card" style="cursor:default;">
+    <div class="q">Create a number where 7 is worth 70,000.</div>
+    <div class="hint" style="margin-top:8px;">Think: which place makes 7 worth 70,000?</div>
+  </div>` + revealHTML('l3_3', 'See one example', breakdownHTML(
+    '173,254',
+    [ {digit:'7', place:'Ten-thousands place', value:'70,000'} ],
+    '7 × 10,000 = 70,000 — that\'s why this place makes the 7 worth so much.'
+  ));
+}
+function mcqHTML(id, q, opts){
+  const state = UI.mcq[id];
+  let optsHtml = opts.map((o,idx)=>{
+    let cls='mcq-opt';
+    if(state!==undefined){
+      if(idx===state) cls+= o.ok?' correct':' incorrect';
+      else if(o.ok) cls+=' correct';
+    }
+    return `<button class="${cls}" ${state!==undefined?'disabled':''} onclick="answerMcq('${id}',${idx})">${o.t}</button>`;
+  }).join('');
+  let fb='';
+  if(state!==undefined){
+    const chosen = opts[state];
+    fb = `<div class="feedback show ${chosen.ok?'good':'bad'}">${chosen.ok?'Correct! ':'Not quite. '}${opts.find(o=>o.ok).why}</div>`;
+  }
+  return `<div class="q" style="font-size:15px;font-weight:800;margin-bottom:10px;">${q}</div>${optsHtml}${fb}`;
+}
+function answerMcq(id, idx){ UI.mcq[id]=idx; window._mcqData=window._mcqData||{}; render(); }
+
+function revealHTML(id, btnText, content){
+  const shown = UI.exampleShown[id];
+  return `<button class="reveal-btn" onclick="toggleReveal('${id}')">${shown?'Hide example':btnText}</button>
+    <div class="example-reveal ${shown?'show':''}">${content}</div>`;
+}
+function breakdownHTML(headline, rows, note){
+  const rowsHtml = rows.map(r=>`<div class="breakdown-row">
+      <div class="bdigit">${r.digit}</div>
+      <div class="btext">${r.place}</div>
+      <div class="bvalue">${r.value}</div>
+    </div>`).join('');
+  return `<div class="headline">${headline}</div>
+    <div class="breakdown">${rowsHtml}</div>
+    ${note?`<div class="breakdown-note">${note}</div>`:''}`;
+}
+function toggleReveal(id){ UI.exampleShown[id]=!UI.exampleShown[id]; render(); }
+
+function criticalBody(i){
+  if(i===0){
+    return `<div class="q" style="font-size:15px;font-weight:800;margin-bottom:4px;">Always, Sometimes, or Never?</div>
+    <p class="small-note" style="margin-top:0;">"A digit has the same value wherever it appears."</p>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      ${['Always','Sometimes','Never'].map(opt=>{
+        const sel = UI.ct2q1===opt;
+        const correct = opt==='Never';
+        let cls='mcq-opt'; if(UI.ct2q1){ if(opt===UI.ct2q1) cls+= correct?' correct':' incorrect'; else if(correct) cls+=' correct'; }
+        return `<button class="${cls}" style="flex:1;text-align:center;" ${UI.ct2q1?'disabled':''} onclick="setCt2('${opt}')">${opt}</button>`;
+      }).join('')}
+    </div>
+    ${UI.ct2q1?`<div class="feedback show ${UI.ct2q1==='Never'?'good':'bad'}">${UI.ct2q1==='Never'?'Correct! ':'Not quite. '}A digit's value depends on its place — the same digit means something different in every position.</div>`:''}`;
+  }
+  return `<div class="q" style="font-size:14.5px;font-weight:800;margin-bottom:6px;">Spot the mistake</div>
+   <p class="small-note" style="margin-top:0;">A learner writes:<br><b>63,405 = 60,000 + 3,000 + 400 + 50</b></p>
+   ` + flipCardHTML('errA', 'Is the learner correct?', 'Not quite! The 5 is in the ones place, so it should be +5, not +50. Correct: 60,000 + 3,000 + 400 + 5.');
+}
+
+function exitBody(i){
+  const items = [
+    ['What is the value of 6 in 46,208?', 'It is in the thousands place → worth 6,000.'],
+    ['Write 80,000 + 4,000 + 300 + 7 in standard form.', '84,307'],
+    ["Why is the 4 in 4,000 worth more than the 4 in 400?", '4,000 has the 4 in the thousands place; 400 has the 4 in the hundreds place. Thousands is 10× bigger than hundreds.']
+  ];
+  return flipCardHTML('exit_'+i, items[i][0], items[i][1]);
+}
+function setCt2(v){ UI.ct2q1=v; render(); }
+
+function bonusChecklistHTML(){
+  const items = [
+    '4 is in the thousands place',
+    '7 is worth 70,000',
+    '2 is worth 20',
+    'The number is greater than 470,000',
+    'No digit is repeated'
+  ];
+  let lis = items.map((t,i)=>`<li class="${UI.checks.bonus[i]?'done':''}" onclick="toggleCheck(${i})"><span class="box">${UI.checks.bonus[i]?'✓':''}</span>${t}</li>`).join('');
+  return `<p class="small-note" style="margin-top:0;">Build a six-digit number that satisfies every clue below:</p>
+  <ul class="checklist">${lis}</ul>` + revealHTML('bonusEx', 'Check one possible answer', breakdownHTML(
+    '574,123',
+    [
+      {digit:'5', place:'Hundred-thousands place', value:'500,000'},
+      {digit:'7', place:'Ten-thousands place', value:'70,000'},
+      {digit:'4', place:'Thousands place', value:'4,000'},
+      {digit:'1', place:'Hundreds place', value:'100'},
+      {digit:'2', place:'Tens place', value:'20'},
+      {digit:'3', place:'Ones place', value:'3'}
+    ],
+    'All six digits are different, and 574,123 is greater than 470,000 — every clue checks out!'
+  ));
+}
+function toggleCheck(i){ UI.checks.bonus[i]=!UI.checks.bonus[i]; render(); }
+
+function masteryHTML(){
+  const opts = [
+    {k:'green', emoji:'🟢', label:'Mastered', desc:'80%+ correct, and I can explain the difference between a digit and its value on my own.'},
+    {k:'yellow', emoji:'🟡', label:'Developing', desc:'I can find the value, but my explanations are still a bit shaky.'},
+    {k:'red', emoji:'🔴', label:'Not yet', desc:"I sometimes mix up a digit and its value — I need more practice."}
+  ];
+  let lights = opts.map(o=>`<div class="tlight ${UI.mastery===o.k?'sel':''}" onclick="setMastery('${o.k}')">${o.emoji}</div>`).join('');
+  const chosen = opts.find(o=>o.k===UI.mastery);
+  return `<p class="small-note" style="margin-top:0;text-align:center;">Tap the light that matches how today's case went for you:</p>
+  <div class="traffic">${lights}</div>
+  <div class="traffic-desc">${chosen?('<b>'+chosen.label+':</b> '+chosen.desc):'Tap a light above to see what it means.'}</div>
+  <div class="stamp">${stampSVG()}</div>`;
+}
+function setMastery(k){ UI.mastery=k; render(); }
+
+function stampSVG(){
+  return `<svg viewBox="0 0 140 140" fill="none">
+    <circle cx="70" cy="70" r="60" stroke="#d6553a" stroke-width="4" stroke-dasharray="4 5" transform="rotate(-8 70 70)"/>
+    <text x="70" y="64" text-anchor="middle" font-family="Special Elite, monospace" font-size="15" fill="#d6553a" transform="rotate(-8 70 70)">CASE</text>
+    <text x="70" y="86" text-anchor="middle" font-family="Special Elite, monospace" font-size="15" fill="#d6553a" transform="rotate(-8 70 70)">CLOSED</text>
+  </svg>`;
+}
+
+function badgeIcon(){return '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 14.4l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8L12 2z" stroke="#16223d" stroke-width="1.6" stroke-linejoin="round"/></svg>';}
+
+const cards = [
+  { tab:null, title:'', sub:'', render:()=>`
+    <div class="cover-wrap">
+      <div class="cover-icon">${MAGNIFY_ICON}</div>
+      <p class="cover-title">Number<br>Detectives</p>
+      <p class="cover-sub">Session 1 Case File</p>
+      <div class="cover-mission"><b>Your mission:</b> crack the code of digit place and value — because in a number, WHERE a digit stands changes everything it's worth.</div>
+      <p class="cover-target">MyMasteryLab · Recap Flashcards</p>
+    </div>` },
+
+  { tab:'Briefing', title:'🕵️ Mission briefing', sub:'By the end of this case, you can:', render:()=>`
+    <ul class="objectives">
+      <li>${checkmarkIcon()}Find the place and value of a digit in a big number.</li>
+      <li>${checkmarkIcon()}Read and write numbers in standard and expanded form.</li>
+      <li>${checkmarkIcon()}Explain how a digit's position changes its value.</li>
+    </ul>` },
+
+  { tab:'Vocab file', title:'📁 Case vocabulary', sub:'Tap each card to reveal the meaning.', render:()=>`
+    <div class="vocab-grid">${vocab.map((v,i)=>renderVocabTile(i)).join('')}</div>` },
+
+  { tab:'Evidence #1', title:'Meet the number: 4,372', sub:'Tap a digit to inspect its value.', render:renderPVTable },
+
+  { tab:'Evidence #2', title:'The ×10 rule', sub:'Same digit, four different numbers — watch what happens.', render:renderBarChart },
+
+  { tab:'Clue level 1', title:'Level 1 clues', sub:'Warm-up cases. Tap a card to flip it.', render:()=>subpagerHTML('level1','Clue',3,level1Body) },
+
+  { tab:'Clue level 2', title:'Level 2 clues', sub:'Bigger numbers, expanded and standard form.', render:()=>subpagerHTML('level2','Clue',3,level2Body) },
+
+  { tab:'Clue level 3', title:'Level 3 · tricky cases', sub:'Watch for common mix-ups!', render:()=>subpagerHTML('level3','Clue',3,level3Body) },
+
+  { tab:'Cross-exam', title:'🔍 Cross-examination', sub:'Think it through before you answer.', render:()=>subpagerHTML('critical','Item',2,criticalBody) },
+
+  { tab:'Your case', title:'Build your own case', sub:'A challenge with no single right answer.', render:()=>`
+    <div class="q" style="font-size:15px;font-weight:800;">Create a number that contains exactly two 5s — where the two 5s have different values.</div>
+    <p class="hint">Hint: think about which places you put each 5 in.</p>
+    ${revealHTML('twofives','See one example', breakdownHTML(
+      '5,053',
+      [
+        {digit:'5', place:'1st 5 — thousands place', value:'5,000'},
+        {digit:'5', place:'2nd 5 — tens place', value:'50'}
+      ],
+      'Same digit, two very different values. Now try building your own number!'
+    ))}` },
+
+  { tab:'Bonus case', title:'⭐ Bonus case: fast learners', sub:'Build a six-digit number using every clue.', render:bonusChecklistHTML },
+
+  { tab:'Final report', title:'📋 Final report', sub:'Your exit ticket — show what you know.', render:()=>subpagerHTML('exit','Question',3,exitBody) },
+
+  { tab:'Case status', title:'Case status check', sub:'Self-check your mastery for today.', render:masteryHTML }
+];
+
+let current = 0;
+
+function render(){
+  const c = cards[current];
+  document.getElementById('tabEl').innerHTML = c.tab ? `<span class="tab">${c.tab}</span>` : '';
+  document.getElementById('titleEl').innerHTML = c.title ? `<h2 class="card-title">${c.title}</h2>` : '';
+  document.getElementById('subEl').innerHTML = c.sub ? `<p class="card-sub">${c.sub}</p>` : '';
+  document.getElementById('bodyEl').innerHTML = c.render();
+
+  document.getElementById('progFill').style.width = (((current+1)/cards.length)*100)+'%';
+  document.getElementById('progText').textContent = `Card ${current+1} of ${cards.length}`;
+  document.getElementById('cardTag').textContent = c.tab ? c.tab.toUpperCase() : 'START';
+
+  document.getElementById('btnBack').disabled = current===0;
+  const nextBtn = document.getElementById('btnNext');
+  if(current===cards.length-1){ nextBtn.textContent='Restart ↺'; }
+  else { nextBtn.textContent='Next ▸'; }
+
+  const dotsEl = document.getElementById('dots');
+  dotsEl.innerHTML = cards.map((_,i)=>`<div class="dot ${i===current?'active':''}"></div>`).join('');
+}
+
+function go(delta){
+  if(current===cards.length-1 && delta===1){ current=0; render(); return; }
+  current = Math.min(cards.length-1, Math.max(0, current+delta));
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
