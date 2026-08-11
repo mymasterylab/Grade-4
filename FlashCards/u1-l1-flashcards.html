@@ -140,7 +140,7 @@
   .card-sub{
     font-size:13.5px;
     color:#5c5646;
-    margin:0 0 16px;
+    margin:0 0 20px;
     font-weight:600;
   }
   .body-area{ min-height:250px; }
@@ -272,16 +272,15 @@
   }
   .value-readout b{color:var(--gold-bright); font-size:16px;}
 
-  .barchart{display:flex; align-items:flex-end; gap:10px; height:150px; margin:14px 0 6px; padding:0 4px;}
-  .bar-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
-  .bar{
-    width:100%;
-    border-radius:6px 6px 0 0;
-    background:linear-gradient(180deg, var(--gold-bright), var(--gold));
-    transition:height .6s ease;
+  .pv10 td.digit3{background:var(--gold); color:#241a05; font-family:'Special Elite',monospace;}
+  .pv10 td.zero{color:#c9c2ab; font-weight:600;}
+  .pv10 td.pv-num{
+    background:transparent; border:none; box-shadow:none;
+    font-family:'Nunito',sans-serif; font-size:13px; font-weight:800;
+    color:var(--charcoal); white-space:nowrap; cursor:default; text-align:left;
+    padding-left:10px;
   }
-  .bar-label{margin-top:6px; font-size:12px; font-weight:800; font-family:'Special Elite',monospace;}
-  .bar-label .g{color:var(--coral-dark);}
+  .pv10 th:last-child{background:transparent;}
 
   .rule-box{
     background:var(--parchment-2);
@@ -292,7 +291,7 @@
     font-weight:700;
     line-height:1.5;
     text-align:center;
-    margin-top:10px;
+    margin-top:16px;
   }
 
   .flip-card{
@@ -347,7 +346,7 @@
   .mcq-opt.incorrect{background:var(--coral); border-color:var(--coral-dark); color:#fff0ea;}
   .mcq-opt[disabled]{cursor:default;}
   .feedback{
-    margin-top:8px; font-size:13px; font-weight:700; line-height:1.4;
+    margin-top:14px; font-size:13px; font-weight:700; line-height:1.4;
     padding:9px 11px; border-radius:8px; display:none;
   }
   .feedback.show{display:block;}
@@ -394,7 +393,7 @@
   .breakdown-row .btext b{color:var(--gold-bright);}
   .breakdown-row .bvalue{font-size:12.5px; font-weight:800; color:var(--gold-bright); white-space:nowrap;}
   .breakdown-note{
-    margin-top:10px; padding-top:10px; border-top:1px dashed rgba(230,187,106,0.4);
+    margin-top:16px; padding-top:12px; border-top:1px dashed rgba(230,187,106,0.4);
     font-size:11.5px; font-weight:700; color:var(--cream); line-height:1.5; text-align:left;
   }
   .reveal-btn{
@@ -434,13 +433,13 @@
   .cover-sub{font-size:14px; font-weight:800; color:var(--coral-dark); margin:0 0 20px; letter-spacing:0.3px;}
   .cover-mission{
     background:var(--ink); color:var(--cream); border-radius:12px;
-    padding:14px 16px; font-size:13.5px; font-weight:700; line-height:1.5; margin-bottom:8px;
+    padding:16px 18px; font-size:13.5px; font-weight:700; line-height:1.6; margin-bottom:18px;
   }
   .cover-mission b{color:var(--gold-bright);}
   .cover-target{font-size:11.5px; opacity:0.7; margin-top:22px; font-weight:700;}
 
-  .hint{font-size:12px; color:#6b6350; font-weight:700; margin-top:6px; font-style:italic;}
-  .small-note{font-size:12.5px; color:#5c5646; line-height:1.5; margin-top:10px;}
+  .hint{font-size:12px; color:#6b6350; font-weight:700; margin-top:10px; font-style:italic;}
+  .small-note{font-size:12.5px; color:#5c5646; line-height:1.5; margin-top:14px;}
   @media (max-width:360px){ .card{padding:18px 14px 16px;} }
 </style>
 </head>
@@ -528,15 +527,24 @@ function renderPVTable(){
 }
 function pickDigit(i){ UI.selectedDigit = i; render(); }
 
-function renderBarChart(){
-  const data = [{v:3,label:'3'},{v:30,label:'30'},{v:300,label:'300'},{v:3000,label:'3,000'}];
-  const max = Math.log10(3000)+1;
-  let bars = data.map(x=>{
-    const h = ((Math.log10(x.v)+1)/max*100).toFixed(0);
-    const lbl = x.label.replace('3', '<span class="g">3</span>');
-    return `<div class="bar-col"><div class="bar" style="height:${h}%"></div><div class="bar-label">${lbl}</div></div>`;
+function renderPlaceValueChart(){
+  const headers = ['Thousands','Hundreds','Tens','Ones'];
+  const rows = [
+    {num:'3',     cells:['','','','3']},
+    {num:'30',    cells:['','','3','0']},
+    {num:'300',   cells:['','3','0','0']},
+    {num:'3,000', cells:['3','0','0','0']}
+  ];
+  let head = headers.map(h=>`<th>${h}</th>`).join('') + '<th></th>';
+  let bodyRows = rows.map(r=>{
+    let cells = r.cells.map(c=>{
+      if(c==='3') return `<td class="digit3">3</td>`;
+      if(c==='0') return `<td class="zero">0</td>`;
+      return `<td></td>`;
+    }).join('');
+    return `<tr>${cells}<td class="pv-num">= ${r.num}</td></tr>`;
   }).join('');
-  return `<div class="barchart">${bars}</div>
+  return `<table class="pv pv10"><tr>${head}</tr>${bodyRows}</table>
   <div class="rule-box">Each step to the LEFT makes the digit <b>10 times bigger</b>.</div>
   <div class="flip-card" id="fc-why7" onclick="toggleFlip('why7')">
     <span class="peek">tap</span>
@@ -731,7 +739,7 @@ const cards = [
       <div class="cover-icon">${MAGNIFY_ICON}</div>
       <p class="cover-title">Number<br>Detectives</p>
       <p class="cover-sub">Session 1 Case File</p>
-      <div class="cover-mission"><b>Your mission:</b> crack the code of digit place and value — because in a number, WHERE a digit stands changes everything it's worth.</div>
+      <div class="cover-mission"><b>Your mission:</b> Every digit has a special spot in a number. Find out how that spot changes how much the digit is worth!</div>
       <p class="cover-target">MyMasteryLab · Recap Flashcards</p>
     </div>` },
 
@@ -747,7 +755,7 @@ const cards = [
 
   { tab:'Evidence #1', title:'Meet the number: 4,372', sub:'Tap a digit to inspect its value.', render:renderPVTable },
 
-  { tab:'Evidence #2', title:'The ×10 rule', sub:'Same digit, four different numbers — watch what happens.', render:renderBarChart },
+  { tab:'Evidence #2', title:'The ×10 rule', sub:'Same digit, four different numbers — watch what happens.', render:renderPlaceValueChart },
 
   { tab:'Clue level 1', title:'Level 1 clues', sub:'Warm-up cases. Tap a card to flip it.', render:()=>subpagerHTML('level1','Clue',3,level1Body) },
 
