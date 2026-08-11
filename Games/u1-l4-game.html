@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | Galaxy Rescue: Compare &amp; Order Patrol</title>
+<style>
+  :root{
+    --space-900:#071726;
+    --space-800:#0E2839;
+    --space-700:#153347;
+    --panel:#0F2C3F;
+    --panel-light:#153A50;
+    --teal-500:#1AA79B;
+    --teal-300:#5FD1C5;
+    --teal-100:#CFF3EE;
+    --orange-500:#EA580C;
+    --orange-400:#F97316;
+    --orange-300:#FB923C;
+    --gold:#FFD166;
+    --text-light:#EAF6F4;
+    --text-dim:#9FB8B5;
+    --success:#3ED598;
+    --success-bg:rgba(62,213,152,0.14);
+    --danger:#FF6B6B;
+    --danger-bg:rgba(255,107,107,0.14);
+    --radius:18px;
+    --shadow: 0 12px 30px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Trebuchet MS","Segoe UI Rounded","Segoe UI",Verdana,sans-serif;
+    background: var(--space-900);
+    color: var(--text-light);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  #starField{ position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .star{
+    position:absolute; width:2px; height:2px; background:#fff; border-radius:50%;
+    opacity:0.6; animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:0.15;} 50%{opacity:0.95;} }
+  .app{ position:relative; z-index:1; max-width:760px; margin:0 auto; padding: 16px 14px 40px; }
+
+  /* ---------- TOPBAR ---------- */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+  .brand{ display:flex; align-items:center; gap:9px; }
+  .brand-badge{
+    width:42px; height:42px; border-radius:50%;
+    background: conic-gradient(from 220deg, var(--teal-500), var(--orange-500), var(--teal-300));
+    display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow); flex-shrink:0;
+  }
+  .brand-badge svg{ width:22px; height:22px; }
+  .brand-text .kicker{ font-size:10.5px; letter-spacing:1.4px; text-transform:uppercase; color: var(--orange-300); font-weight:700; }
+  .brand-text .name{ font-size:14px; font-weight:800; color:#fff; line-height:1.1; }
+  .top-actions{ display:flex; align-items:center; gap:8px; }
+  .star-pill, .mute-btn{
+    display:flex; align-items:center; gap:6px; background: var(--panel);
+    border:1.5px solid var(--panel-light); padding:8px 12px; border-radius:999px;
+    font-weight:800; font-size:13px; cursor:pointer; color:var(--text-light);
+  }
+  .star-pill svg{ width:15px; height:15px; }
+  .mute-btn svg{ width:16px; height:16px; }
+
+  /* ---------- SCREENS ---------- */
+  .screen{ display:none; animation: fadeUp .35s ease; }
+  .screen.active{ display:block; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .panel{
+    background: var(--panel); border:1px solid var(--panel-light);
+    border-radius: var(--radius); padding:20px 18px; box-shadow: var(--shadow);
+  }
+
+  /* ---------- INTRO ---------- */
+  .hero-scene{
+    height:150px; position:relative; border-radius:16px; overflow:hidden; margin-bottom:16px;
+    background: linear-gradient(180deg, #0A2233, #0F3A4D);
+  }
+  .hero-scene .planet{
+    position:absolute; border-radius:50%; opacity:0.9;
+  }
+  .p1{ width:70px; height:70px; background: radial-gradient(circle at 30% 30%, var(--teal-300), var(--teal-500)); top:15px; left:24px; box-shadow: 0 0 24px rgba(26,167,155,0.5); }
+  .p2{ width:44px; height:44px; background: radial-gradient(circle at 30% 30%, var(--orange-300), var(--orange-500)); bottom:12px; right:40px; box-shadow: 0 0 20px rgba(234,88,12,0.5); }
+  .comet{ position:absolute; top:50px; right:90px; font-size:30px; animation: driftComet 4s ease-in-out infinite; }
+  @keyframes driftComet{ 0%,100%{ transform: translate(0,0) rotate(-15deg);} 50%{ transform: translate(-14px,10px) rotate(-15deg);} }
+
+  .story-title{ font-size:21px; font-weight:900; margin:0 0 8px; color:#fff; }
+  .story-text{ font-size:14px; line-height:1.6; color: var(--text-dim); margin:0 0 16px; }
+  .story-text strong{ color: var(--orange-300); }
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    border:none; cursor:pointer; font-weight:800; font-size:14px; border-radius:999px;
+    padding:12px 22px; background: var(--teal-500); color:#04211d;
+    display:inline-flex; align-items:center; gap:7px; transition: transform .12s, background .15s;
+  }
+  .btn svg{ width:15px; height:15px; }
+  .btn:hover{ background: var(--teal-300); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn.secondary{ background: var(--orange-500); color:#fff; }
+  .btn.secondary:hover{ background: var(--orange-400); }
+  .btn.ghost{ background: transparent; border:2px solid var(--panel-light); color: var(--text-light); }
+  .btn.ghost:hover{ border-color: var(--teal-500); }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+  /* ---------- HUB ---------- */
+  .hub-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+  @media (max-width:480px){ .hub-grid{ grid-template-columns:1fr; } }
+  .mission-card{
+    background: var(--panel); border:1.5px solid var(--panel-light); border-radius:16px;
+    padding:14px; cursor:pointer; transition: transform .15s, border-color .15s; position:relative;
+  }
+  .mission-card:hover{ transform: translateY(-2px); border-color: var(--teal-500); }
+  .mission-card .icon-wrap{
+    width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    background: var(--space-800); margin-bottom:8px;
+  }
+  .mission-card .icon-wrap svg{ width:24px; height:24px; }
+  .mission-card h3{ margin:0 0 4px; font-size:14.5px; color:#fff; }
+  .mission-card p{ margin:0; font-size:12px; color: var(--text-dim); line-height:1.4; }
+  .mission-card .stars-row{ display:flex; gap:2px; margin-top:8px; }
+  .mission-card .stars-row svg{ width:14px; height:14px; }
+  .mission-card .done-badge{
+    position:absolute; top:10px; right:10px; background: var(--success-bg); color: var(--success);
+    font-size:10px; font-weight:800; padding:3px 7px; border-radius:999px; display:none;
+  }
+  .mission-card.completed .done-badge{ display:block; }
+
+  /* ---------- MISSION SCREENS ---------- */
+  .mission-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:10px; }
+  .tab{
+    display:inline-flex; align-items:center; gap:6px; background: var(--space-800); color: var(--orange-300);
+    font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:5px 10px; border-radius:999px;
+  }
+  .tab svg{ width:13px; height:13px; }
+  .round-counter{ font-size:12px; font-weight:700; color: var(--text-dim); }
+  h2.mission-title{ margin:4px 0 6px; font-size:19px; color:#fff; }
+  .mission-sub{ margin:0 0 14px; font-size:13.5px; color: var(--text-dim); line-height:1.5; }
+
+  .prog-bar{ height:6px; background: var(--space-800); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .prog-bar > i{ display:block; height:100%; width:0%; background: linear-gradient(90deg,var(--orange-500),var(--teal-500)); transition: width .3s; }
+
+  /* duel */
+  .duel-row{ display:flex; align-items:center; justify-content:center; gap:14px; margin: 8px 0 14px; }
+  .duel-planet{
+    flex:1; max-width:180px; text-align:center; background: var(--space-800); border:2px solid var(--panel-light);
+    border-radius:16px; padding:18px 8px; transition: border-color .2s, transform .2s;
+  }
+  .duel-planet.correct-pick{ border-color: var(--success); }
+  .duel-planet.wrong-pick{ border-color: var(--danger); animation: shake .4s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+  .duel-planet .num{ font-size:22px; font-weight:900; color:#fff; letter-spacing:0.5px; }
+  .duel-vs{ font-size:13px; font-weight:800; color: var(--text-dim); }
+  .rocket-track{ position:relative; height:26px; margin: 6px 0 18px; }
+  .rocket-track .track-line{ position:absolute; left:0; right:0; top:12px; height:2px; background: var(--panel-light); }
+  .rocket-track .rocket{ position:absolute; left:0; top:0; font-size:22px; transition: left .5s ease; }
+
+  .compare-viz{ margin: 10px 0 6px; }
+  .place-grid{ display:flex; gap:4px; justify-content:center; margin-bottom:6px; flex-wrap:wrap; }
+  .place-col{ text-align:center; width:52px; }
+  .place-col .lab{ font-size:8.5px; color: var(--text-dim); font-weight:700; height:24px; display:flex; align-items:center; justify-content:center; line-height:1.1; }
+  .place-col .box{
+    width:44px; height:36px; margin:2px auto; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:16px; background: var(--space-800); border:2px solid var(--panel-light); color:#fff;
+  }
+  .place-col .box.match{ background: var(--success-bg); border-color: var(--success); color: var(--success); }
+  .place-col .box.diff{ background: var(--danger-bg); border-color: var(--orange-400); color: var(--orange-300); }
+  .place-col .box.dim{ opacity:0.35; }
+  .compare-note{ text-align:center; font-size:12.5px; color: var(--text-dim); margin-top:4px; }
+  .compare-note strong{ color: var(--orange-300); }
+
+  .answer-row{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .answer-btn{
+    flex:1; min-width:110px; text-align:center; padding:12px 8px; border-radius:12px;
+    border:2px solid var(--panel-light); background: var(--space-800); font-weight:800; font-size:13px;
+    color:#fff; cursor:pointer; transition: all .15s;
+  }
+  .answer-btn:hover{ border-color: var(--teal-500); }
+  .answer-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .feedback-banner{
+    margin-top:12px; padding:10px 12px; border-radius:12px; font-size:13.5px; line-height:1.5; display:none;
+  }
+  .feedback-banner.show{ display:block; animation: fadeUp .25s ease; }
+  .feedback-banner.correct{ background: var(--success-bg); color: var(--success); border:1.5px solid rgba(62,213,152,0.4); }
+  .feedback-banner.wrong{ background: var(--danger-bg); color: #FF9C9C; border:1.5px solid rgba(255,107,107,0.4); }
+
+  /* asteroid order */
+  .slots-row{ display:flex; gap:8px; justify-content:center; margin: 6px 0 16px; flex-wrap:wrap; }
+  .slot{
+    width:100px; height:54px; border-radius:12px; border:2px dashed var(--panel-light);
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:14px; color: var(--text-dim);
+    background: var(--space-800);
+  }
+  .slot.filled{ border-style:solid; border-color: var(--teal-500); color:#fff; }
+  .slot.correct-slot{ border-color: var(--success); background: var(--success-bg); color: var(--success); }
+  .slot.wrong-slot{ border-color: var(--danger); background: var(--danger-bg); color: #FF9C9C; }
+  .chip-pool{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+  .chip{
+    padding:12px 14px; border-radius:12px; background: var(--panel-light); border:2px solid var(--teal-500);
+    font-weight:900; font-size:14px; color:#fff; cursor:pointer; transition: transform .12s, opacity .12s;
+  }
+  .chip:hover{ transform: translateY(-2px); }
+  .chip.used{ opacity:0.25; pointer-events:none; }
+  .order-direction{ text-align:center; font-size:13px; font-weight:800; color: var(--orange-300); margin-bottom:10px; }
+
+  /* MCQ */
+  .mcq-list{ display:flex; flex-direction:column; gap:8px; margin: 10px 0; }
+  .mcq-opt{
+    text-align:left; padding:12px 14px; border-radius:12px; border:2px solid var(--panel-light);
+    background: var(--space-800); font-size:13.5px; color:#fff; cursor:pointer; line-height:1.4;
+  }
+  .mcq-opt:hover{ border-color: var(--teal-500); }
+  .mcq-opt.correct-opt{ border-color: var(--success); background: var(--success-bg); color: var(--success); }
+  .mcq-opt.wrong-opt{ border-color: var(--danger); background: var(--danger-bg); color:#FF9C9C; }
+
+  .callout{
+    background: var(--space-800); border-left:4px solid var(--orange-500); border-radius:10px;
+    padding:11px 13px; font-size:13.5px; line-height:1.55; margin:12px 0; color: var(--text-light);
+  }
+  .callout strong{ color: var(--orange-300); }
+
+  .robot-bubble{
+    background: var(--space-800); border:1.5px solid var(--panel-light); border-radius:14px;
+    padding:12px 14px; font-size:14px; display:flex; gap:10px; align-items:flex-start; margin-bottom:10px;
+  }
+  .robot-bubble svg{ width:34px; height:34px; flex-shrink:0; }
+
+  /* forge */
+  .forge-row{ display:flex; gap:6px; justify-content:center; align-items:center; margin: 10px 0; flex-wrap:wrap; }
+  .forge-row input{
+    width:42px; height:48px; text-align:center; font-size:18px; font-weight:900;
+    border-radius:10px; border:2px solid var(--panel-light); background: var(--space-800); color:#fff; font-family:inherit;
+  }
+  .forge-row input:focus{ outline:none; border-color: var(--teal-500); }
+  .forge-row .plus-sep{ font-size:12px; color: var(--text-dim); font-weight:800; margin:0 2px; }
+  .forge-label{ font-size:12px; font-weight:800; color: var(--text-dim); text-align:center; margin: 10px 0 2px; text-transform:uppercase; letter-spacing:0.6px; }
+
+  /* table (nebula) */
+  table.nebula-table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+  table.nebula-table th{ background: var(--space-800); color: var(--teal-300); padding:7px; font-size:11px; text-transform:uppercase; }
+  table.nebula-table td{ padding:7px; text-align:center; border-bottom:1px solid var(--panel-light); color:#fff; }
+  table.nebula-table tr.fail td{ color: #FF9C9C; }
+
+  /* results / finale */
+  .result-stars{ display:flex; justify-content:center; gap:8px; margin: 16px 0; }
+  .result-stars svg{ width:44px; height:44px; }
+  .result-msg{ text-align:center; font-size:15px; font-weight:800; color:#fff; margin-bottom:4px; }
+  .result-sub{ text-align:center; font-size:13px; color: var(--text-dim); margin-bottom:14px; }
+  .center-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+
+  .badge-circle{
+    width:120px; height:120px; border-radius:50%; margin: 6px auto 14px;
+    background: conic-gradient(from 200deg, var(--teal-500), var(--orange-500), var(--teal-300), var(--teal-500));
+    display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow);
+  }
+  .badge-circle .inner{ width:94px; height:94px; border-radius:50%; background: var(--space-900); display:flex; align-items:center; justify-content:center; }
+  .badge-circle svg{ width:52px; height:52px; }
+
+  textarea.explain-box{
+    width:100%; border:2px solid var(--panel-light); border-radius:12px; padding:10px 12px;
+    font-family:inherit; font-size:14px; resize:vertical; background: var(--space-800); color:#fff;
+  }
+  textarea.explain-box:focus{ outline:none; border-color: var(--teal-500); }
+
+  .confetti{ position:fixed; top:-10px; width:8px; height:8px; z-index:50; pointer-events:none; border-radius:2px; }
+
+  .home-link{ display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700; color: var(--text-dim); cursor:pointer; margin-bottom:10px; }
+  .home-link:hover{ color: var(--teal-300); }
+  .home-link svg{ width:14px; height:14px; }
+</style>
+</head>
+<body>
+<div id="starField"></div>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#04211d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2c2 3 3 6 3 9 0 4-3 7-3 11 0-4-3-7-3-11 0-3 1-6 3-9z"/>
+          <circle cx="12" cy="11" r="1.6" fill="#04211d"></circle>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="kicker">MyMasteryLab</div>
+        <div class="name">Building Confident Problem Solvers</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="star-pill" id="starPill">
+        <svg viewBox="0 0 24 24" fill="#FFD166" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>
+        <span id="totalStars">0</span>/21
+      </div>
+      <div class="mute-btn" id="muteBtn" title="Toggle sound">
+        <svg id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="#EAF6F4" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN: INTRO ============ -->
+  <section class="screen active" id="screen-intro">
+    <div class="panel">
+      <div class="hero-scene">
+        <div class="planet p1"></div>
+        <div class="planet p2"></div>
+        <div class="comet">☄️</div>
+      </div>
+      <div class="story-title">Galaxy Rescue: Compare &amp; Order Patrol</div>
+      <p class="story-text">
+        Uh-oh! <strong>Glitch the Comet</strong> zoomed through Numeria Galaxy and scrambled every planet's number tag! Ships can't tell which planet is bigger, and the Asteroid Bridges are out of order. Captain — that's <strong>you</strong>. Fly through six missions using <strong>place value</strong> to compare and order numbers, repair the confused robot, and rebuild the galaxy!
+      </p>
+      <div class="btn-row">
+        <button class="btn secondary" id="startBtn">🚀 Launch Mission</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: HUB ============ -->
+  <section class="screen" id="screen-hub">
+    <div class="panel">
+      <h2 class="mission-title" style="margin-top:0;">Mission Control</h2>
+      <p class="mission-sub">Pick a mission. Complete all seven to fully restore Numeria Galaxy!</p>
+      <div class="hub-grid" id="hubGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 1 - DIGIT DUEL ============ -->
+  <section class="screen" id="screen-m1">
+    <div class="panel">
+      <div class="home-link" data-home="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Mission Control</div>
+      <div class="mission-head">
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c2 3 3 6 3 9 0 4-3 7-3 11 0-4-3-7-3-11 0-3 1-6 3-9z"/></svg> Mission 1 · Digit Duel</div>
+        <div class="round-counter" id="m1counter">Round 1 of 8</div>
+      </div>
+      <h2 class="mission-title">Which planet is bigger?</h2>
+      <p class="mission-sub">Compare the numbers using place value. Scan the digits if you need a clue!</p>
+      <div class="prog-bar"><i id="m1prog"></i></div>
+
+      <div class="duel-row" id="m1duel"></div>
+      <div class="rocket-track"><div class="track-line"></div><div class="rocket" id="m1rocket">🚀</div></div>
+
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn ghost" id="m1scanBtn">🔍 Scan Digits</button>
+      </div>
+      <div class="compare-viz" id="m1viz" style="display:none;"></div>
+
+      <div class="answer-row" id="m1answers" style="margin-top:14px;">
+        <div class="answer-btn" data-ans="left">⬅ Left is Bigger</div>
+        <div class="answer-btn" data-ans="equal">⚖️ They're Equal</div>
+        <div class="answer-btn" data-ans="right">Right is Bigger ➡</div>
+      </div>
+      <div class="feedback-banner" id="m1feedback"></div>
+      <div class="btn-row" id="m1nextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="m1nextBtn">Next Round ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 1 RESULTS ============ -->
+  <section class="screen" id="screen-m1results">
+    <div class="panel">
+      <h2 class="mission-title" style="text-align:center;">Digit Duel Complete!</h2>
+      <div class="result-stars" id="m1resultStars"></div>
+      <p class="result-msg" id="m1resultMsg"></p>
+      <p class="result-sub" id="m1resultSub"></p>
+      <div class="center-row">
+        <button class="btn ghost" id="m1replayBtn">🔁 Fly Again</button>
+        <button class="btn secondary" id="m1doneBtn">Mission Control ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 2 - ASTEROID ORDER-UP ============ -->
+  <section class="screen" id="screen-m2">
+    <div class="panel">
+      <div class="home-link" data-home="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Mission Control</div>
+      <div class="mission-head">
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg> Mission 2 · Asteroid Order-Up</div>
+        <div class="round-counter" id="m2counter">Round 1 of 5</div>
+      </div>
+      <h2 class="mission-title">Rebuild the Asteroid Bridge!</h2>
+      <p class="mission-sub">Tap the asteroids in the correct order to place them in the bridge slots.</p>
+      <div class="prog-bar"><i id="m2prog"></i></div>
+
+      <div class="order-direction" id="m2direction"></div>
+      <div class="slots-row" id="m2slots"></div>
+      <div class="chip-pool" id="m2pool"></div>
+
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn ghost" id="m2resetBtn">↺ Reset</button>
+      </div>
+      <div class="feedback-banner" id="m2feedback"></div>
+      <div class="btn-row" id="m2nextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="m2nextBtn">Next Bridge ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 2 RESULTS ============ -->
+  <section class="screen" id="screen-m2results">
+    <div class="panel">
+      <h2 class="mission-title" style="text-align:center;">Bridges Rebuilt!</h2>
+      <div class="result-stars" id="m2resultStars"></div>
+      <p class="result-msg" id="m2resultMsg"></p>
+      <p class="result-sub" id="m2resultSub"></p>
+      <div class="center-row">
+        <button class="btn ghost" id="m2replayBtn">🔁 Fly Again</button>
+        <button class="btn secondary" id="m2doneBtn">Mission Control ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 3 - ROBOT REPAIR ============ -->
+  <section class="screen" id="screen-m3">
+    <div class="panel">
+      <div class="home-link" data-home="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Mission Control</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="12" height="10" rx="2"/><line x1="12" y1="8" x2="12" y2="3"/><circle cx="12" cy="2" r="1"/></svg> Mission 3 · Robot Repair</div>
+      <h2 class="mission-title">Fix Beep-Bot's thinking!</h2>
+      <p class="mission-sub">Beep-Bot compared two planet numbers and got confused. Find the correct explanation.</p>
+
+      <div class="robot-bubble">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2"><rect x="4" y="7" width="16" height="12" rx="2"/><line x1="12" y1="7" x2="12" y2="2"/><circle cx="12" cy="1.5" r="1.2" fill="#FB923C"></circle><circle cx="9" cy="13" r="1.2" fill="#FB923C"></circle><circle cx="15" cy="13" r="1.2" fill="#FB923C"></circle></svg>
+        <div>"482,615 is bigger than 482,651... because 5 is bigger than 1!" <br><span style="color:var(--text-dim); font-size:12px;">— Beep-Bot 🤖</span></div>
+      </div>
+
+      <div class="mcq-list" id="m3options">
+        <div class="mcq-opt" data-correct="false">Beep-Bot is actually correct — bigger last digit always wins.</div>
+        <div class="mcq-opt" data-correct="false">Beep-Bot should only compare the very first digit and stop.</div>
+        <div class="mcq-opt" data-correct="true">Beep-Bot compared the wrong place! Reading left to right, the digits match until the tens place: 1 is less than 5, so 482,615 is actually smaller.</div>
+      </div>
+      <div class="feedback-banner" id="m3feedback"></div>
+      <div class="compare-viz" id="m3viz" style="display:none;"></div>
+      <div class="btn-row" id="m3nextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="m3nextBtn">Mission Control ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 4 - TRUTH SCANNER ============ -->
+  <section class="screen" id="screen-m4">
+    <div class="panel">
+      <div class="home-link" data-home="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Mission Control</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg> Mission 4 · Truth Scanner</div>
+      <h2 class="mission-title">Always, Sometimes, or Never?</h2>
+      <div class="callout">"The number with the larger last digit is always greater."</div>
+      <div class="mcq-list" id="m4options">
+        <div class="mcq-opt" data-val="always">Always true</div>
+        <div class="mcq-opt" data-val="sometimes">Sometimes true</div>
+        <div class="mcq-opt" data-val="never">Never true</div>
+      </div>
+      <div class="feedback-banner" id="m4feedback"></div>
+      <div id="m4examples" style="display:none;">
+        <div class="mini-example" style="margin-top:6px;">
+          <p class="mission-sub" style="margin:10px 0 6px;">👀 Example where it's <strong style="color:#FF9C9C;">FALSE</strong>:</p>
+          <div class="duel-row" style="margin:0 0 10px;">
+            <div class="duel-planet"><div class="num">52</div></div>
+            <div class="duel-vs">vs</div>
+            <div class="duel-planet"><div class="num">19</div></div>
+          </div>
+          <p class="compare-note">19 has the bigger last digit (9), but <strong>52 is still greater</strong> — because the tens digit (5) beats (1) first!</p>
+        </div>
+        <div class="mini-example">
+          <p class="mission-sub" style="margin:14px 0 6px;">👀 Example where it's <strong style="color:#3ED598;">TRUE</strong>:</p>
+          <div class="duel-row" style="margin:0 0 10px;">
+            <div class="duel-planet"><div class="num">23</div></div>
+            <div class="duel-vs">vs</div>
+            <div class="duel-planet"><div class="num">21</div></div>
+          </div>
+          <p class="compare-note">Here the tens digits <strong>match</strong> (both 2), so the ones digit decides — 23 > 21.</p>
+        </div>
+      </div>
+      <div class="btn-row" id="m4nextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="m4nextBtn">Mission Control ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 5 - NUMBER FORGE ============ -->
+  <section class="screen" id="screen-m5">
+    <div class="panel">
+      <div class="home-link" data-home="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Mission Control</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg> Mission 5 · Number Forge</div>
+      <h2 class="mission-title">Forge two twin planets!</h2>
+      <p class="mission-sub">Create two <strong>six-digit</strong> numbers that share the <strong>same first five digits</strong> but have a <strong>different digit in the ones place</strong>.</p>
+
+      <div class="forge-label">Shared first five digits</div>
+      <div class="forge-row" id="forgeShared">
+        <input maxlength="1" inputmode="numeric" id="fs0">
+        <input maxlength="1" inputmode="numeric" id="fs1">
+        <input maxlength="1" inputmode="numeric" id="fs2">
+        <input maxlength="1" inputmode="numeric" id="fs3">
+        <input maxlength="1" inputmode="numeric" id="fs4">
+      </div>
+      <div class="forge-label">Planet A ones digit &nbsp;|&nbsp; Planet B ones digit</div>
+      <div class="forge-row">
+        <input maxlength="1" inputmode="numeric" id="fa">
+        <span class="plus-sep">A</span>
+        <span class="plus-sep" style="margin-left:18px;">B</span>
+        <input maxlength="1" inputmode="numeric" id="fb">
+      </div>
+
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn secondary" id="forgeBtn">🔨 Forge Numbers!</button>
+      </div>
+      <div class="feedback-banner" id="m5feedback"></div>
+      <div class="compare-viz" id="m5viz" style="display:none;"></div>
+      <div class="btn-row" id="m5nextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="m5nextBtn">Mission Control ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MISSION 6 - NEBULA CHALLENGE ============ -->
+  <section class="screen" id="screen-m6">
+    <div class="panel">
+      <div class="home-link" data-home="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Mission Control</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 100 18 9 9 0 000-18z"/><path d="M8 12a4 4 0 108 0 4 4 0 00-8 0z"/></svg> Mission 6 · Nebula Challenge (Bonus)</div>
+      <h2 class="mission-title">Hunt for hidden numbers</h2>
+      <p class="mission-sub">Between <strong>349,990</strong> and <strong>350,010</strong>, how many numbers are:</p>
+      <ul style="font-size:13.5px; line-height:1.7; color:var(--text-dim); padding-left:18px;">
+        <li>greater than <strong style="color:#fff;">350,000</strong></li>
+        <li>less than <strong style="color:#fff;">350,010</strong></li>
+        <li>with digit sum equal to <strong style="color:#fff;">8</strong></li>
+      </ul>
+      <div class="mcq-list" id="m6options">
+        <div class="mcq-opt" data-val="0">There are none — no number fits all three clues.</div>
+        <div class="mcq-opt" data-val="1">Exactly 1 number fits.</div>
+        <div class="mcq-opt" data-val="3">Exactly 3 numbers fit.</div>
+        <div class="mcq-opt" data-val="9">All 9 numbers fit.</div>
+      </div>
+      <div class="feedback-banner" id="m6feedback"></div>
+      <div id="m6tableWrap" style="display:none;">
+        <table class="nebula-table">
+          <thead><tr><th>Number</th><th>Digit Sum</th><th>Sum = 8?</th></tr></thead>
+          <tbody id="m6tbody"></tbody>
+        </table>
+        <div class="compare-note">The <strong>smallest possible digit sum</strong> in this range is 9 (for 350,001) — so a digit sum of 8 is impossible here!</div>
+      </div>
+      <div class="btn-row" id="m6nextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="m6nextBtn">Mission Control ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: FINAL CHECKPOINT (EXIT TICKET) ============ -->
+  <section class="screen" id="screen-exit">
+    <div class="panel">
+      <div class="home-link" data-home="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Mission Control</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg> Final Checkpoint</div>
+      <h2 class="mission-title">Captain's Final Report</h2>
+      <p class="mission-sub">Three quick tasks before the galaxy is fully restored.</p>
+
+      <p class="mini-label" style="color:var(--teal-300); font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">1. Compare</p>
+      <div class="duel-row" id="exDuel"></div>
+      <div class="answer-row" id="exAnswers">
+        <div class="answer-btn" data-ans="left">⬅ Left is Bigger</div>
+        <div class="answer-btn" data-ans="equal">⚖️ Equal</div>
+        <div class="answer-btn" data-ans="right">Right is Bigger ➡</div>
+      </div>
+      <div class="feedback-banner" id="exFeedback1"></div>
+
+      <hr style="border:none; border-top:1.5px dashed var(--panel-light); margin:18px 0;">
+      <p class="mini-label" style="color:var(--teal-300); font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">2. Order (Least to Greatest)</p>
+      <div class="slots-row" id="exSlots"></div>
+      <div class="chip-pool" id="exPool"></div>
+      <div class="btn-row" style="justify-content:center;"><button class="btn ghost" id="exResetBtn">↺ Reset</button></div>
+      <div class="feedback-banner" id="exFeedback2"></div>
+
+      <hr style="border:none; border-top:1.5px dashed var(--panel-light); margin:18px 0;">
+      <p class="mini-label" style="color:var(--teal-300); font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">3. Explain</p>
+      <p class="mission-sub" style="margin-bottom:6px;">560,203 and 560,230 — where is the first place the digits differ?</p>
+      <textarea class="explain-box" id="exExplain" rows="2" placeholder="Type your explanation..."></textarea>
+      <div class="btn-row" style="justify-content:flex-start;"><button class="btn ghost" id="exModelBtn">Compare with model answer</button></div>
+      <div class="feedback-banner" id="exFeedback3"></div>
+
+      <div class="btn-row" style="justify-content:flex-end; margin-top:16px;">
+        <button class="btn secondary" id="exFinishBtn">Complete Mission 🎉</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: FINALE ============ -->
+  <section class="screen" id="screen-finale">
+    <div class="panel" style="text-align:center;">
+      <div class="badge-circle"><div class="inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1AA79B" stroke-width="2"><path d="M12 2c2 3 3 6 3 9 0 4-3 7-3 11 0-4-3-7-3-11 0-3 1-6 3-9z"/></svg>
+      </div></div>
+      <h2 class="mission-title">Galaxy Restored, Captain!</h2>
+      <p class="mission-sub">You compared, ordered, and out-thought Glitch the Comet using place value the whole way.</p>
+      <div class="result-stars" id="finaleStars"></div>
+      <p class="result-msg"><span id="finaleTotal">0</span> / 21 stars earned</p>
+      <div class="center-row">
+        <button class="btn ghost" id="finaleReplayBtn">🔁 Restart Whole Patrol</button>
+        <button class="btn secondary" id="finaleHubBtn">Back to Mission Control</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ========================= STARFIELD ========================= */
+  const starField = document.getElementById('starField');
+  for(let i=0;i<70;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    s.style.top = Math.random()*100+'%';
+    s.style.left = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*3).toFixed(2)+'s';
+    s.style.animationDuration = (2+Math.random()*3).toFixed(2)+'s';
+    starField.appendChild(s);
+  }
+
+  /* ========================= SOUND ========================= */
+  let soundOn = true;
+  let actx = null;
+  function ctx(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+  function tone(freq, start, dur, type, vol){
+    if(!soundOn) return;
+    try{
+      const c = ctx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = type||'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, c.currentTime+start);
+      gain.gain.linearRampToValueAtTime(vol||0.18, c.currentTime+start+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime+start+dur);
+      osc.connect(gain); gain.connect(c.destination);
+      osc.start(c.currentTime+start); osc.stop(c.currentTime+start+dur+0.02);
+    }catch(e){}
+  }
+  function playClick(){ tone(520,0,0.08,'triangle',0.12); }
+  function playCorrect(){ tone(523,0,0.12,'sine',0.16); tone(784,0.1,0.18,'sine',0.16); }
+  function playWrong(){ tone(180,0,0.22,'sawtooth',0.14); }
+  function playFanfare(){ [523,659,784,1046].forEach((f,i)=> tone(f, i*0.13, 0.2, 'triangle', 0.15)); }
+  document.getElementById('muteBtn').addEventListener('click', function(){
+    soundOn = !soundOn;
+    document.getElementById('soundIcon').style.opacity = soundOn ? '1':'0.35';
+    if(soundOn) playClick();
+  });
+
+  /* ========================= CONFETTI ========================= */
+  function confettiBurst(){
+    const colors = ['#1AA79B','#EA580C','#FFD166','#5FD1C5','#FB923C'];
+    for(let i=0;i<28;i++){
+      const el = document.createElement('div');
+      el.className='confetti';
+      el.style.left = (45+Math.random()*10)+'%';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.transform = 'rotate('+Math.floor(Math.random()*360)+'deg)';
+      document.body.appendChild(el);
+      const dx = (Math.random()-0.5)*300;
+      const dur = 900+Math.random()*700;
+      el.animate([
+        { transform: el.style.transform+' translate(0,0)', opacity:1 },
+        { transform: 'translate('+dx+'px, '+(400+Math.random()*200)+'px) rotate('+(Math.random()*720)+'deg)', opacity:0 }
+      ], { duration: dur, easing:'ease-out' });
+      setTimeout(()=> el.remove(), dur+50);
+    }
+  }
+
+  /* ========================= NAV ========================= */
+  const screens = {};
+  document.querySelectorAll('.screen').forEach(s=> screens[s.id]=s);
+  function goTo(id){
+    Object.values(screens).forEach(s=>s.classList.remove('active'));
+    screens[id].classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('[data-home]').forEach(el=> el.addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); }));
+  document.getElementById('startBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  /* ========================= STATE ========================= */
+  const state = {
+    stars: { m1:0, m2:0, m3:0, m4:0, m5:0, m6:0, ex:0 },
+    completed: { m1:false, m2:false, m3:false, m4:false, m5:false, m6:false, ex:false }
+  };
+  function totalStars(){ return Object.values(state.stars).reduce((a,b)=>a+b,0); }
+  function refreshStarPill(){ document.getElementById('totalStars').textContent = totalStars(); }
+
+  /* ========================= UTIL ========================= */
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+  function pickN(arr, n){ return shuffle(arr).slice(0,n); }
+  function fmt(n){ return n.toLocaleString('en-US'); }
+
+  const PLACE_LABELS = ["Hundred\nThousands","Ten\nThousands","Thousands","Hundreds","Tens","Ones"];
+  function digitsOf(num, len){ return String(num).padStart(len,'0').split('').map(Number); }
+
+  function buildCompareViz(container, a, b){
+    const len = Math.max(String(a).length, String(b).length);
+    const labels = PLACE_LABELS.slice(PLACE_LABELS.length-len);
+    const da = digitsOf(a,len), db = digitsOf(b,len);
+    let diffIdx = -1;
+    for(let i=0;i<len;i++){ if(da[i]!==db[i]){ diffIdx=i; break; } }
+    function row(digits){
+      let html = '<div class="place-grid">';
+      for(let i=0;i<len;i++){
+        let cls='box';
+        if(diffIdx===-1){ cls+=' match'; }
+        else if(i<diffIdx){ cls+=' match'; }
+        else if(i===diffIdx){ cls+=' diff'; }
+        else { cls+=' dim'; }
+        html += '<div class="place-col">'+(digits===da ? '<div class="lab">'+labels[i].replace('\n','<br>')+'</div>':'<div class="lab"></div>')+'<div class="'+cls+'">'+digits[i]+'</div></div>';
+      }
+      html += '</div>';
+      return html;
+    }
+    let note;
+    if(diffIdx===-1){ note = 'Every digit matches — these numbers are <strong>equal</strong>!'; }
+    else { note = 'First difference at the <strong>'+labels[diffIdx].replace('\n',' ')+'</strong> place: '+da[diffIdx]+' vs '+db[diffIdx]+'.'; }
+    container.innerHTML = row(da) + row(db) + '<div class="compare-note">'+note+'</div>';
+  }
+
+  function relationOf(a,b){ return a>b?'left':(a<b?'right':'equal'); }
+
+  /* ========================= QUESTION BANKS ========================= */
+  const compareBank = [
+    [45210,45201],[87430,87403],[305600,350600],[700050,700500],
+    [482615,482651],[560203,560230],[93214,93241],[618472,618427],
+    [27650,27605],[154320,154230],[809214,890214],[76543,76543],
+    [218976,218967],[40600,46000],[999000,998999],[63082,63820],
+    [500000,499999],[12345,12354],[777777,777770],[30400,30040]
+  ];
+
+  const orderBank = [
+    [45201,45210,45102,45120],
+    [87430,87403,87340,87304],
+    [305600,350600,320600,315600],
+    [700050,700500,700005,700055],
+    [482615,482651,482516,482561],
+    [560203,560230,560023,560320],
+    [93214,93241,93124,93412],
+    [618472,618427,618742,618247],
+    [27650,27605,27560,27506],
+    [154320,154230,154302,154203],
+    [809214,890214,850214,819214],
+    [76543,76534,76453,76345],
+    [218976,218967,218769,218697],
+    [40600,46000,42600,48000],
+    [999000,998999,997999,996999],
+    [63082,63820,63208,63028],
+    [500000,499999,501000,498000],
+    [12345,12354,12435,12453],
+    [777777,777770,777707,777077],
+    [30400,30040,30004,30440]
+  ];
+
+  /* ========================= HUB ========================= */
+  const missions = [
+    { id:'m1', icon:'rocket', title:'Digit Duel', desc:'Compare planet numbers — 8 rounds.' },
+    { id:'m2', icon:'asteroid', title:'Asteroid Order-Up', desc:'Rebuild bridges in order — 5 rounds.' },
+    { id:'m3', icon:'robot', title:'Robot Repair', desc:'Fix Beep-Bot\'s mixed-up thinking.' },
+    { id:'m4', icon:'scanner', title:'Truth Scanner', desc:'Always, sometimes, or never true?' },
+    { id:'m5', icon:'forge', title:'Number Forge', desc:'Create your own twin planets.' },
+    { id:'m6', icon:'nebula', title:'Nebula Challenge', desc:'Bonus brain-teaser hunt!' },
+    { id:'ex', icon:'flag', title:'Final Checkpoint', desc:'Show what you\'ve mastered.' }
+  ];
+  const ICONS = {
+    rocket:'<svg viewBox="0 0 24 24" fill="none" stroke="#5FD1C5" stroke-width="2"><path d="M12 2c2 3 3 6 3 9 0 4-3 7-3 11 0-4-3-7-3-11 0-3 1-6 3-9z"/></svg>',
+    asteroid:'<svg viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="9" cy="10" r="1" fill="#FB923C"></circle><circle cx="15" cy="14" r="1" fill="#FB923C"></circle></svg>',
+    robot:'<svg viewBox="0 0 24 24" fill="none" stroke="#5FD1C5" stroke-width="2"><rect x="4" y="7" width="16" height="12" rx="2"/><line x1="12" y1="7" x2="12" y2="2"/></svg>',
+    scanner:'<svg viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>',
+    forge:'<svg viewBox="0 0 24 24" fill="none" stroke="#5FD1C5" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>',
+    nebula:'<svg viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2"><path d="M12 3a9 9 0 100 18 9 9 0 000-18z"/><path d="M8 12a4 4 0 108 0 4 4 0 00-8 0z"/></svg>',
+    flag:'<svg viewBox="0 0 24 24" fill="none" stroke="#5FD1C5" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg>'
+  };
+  const STAR_ICON_ON = '<svg viewBox="0 0 24 24" fill="#FFD166" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>';
+  const STAR_ICON_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="#3A5464" stroke-width="1.6"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>';
+
+  function renderHub(){
+    const grid = document.getElementById('hubGrid');
+    grid.innerHTML = '';
+    missions.forEach(m=>{
+      const card = document.createElement('div');
+      card.className = 'mission-card' + (state.completed[m.id] ? ' completed':'');
+      let starsHtml = '';
+      for(let i=0;i<3;i++){ starsHtml += (i < state.stars[m.id]) ? STAR_ICON_ON : STAR_ICON_OFF; }
+      card.innerHTML =
+        '<div class="done-badge">✓ Done</div>' +
+        '<div class="icon-wrap">'+ICONS[m.icon]+'</div>' +
+        '<h3>'+m.title+'</h3>' +
+        '<p>'+m.desc+'</p>' +
+        '<div class="stars-row">'+starsHtml+'</div>';
+      card.addEventListener('click', ()=>{ playClick(); launchMission(m.id); });
+      grid.appendChild(card);
+    });
+    refreshStarPill();
+  }
+  function launchMission(id){
+    if(id==='m1') startM1();
+    if(id==='m2') startM2();
+    if(id==='m3') startM3();
+    if(id==='m4') startM4();
+    if(id==='m5') startM5();
+    if(id==='m6') startM6();
+    if(id==='ex') startEx();
+  }
+
+  function starsFromAccuracy(correct, total){
+    const pct = total? correct/total : 0;
+    if(pct >= 0.9) return 3;
+    if(pct >= 0.65) return 2;
+    if(pct > 0) return 1;
+    return 0;
+  }
+
+  /* ========================= MISSION 1: DIGIT DUEL ========================= */
+  let m1Rounds=[], m1Idx=0, m1Correct=0, m1Locked=false;
+  function startM1(){
+    m1Rounds = pickN(compareBank, 8);
+    m1Idx = 0; m1Correct = 0;
+    goTo('screen-m1');
+    renderM1Round();
+  }
+  function renderM1Round(){
+    m1Locked = false;
+    const [a,b] = m1Rounds[m1Idx];
+    document.getElementById('m1counter').textContent = 'Round '+(m1Idx+1)+' of '+m1Rounds.length;
+    document.getElementById('m1prog').style.width = ((m1Idx)/m1Rounds.length*100)+'%';
+    const duel = document.getElementById('m1duel');
+    duel.innerHTML =
+      '<div class="duel-planet" id="m1left"><div class="num">'+fmt(a)+'</div></div>' +
+      '<div class="duel-vs">VS</div>' +
+      '<div class="duel-planet" id="m1right"><div class="num">'+fmt(b)+'</div></div>';
+    document.getElementById('m1rocket').style.left = '0%';
+    document.getElementById('m1viz').style.display='none';
+    document.getElementById('m1viz').innerHTML='';
+    document.getElementById('m1feedback').className='feedback-banner';
+    document.getElementById('m1feedback').innerHTML='';
+    document.getElementById('m1nextRow').style.display='none';
+    document.querySelectorAll('#m1answers .answer-btn').forEach(b=>{ b.style.pointerEvents='auto'; b.style.opacity='1'; });
+  }
+  document.getElementById('m1scanBtn').addEventListener('click', ()=>{
+    playClick();
+    const [a,b] = m1Rounds[m1Idx];
+    const viz = document.getElementById('m1viz');
+    buildCompareViz(viz, a, b);
+    viz.style.display='block';
+  });
+  document.getElementById('m1answers').addEventListener('click', function(e){
+    const btn = e.target.closest('.answer-btn');
+    if(!btn || m1Locked) return;
+    m1Locked = true;
+    const [a,b] = m1Rounds[m1Idx];
+    const correct = relationOf(a,b);
+    const chosen = btn.dataset.ans;
+    document.querySelectorAll('#m1answers .answer-btn').forEach(bt=> bt.style.pointerEvents='none');
+    const leftPlanet = document.getElementById('m1left'), rightPlanet = document.getElementById('m1right');
+    const fb = document.getElementById('m1feedback');
+    fb.classList.add('show');
+    if(chosen===correct){
+      playCorrect();
+      m1Correct++;
+      document.getElementById('m1rocket').style.left = '92%';
+      if(correct==='left') leftPlanet.classList.add('correct-pick'); else if(correct==='right') rightPlanet.classList.add('correct-pick');
+      fb.className='feedback-banner show correct';
+      fb.innerHTML = '✅ Great flying! '+explainRelation(a,b,correct);
+    } else {
+      playWrong();
+      if(chosen==='left') leftPlanet.classList.add('wrong-pick'); else if(chosen==='right') rightPlanet.classList.add('wrong-pick');
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🌠 Not quite! '+explainRelation(a,b,correct);
+    }
+    const viz = document.getElementById('m1viz');
+    buildCompareViz(viz, a, b);
+    viz.style.display='block';
+    document.getElementById('m1nextRow').style.display='flex';
+  });
+  function explainRelation(a,b,rel){
+    if(rel==='equal') return fmt(a)+' equals '+fmt(b)+'.';
+    const bigger = rel==='left'? a : b;
+    const smaller = rel==='left'? b : a;
+    return fmt(bigger)+' is greater than '+fmt(smaller)+'.';
+  }
+  document.getElementById('m1nextBtn').addEventListener('click', ()=>{
+    playClick();
+    m1Idx++;
+    if(m1Idx >= m1Rounds.length){
+      document.getElementById('m1prog').style.width='100%';
+      finishM1();
+    } else {
+      renderM1Round();
+    }
+  });
+  function finishM1(){
+    const stars = starsFromAccuracy(m1Correct, m1Rounds.length);
+    state.stars.m1 = Math.max(state.stars.m1, stars);
+    state.completed.m1 = true;
+    document.getElementById('m1resultStars').innerHTML = starRow(stars);
+    document.getElementById('m1resultMsg').textContent = m1Correct+' / '+m1Rounds.length+' correct!';
+    document.getElementById('m1resultSub').textContent = starMsg(stars);
+    if(stars>=2) { confettiBurst(); playFanfare(); }
+    goTo('screen-m1results');
+  }
+  document.getElementById('m1replayBtn').addEventListener('click', ()=>{ playClick(); startM1(); });
+  document.getElementById('m1doneBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  function starRow(n){
+    let h='';
+    for(let i=0;i<3;i++){ h += (i<n)?STAR_ICON_ON:STAR_ICON_OFF; }
+    return h;
+  }
+  function starMsg(n){
+    if(n===3) return 'Stellar work — perfect place-value scanning!';
+    if(n===2) return 'Nice flying — a little more practice for a full 3 stars.';
+    if(n===1) return 'Good start — try again to sharpen your scanning skills.';
+    return 'Let\'s scan those digits more carefully next time!';
+  }
+
+  /* ========================= MISSION 2: ASTEROID ORDER-UP ========================= */
+  let m2Rounds=[], m2Idx=0, m2Correct=0, m2Attempted=false;
+  let m2Current=null, m2Target=null, m2Filled=[];
+  function startM2(){
+    m2Rounds = pickN(orderBank, 5);
+    m2Idx = 0; m2Correct = 0;
+    goTo('screen-m2');
+    renderM2Round();
+  }
+  function renderM2Round(){
+    m2Attempted = false;
+    document.getElementById('m2counter').textContent = 'Bridge '+(m2Idx+1)+' of '+m2Rounds.length;
+    document.getElementById('m2prog').style.width = ((m2Idx)/m2Rounds.length*100)+'%';
+    const nums = m2Rounds[m2Idx];
+    const dir = Math.random() < 0.5 ? 'asc' : 'desc';
+    m2Current = shuffle(nums);
+    m2Target = [...nums].sort((x,y)=> dir==='asc' ? x-y : y-x);
+    m2Filled = [];
+    document.getElementById('m2direction').textContent = dir==='asc' ? '🔼 Order: LEAST to GREATEST' : '🔽 Order: GREATEST to LEAST';
+    const slotsEl = document.getElementById('m2slots');
+    slotsEl.innerHTML='';
+    for(let i=0;i<nums.length;i++){
+      const s = document.createElement('div');
+      s.className='slot'; s.id='m2slot'+i; s.textContent='?';
+      slotsEl.appendChild(s);
+    }
+    const poolEl = document.getElementById('m2pool');
+    poolEl.innerHTML='';
+    m2Current.forEach((n,i)=>{
+      const c = document.createElement('div');
+      c.className='chip'; c.textContent = fmt(n); c.dataset.val = n; c.dataset.idx = i;
+      c.addEventListener('click', onChipClick);
+      poolEl.appendChild(c);
+    });
+    document.getElementById('m2feedback').className='feedback-banner';
+    document.getElementById('m2feedback').innerHTML='';
+    document.getElementById('m2nextRow').style.display='none';
+  }
+  function onChipClick(e){
+    if(m2Attempted) return;
+    const chip = e.currentTarget;
+    if(chip.classList.contains('used')) return;
+    playClick();
+    chip.classList.add('used');
+    m2Filled.push(Number(chip.dataset.val));
+    const slot = document.getElementById('m2slot'+(m2Filled.length-1));
+    slot.textContent = fmt(Number(chip.dataset.val));
+    slot.classList.add('filled');
+    if(m2Filled.length === m2Target.length){ checkM2(); }
+  }
+  function checkM2(){
+    m2Attempted = true;
+    let allCorrect = true;
+    for(let i=0;i<m2Target.length;i++){
+      const slot = document.getElementById('m2slot'+i);
+      if(m2Filled[i]===m2Target[i]){ slot.classList.add('correct-slot'); }
+      else { slot.classList.add('wrong-slot'); allCorrect=false; }
+    }
+    const fb = document.getElementById('m2feedback');
+    fb.classList.add('show');
+    if(allCorrect){
+      playCorrect();
+      m2Correct++;
+      fb.className='feedback-banner show correct';
+      fb.innerHTML = '✅ Bridge secured! Perfect order.';
+    } else {
+      playWrong();
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🌠 A few asteroids are out of place. Correct order: '+m2Target.map(fmt).join(' → ');
+    }
+    document.getElementById('m2nextRow').style.display='flex';
+  }
+  document.getElementById('m2resetBtn').addEventListener('click', ()=>{
+    if(m2Attempted) return;
+    playClick();
+    renderM2Round();
+  });
+  document.getElementById('m2nextBtn').addEventListener('click', ()=>{
+    playClick();
+    m2Idx++;
+    if(m2Idx >= m2Rounds.length){
+      document.getElementById('m2prog').style.width='100%';
+      finishM2();
+    } else {
+      renderM2Round();
+    }
+  });
+  function finishM2(){
+    const stars = starsFromAccuracy(m2Correct, m2Rounds.length);
+    state.stars.m2 = Math.max(state.stars.m2, stars);
+    state.completed.m2 = true;
+    document.getElementById('m2resultStars').innerHTML = starRow(stars);
+    document.getElementById('m2resultMsg').textContent = m2Correct+' / '+m2Rounds.length+' bridges perfect!';
+    document.getElementById('m2resultSub').textContent = starMsg(stars);
+    if(stars>=2){ confettiBurst(); playFanfare(); }
+    goTo('screen-m2results');
+  }
+  document.getElementById('m2replayBtn').addEventListener('click', ()=>{ playClick(); startM2(); });
+  document.getElementById('m2doneBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  /* ========================= MISSION 3: ROBOT REPAIR ========================= */
+  let m3Answered = false;
+  function startM3(){
+    m3Answered = false;
+    document.querySelectorAll('#m3options .mcq-opt').forEach(o=>{ o.classList.remove('correct-opt','wrong-opt'); o.style.pointerEvents='auto'; });
+    document.getElementById('m3feedback').className='feedback-banner';
+    document.getElementById('m3feedback').innerHTML='';
+    document.getElementById('m3viz').style.display='none';
+    document.getElementById('m3nextRow').style.display='none';
+    goTo('screen-m3');
+  }
+  document.getElementById('m3options').addEventListener('click', function(e){
+    const opt = e.target.closest('.mcq-opt');
+    if(!opt || m3Answered) return;
+    m3Answered = true;
+    document.querySelectorAll('#m3options .mcq-opt').forEach(o=> o.style.pointerEvents='none');
+    const isCorrect = opt.dataset.correct === 'true';
+    const fb = document.getElementById('m3feedback');
+    fb.classList.add('show');
+    if(isCorrect){
+      playCorrect();
+      opt.classList.add('correct-opt');
+      state.stars.m3 = Math.max(state.stars.m3, 3);
+      fb.className='feedback-banner show correct';
+      fb.innerHTML = '✅ Beep-Bot is repaired! You always start comparing from the leftmost (biggest) place.';
+    } else {
+      playWrong();
+      opt.classList.add('wrong-opt');
+      document.querySelector('#m3options .mcq-opt[data-correct="true"]').classList.add('correct-opt');
+      state.stars.m3 = Math.max(state.stars.m3, 1);
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🔧 Almost — the correct fix is highlighted below.';
+    }
+    state.completed.m3 = true;
+    const viz = document.getElementById('m3viz');
+    buildCompareViz(viz, 482615, 482651);
+    viz.style.display='block';
+    document.getElementById('m3nextRow').style.display='flex';
+  });
+  document.getElementById('m3nextBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  /* ========================= MISSION 4: TRUTH SCANNER ========================= */
+  let m4Answered=false;
+  function startM4(){
+    m4Answered=false;
+    document.querySelectorAll('#m4options .mcq-opt').forEach(o=>{ o.classList.remove('correct-opt','wrong-opt'); o.style.pointerEvents='auto'; });
+    document.getElementById('m4feedback').className='feedback-banner';
+    document.getElementById('m4feedback').innerHTML='';
+    document.getElementById('m4examples').style.display='none';
+    document.getElementById('m4nextRow').style.display='none';
+    goTo('screen-m4');
+  }
+  document.getElementById('m4options').addEventListener('click', function(e){
+    const opt = e.target.closest('.mcq-opt');
+    if(!opt || m4Answered) return;
+    m4Answered = true;
+    document.querySelectorAll('#m4options .mcq-opt').forEach(o=> o.style.pointerEvents='none');
+    const val = opt.dataset.val;
+    const fb = document.getElementById('m4feedback');
+    fb.classList.add('show');
+    if(val==='sometimes'){
+      playCorrect();
+      opt.classList.add('correct-opt');
+      state.stars.m4 = Math.max(state.stars.m4, 3);
+      fb.className='feedback-banner show correct';
+      fb.innerHTML = '✅ Correct — SOMETIMES true! The last digit only decides when every other digit already matches.';
+    } else {
+      playWrong();
+      opt.classList.add('wrong-opt');
+      document.querySelector('#m4options .mcq-opt[data-val="sometimes"]').classList.add('correct-opt');
+      state.stars.m4 = Math.max(state.stars.m4, 1);
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🔭 Check the examples below — the answer is SOMETIMES true.';
+    }
+    state.completed.m4 = true;
+    document.getElementById('m4examples').style.display='block';
+    document.getElementById('m4nextRow').style.display='flex';
+  });
+  document.getElementById('m4nextBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  /* ========================= MISSION 5: NUMBER FORGE ========================= */
+  function startM5(){
+    ['fs0','fs1','fs2','fs3','fs4','fa','fb'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('m5feedback').className='feedback-banner';
+    document.getElementById('m5feedback').innerHTML='';
+    document.getElementById('m5viz').style.display='none';
+    document.getElementById('m5nextRow').style.display='none';
+    goTo('screen-m5');
+  }
+  // auto-advance digit inputs
+  document.querySelectorAll('.forge-row input').forEach((inp, idx, all)=>{
+    inp.addEventListener('input', function(){
+      this.value = this.value.replace(/[^0-9]/g,'').slice(0,1);
+      if(this.value && all[idx+1]) all[idx+1].focus();
+    });
+  });
+  document.getElementById('forgeBtn').addEventListener('click', function(){
+    playClick();
+    const shared = ['fs0','fs1','fs2','fs3','fs4'].map(id=>document.getElementById(id).value);
+    const a = document.getElementById('fa').value;
+    const b = document.getElementById('fb').value;
+    const fb = document.getElementById('m5feedback');
+    fb.classList.add('show');
+    if(shared.some(v=>v==='') || a==='' || b===''){
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🔧 Fill in every box first — five shared digits plus one ones-digit for each planet.';
+      return;
+    }
+    if(a===b){
+      playWrong();
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🌠 Planet A and Planet B need DIFFERENT ones digits — try again!';
+      return;
+    }
+    playCorrect();
+    const numA = Number(shared.join('')+a);
+    const numB = Number(shared.join('')+b);
+    fb.className='feedback-banner show correct';
+    fb.innerHTML = '✅ Forged! '+fmt(numA)+' and '+fmt(numB)+' share the same first five digits and differ only in the ones place.';
+    const viz = document.getElementById('m5viz');
+    buildCompareViz(viz, numA, numB);
+    viz.style.display='block';
+    state.stars.m5 = 3;
+    state.completed.m5 = true;
+    document.getElementById('m5nextRow').style.display='flex';
+    confettiBurst();
+  });
+  document.getElementById('m5nextBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  /* ========================= MISSION 6: NEBULA CHALLENGE ========================= */
+  let m6Answered=false;
+  function startM6(){
+    m6Answered=false;
+    document.querySelectorAll('#m6options .mcq-opt').forEach(o=>{ o.classList.remove('correct-opt','wrong-opt'); o.style.pointerEvents='auto'; });
+    document.getElementById('m6feedback').className='feedback-banner';
+    document.getElementById('m6feedback').innerHTML='';
+    document.getElementById('m6tableWrap').style.display='none';
+    document.getElementById('m6nextRow').style.display='none';
+    goTo('screen-m6');
+  }
+  document.getElementById('m6options').addEventListener('click', function(e){
+    const opt = e.target.closest('.mcq-opt');
+    if(!opt || m6Answered) return;
+    m6Answered = true;
+    document.querySelectorAll('#m6options .mcq-opt').forEach(o=> o.style.pointerEvents='none');
+    const val = opt.dataset.val;
+    const fb = document.getElementById('m6feedback');
+    fb.classList.add('show');
+    if(val==='0'){
+      playCorrect();
+      opt.classList.add('correct-opt');
+      state.stars.m6 = 3;
+      fb.className='feedback-banner show correct';
+      fb.innerHTML = '✅ Correct — NONE of them work! See the digit-sum scan below.';
+    } else {
+      playWrong();
+      opt.classList.add('wrong-opt');
+      document.querySelector('#m6options .mcq-opt[data-val="0"]').classList.add('correct-opt');
+      state.stars.m6 = 1;
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🔭 Let\'s scan every candidate number below to see why.';
+    }
+    state.completed.m6 = true;
+    const tbody = document.getElementById('m6tbody');
+    tbody.innerHTML='';
+    for(let n=350001; n<=350009; n++){
+      const sum = String(n).split('').reduce((s,d)=>s+Number(d),0);
+      const tr = document.createElement('tr');
+      if(sum!==8) tr.className='fail';
+      tr.innerHTML = '<td>'+fmt(n)+'</td><td>'+sum+'</td><td>'+(sum===8?'Yes':'No')+'</td>';
+      tbody.appendChild(tr);
+    }
+    document.getElementById('m6tableWrap').style.display='block';
+    document.getElementById('m6nextRow').style.display='flex';
+  });
+  document.getElementById('m6nextBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  /* ========================= FINAL CHECKPOINT ========================= */
+  let exPart1Done=false, exPart2Done=false, exPart3Done=false;
+  let exFilled=[], exTarget=null;
+  function startEx(){
+    exPart1Done=false; exPart2Done=false; exPart3Done=false;
+    document.getElementById('exExplain').value='';
+    // Part 1
+    const [a,b] = [560203, 560230];
+    document.getElementById('exDuel').innerHTML =
+      '<div class="duel-planet" id="exleft"><div class="num">'+fmt(a)+'</div></div>' +
+      '<div class="duel-vs">VS</div>' +
+      '<div class="duel-planet" id="exright"><div class="num">'+fmt(b)+'</div></div>';
+    document.getElementById('exFeedback1').className='feedback-banner';
+    document.getElementById('exFeedback1').innerHTML='';
+    document.querySelectorAll('#exAnswers .answer-btn').forEach(bt=>{ bt.style.pointerEvents='auto'; });
+    document.getElementById('exleft') && document.getElementById('exleft').classList.remove('correct-pick','wrong-pick');
+    // Part 2
+    const nums = [560230, 560203, 560023];
+    exTarget = [...nums].sort((x,y)=>x-y);
+    const shuffled = shuffle(nums);
+    exFilled=[];
+    const slotsEl = document.getElementById('exSlots');
+    slotsEl.innerHTML='';
+    nums.forEach((n,i)=>{
+      const s = document.createElement('div'); s.className='slot'; s.id='exslot'+i; s.textContent='?';
+      slotsEl.appendChild(s);
+    });
+    const poolEl = document.getElementById('exPool');
+    poolEl.innerHTML='';
+    shuffled.forEach(n=>{
+      const c = document.createElement('div'); c.className='chip'; c.textContent=fmt(n); c.dataset.val=n;
+      c.addEventListener('click', onExChipClick);
+      poolEl.appendChild(c);
+    });
+    document.getElementById('exFeedback2').className='feedback-banner';
+    document.getElementById('exFeedback2').innerHTML='';
+    document.getElementById('exFeedback3').className='feedback-banner';
+    document.getElementById('exFeedback3').innerHTML='';
+    goTo('screen-exit');
+  }
+  document.getElementById('exAnswers').addEventListener('click', function(e){
+    const btn = e.target.closest('.answer-btn');
+    if(!btn || exPart1Done) return;
+    exPart1Done = true;
+    document.querySelectorAll('#exAnswers .answer-btn').forEach(bt=> bt.style.pointerEvents='none');
+    const a=560203,b=560230;
+    const correct = relationOf(a,b);
+    const chosen = btn.dataset.ans;
+    const fb = document.getElementById('exFeedback1');
+    fb.classList.add('show');
+    if(chosen===correct){
+      playCorrect();
+      fb.className='feedback-banner show correct';
+      fb.innerHTML = '✅ Right! 560,230 is greater — they match until the tens place (0 vs 3).';
+    } else {
+      playWrong();
+      fb.className='feedback-banner show wrong';
+      fb.innerHTML = '🌠 Actually, 560,230 is greater — digits match until the tens place, where 3 beats 0.';
+    }
+  });
+  function onExChipClick(e){
+    if(exPart2Done) return;
+    const chip = e.currentTarget;
+    if(chip.classList.contains('used')) return;
+    playClick();
+    chip.classList.add('used');
+    exFilled.push(Number(chip.dataset.val));
+    const slot = document.getElementById('exslot'+(exFilled.length-1));
+    slot.textContent = fmt(Number(chip.dataset.val));
+    slot.classList.add('filled');
+    if(exFilled.length===exTarget.length){
+      exPart2Done = true;
+      let allCorrect = true;
+      for(let i=0;i<exTarget.length;i++){
+        const s = document.getElementById('exslot'+i);
+        if(exFilled[i]===exTarget[i]) s.classList.add('correct-slot'); else { s.classList.add('wrong-slot'); allCorrect=false; }
+      }
+      const fb = document.getElementById('exFeedback2');
+      fb.classList.add('show');
+      if(allCorrect){ playCorrect(); fb.className='feedback-banner show correct'; fb.innerHTML='✅ Perfect order!'; }
+      else { playWrong(); fb.className='feedback-banner show wrong'; fb.innerHTML='🌠 Correct order: '+exTarget.map(fmt).join(' → '); }
+    }
+  }
+  document.getElementById('exResetBtn').addEventListener('click', ()=>{
+    if(exPart2Done) return;
+    playClick();
+    document.querySelectorAll('#exPool .chip').forEach(c=> c.classList.remove('used'));
+    document.querySelectorAll('#exSlots .slot').forEach(s=>{ s.textContent='?'; s.classList.remove('filled','correct-slot','wrong-slot'); });
+    exFilled=[];
+  });
+  document.getElementById('exModelBtn').addEventListener('click', function(){
+    playClick();
+    exPart3Done = true;
+    const fb = document.getElementById('exFeedback3');
+    fb.classList.add('show');
+    fb.className='feedback-banner show correct';
+    fb.innerHTML = 'Model answer: Reading left to right, the digits match through the hundreds place — the first difference is in the <strong>tens place</strong> (0 vs 3), which is why 560,230 is greater.';
+  });
+  document.getElementById('exFinishBtn').addEventListener('click', function(){
+    playClick();
+    let score = 0;
+    if(exPart1Done) score++;
+    if(exPart2Done) score++;
+    if(exPart3Done) score++;
+    state.stars.ex = starsFromAccuracy(score, 3);
+    state.completed.ex = true;
+    showFinale();
+  });
+
+  /* ========================= FINALE ========================= */
+  function showFinale(){
+    const total = totalStars();
+    document.getElementById('finaleTotal').textContent = total;
+    document.getElementById('finaleStars').innerHTML = starRow(Math.round((total/21)*3));
+    confettiBurst();
+    playFanfare();
+    goTo('screen-finale');
+  }
+  document.getElementById('finaleReplayBtn').addEventListener('click', function(){
+    playClick();
+    Object.keys(state.stars).forEach(k=> state.stars[k]=0);
+    Object.keys(state.completed).forEach(k=> state.completed[k]=false);
+    renderHub();
+    goTo('screen-intro');
+  });
+  document.getElementById('finaleHubBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+  /* ========================= INIT ========================= */
+  renderHub();
+})();
+</script>
+</body>
+</html>
