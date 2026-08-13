@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | Case File: Number Sense Challenge</title>
+<style>
+  :root{
+    --teal-900:#0B4F4A;
+    --teal-700:#0F766E;
+    --teal-600:#128077;
+    --teal-500:#1AA79B;
+    --teal-100:#E3F3F1;
+    --teal-050:#F1FAF9;
+    --orange-700:#C2410C;
+    --orange-600:#D9520F;
+    --orange-500:#EA580C;
+    --orange-300:#FB923C;
+    --orange-100:#FEECDC;
+    --cream:#FFFBF4;
+    --paper:#FFF7EA;
+    --paper-line:#EADFC8;
+    --ink:#20302F;
+    --ink-soft:#5B6B69;
+    --success:#1E8F63;
+    --success-bg:#E4F5EC;
+    --danger:#C2483C;
+    --danger-bg:#FBEAE7;
+    --shadow: 0 10px 30px rgba(11,79,74,0.14);
+    --radius: 18px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: "Trebuchet MS", "Segoe UI Rounded", "Segoe UI", Verdana, sans-serif;
+    background:
+      radial-gradient(circle at 8% 8%, rgba(26,167,155,0.10), transparent 40%),
+      radial-gradient(circle at 95% 12%, rgba(234,88,12,0.10), transparent 38%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    padding: 18px 14px 40px;
+  }
+
+  .app{ max-width: 760px; margin: 0 auto; }
+
+  /* ---------- HEADER ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-badge{
+    width:44px; height:44px; border-radius:50%;
+    background: conic-gradient(from 220deg, var(--teal-700), var(--orange-500), var(--teal-500));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+    flex-shrink:0;
+  }
+  .brand-badge svg{ width:24px; height:24px; }
+  .brand-text .kicker{
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--orange-600); font-weight:700;
+  }
+  .brand-text .name{ font-size:15px; font-weight:800; color:var(--teal-900); line-height:1.1; }
+
+  .xp-pill{
+    display:flex; align-items:center; gap:6px;
+    background: var(--teal-900); color:#fff;
+    padding: 8px 14px; border-radius: 999px;
+    font-size:13px; font-weight:700;
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+  }
+  .xp-pill svg{ width:16px; height:16px; }
+
+  .case-title{
+    background: var(--teal-900);
+    color:#fff;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+  .case-title::before{
+    content:"";
+    position:absolute; right:-30px; top:-30px;
+    width:140px; height:140px; border-radius:50%;
+    background: rgba(251,146,60,0.18);
+  }
+  .case-title h1{
+    margin:0 0 4px; font-size: 21px; letter-spacing:0.3px; position:relative;
+  }
+  .case-title p{ margin:0; font-size:13px; color:#BFE6E1; position:relative; }
+  .case-title .stamp{
+    position:absolute; top:14px; right:16px;
+    border:2px solid var(--orange-300); color:var(--orange-300);
+    padding:3px 9px; border-radius:6px; font-size:10px; font-weight:800;
+    letter-spacing:1.5px; transform: rotate(6deg); opacity:0.9;
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-wrap{ margin-bottom: 14px; }
+  .progress-track{
+    display:flex; gap:5px; margin-bottom:6px;
+  }
+  .progress-track .seg{
+    flex:1; height:6px; border-radius:4px; background: var(--teal-100);
+    overflow:hidden;
+  }
+  .progress-track .seg > i{
+    display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--orange-500), var(--teal-500));
+    transition: width .3s ease;
+  }
+  .progress-label{
+    display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-weight:600;
+  }
+
+  /* ---------- STAGE / CARDS ---------- */
+  .stage{ position:relative; min-height: 430px; }
+  .card{
+    display:none;
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: var(--radius);
+    padding: 22px 20px 24px;
+    box-shadow: var(--shadow);
+    animation: rise .35s ease;
+  }
+  .card.active{ display:block; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .tab{
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--orange-100); color:var(--orange-700);
+    font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+    padding:5px 10px; border-radius: 999px; margin-bottom:12px;
+  }
+  .tab svg{ width:13px; height:13px; }
+
+  h2.card-title{
+    margin: 0 0 6px; font-size:19px; color:var(--teal-900); line-height:1.25;
+  }
+  .card-sub{ margin:0 0 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
+
+  .divider{ border:none; border-top:1.5px dashed var(--paper-line); margin: 16px 0; }
+
+  /* ---------- GENERIC UI PIECES ---------- */
+  .goal-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+  .goal-list li{
+    display:flex; align-items:flex-start; gap:10px;
+    background: var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.4;
+  }
+  .goal-list li .chk{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--teal-500);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; margin-top:1px; background:#fff; transition: background .15s, border-color .15s;
+  }
+  .goal-list li .chk.done{ background: var(--teal-500); border-color:var(--teal-500); }
+  .goal-list li .chk svg{ width:12px; height:12px; opacity:0; transition:opacity .15s; }
+  .goal-list li .chk.done svg{ opacity:1; }
+
+  .btn{
+    border:none; cursor:pointer; font-weight:800; font-size:13.5px;
+    border-radius: 999px; padding: 10px 18px;
+    background: var(--teal-700); color:#fff;
+    display:inline-flex; align-items:center; gap:6px;
+    transition: transform .12s ease, background .15s ease;
+  }
+  .btn:hover{ background: var(--teal-600); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn.secondary{ background: var(--orange-500); }
+  .btn.secondary:hover{ background: var(--orange-600); }
+  .btn.ghost{ background: transparent; color:var(--teal-700); border:2px solid var(--teal-100); }
+  .btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .btn svg{ width:14px; height:14px; }
+
+  .reveal-box{
+    margin-top:12px; border-radius:12px; padding:14px 14px;
+    background: var(--success-bg); border:1.5px solid #BFE3CE;
+    font-size:14px; line-height:1.55; display:none;
+  }
+  .reveal-box.show{ display:block; animation: rise .3s ease; }
+  .reveal-box strong{ color:var(--success); }
+
+  /* Vocabulary flip cards */
+  .vocab-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  @media (max-width:480px){ .vocab-grid{ grid-template-columns: 1fr; } }
+  .flip-card{ perspective: 1000px; height: 108px; cursor:pointer; }
+  .flip-inner{
+    position:relative; width:100%; height:100%; text-align:center;
+    transition: transform .5s; transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform: rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:10px; font-size:13px;
+  }
+  .flip-front{ background: var(--teal-700); color:#fff; font-weight:800; font-size:15px; }
+  .flip-front span{ font-size:10px; font-weight:600; opacity:0.75; margin-top:4px; }
+  .flip-back{ background:#fff; border:2px solid var(--teal-100); color:var(--ink); transform: rotateY(180deg); line-height:1.35; }
+
+  /* SVG viz container */
+  .viz{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding: 10px 6px 4px; margin: 6px 0 4px; overflow:hidden;
+  }
+  .viz svg{ width:100%; height:auto; display:block; }
+  .viz-caption{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin: 2px 0 8px; font-weight:600; }
+
+  /* Table */
+  table.pv-table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:14px; }
+  table.pv-table th{
+    background: var(--teal-700); color:#fff; padding:9px 8px; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:0.4px;
+  }
+  table.pv-table th:first-child{ border-radius:8px 0 0 0; }
+  table.pv-table th:last-child{ border-radius:0 8px 0 0; }
+  table.pv-table td{ padding:9px 8px; border-bottom:1px solid var(--paper-line); text-align:center; }
+  table.pv-table tr:nth-child(even) td{ background: var(--teal-050); }
+  table.pv-table input{
+    width: 78px; padding:6px 4px; text-align:center; font-size:14px;
+    border:2px solid var(--teal-100); border-radius:8px; font-family:inherit;
+  }
+  table.pv-table input:focus{ outline:none; border-color:var(--teal-500); }
+  .cell-status{ display:inline-block; margin-left:4px; }
+
+  /* quick problem chain */
+  .chain{ display:flex; flex-direction:column; gap:8px; margin: 4px 0 6px; }
+  .chain .step{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:10px; padding:10px 12px;
+  }
+  .chain .step .q{ font-size:15px; font-weight:700; color:var(--teal-900); }
+  .chain .step .a{
+    font-size:15px; font-weight:800; color: var(--orange-700);
+    min-width:50px; text-align:right;
+  }
+
+  /* choice buttons */
+  .choice-row{ display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0; }
+  .choice{
+    flex:1; min-width:90px; text-align:center;
+    padding:10px 8px; border-radius:10px; border:2px solid var(--teal-100);
+    background:#fff; font-weight:800; font-size:13.5px; cursor:pointer; color:var(--teal-900);
+    transition: all .15s ease;
+  }
+  .choice:hover{ border-color: var(--teal-500); }
+  .choice.selected{ background: var(--teal-700); color:#fff; border-color:var(--teal-700); }
+
+  .input-line{ display:flex; align-items:center; gap:10px; margin: 10px 0; flex-wrap:wrap; }
+  .input-line input[type="text"], .input-line input[type="number"]{
+    width: 110px; padding:9px 10px; font-size:15px; text-align:center;
+    border:2px solid var(--teal-100); border-radius:10px; font-family:inherit; font-weight:700;
+  }
+  .input-line input:focus{ outline:none; border-color:var(--teal-500); }
+
+  .callout{
+    background: var(--orange-100); border-left:4px solid var(--orange-500);
+    border-radius:10px; padding:10px 12px; font-size:13.5px; line-height:1.5; margin: 12px 0;
+  }
+  .callout strong{ color:var(--orange-700); }
+
+  .mini-label{ font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; color:var(--teal-700); margin: 14px 0 6px; }
+
+  /* Badge / final card */
+  .badge-wrap{ text-align:center; padding: 6px 0 4px; }
+  .badge-circle{
+    width:110px; height:110px; border-radius:50%; margin: 4px auto 12px;
+    background: conic-gradient(from 200deg, var(--teal-700), var(--orange-500), var(--teal-500), var(--teal-700));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+  }
+  .badge-circle .inner{
+    width:86px; height:86px; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .badge-circle svg{ width:44px; height:44px; }
+  .final-xp{ font-size:26px; font-weight:900; color:var(--teal-900); }
+  .final-xp span{ font-size:14px; color:var(--ink-soft); font-weight:700; }
+
+  /* nav controls */
+  .controls{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:16px; gap:10px;
+  }
+  .controls .btn{ padding:10px 16px; }
+  .counter{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+
+  .feedback-text{ font-size:13.5px; margin-top:8px; line-height:1.5; display:none; padding:10px 12px; border-radius:10px; }
+  .feedback-text.show{ display:block; animation: rise .25s ease; }
+  .feedback-text.correct{ background: var(--success-bg); color:var(--success); border:1.5px solid #BFE3CE; }
+  .feedback-text.wrong{ background: var(--danger-bg); color:var(--danger); border:1.5px solid #F1C6BE; }
+  .feedback-text.info{ background: var(--teal-050); color:var(--teal-900); border:1.5px solid var(--teal-100); }
+
+  /* ---------- extra: Q&A reveal cards (session 3) ---------- */
+  .qa-list{ display:flex; flex-direction:column; gap:10px; margin:10px 0 4px; }
+  .qa-item{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; transition:border-color .15s ease;
+  }
+  .qa-item:hover{ border-color:var(--teal-500); }
+  .qa-item .qrow{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .qa-item .q{ font-size:14.5px; font-weight:700; color:var(--teal-900); line-height:1.45; }
+  .qa-item .peek{
+    font-size:9.5px; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink-soft);
+    font-weight:800; white-space:nowrap; margin-top:2px; flex-shrink:0;
+  }
+  .qa-item .a{
+    margin-top:12px; padding-top:12px; border-top:1.5px dashed var(--paper-line);
+    font-size:14px; font-weight:700; color:var(--orange-700); line-height:1.6; display:none;
+  }
+  .qa-item.open .a{ display:block; }
+
+  /* place-value table with placeholder zeros */
+  table.pv-table td.zero-cell{ background:var(--teal-050); color:var(--ink-soft); font-style:italic; }
+  .table-note{ font-size:12px; color:var(--ink-soft); font-weight:600; margin-top:8px; line-height:1.5; }
+
+  /* decomposition breakdown rows (spaced) */
+  .decomp-list{ display:flex; flex-direction:column; gap:10px; margin:12px 0 4px; }
+  .decomp-row{
+    display:flex; align-items:center; gap:12px;
+    background:var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:10px; padding:10px 13px;
+  }
+  .decomp-row .dnum{
+    width:26px; height:26px; border-radius:7px; flex-shrink:0;
+    background:var(--teal-700); color:#fff; font-weight:800; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .decomp-row .dtext{ flex:1; font-size:13.5px; font-weight:700; color:var(--teal-900); line-height:1.4; }
+
+  /* representation table (standard / expanded / word) */
+  table.rep-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; }
+  table.rep-table td{
+    padding:12px 14px; border-bottom:1px solid var(--paper-line); font-size:14px;
+  }
+  table.rep-table td:first-child{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); width:92px; vertical-align:top; padding-top:14px;
+  }
+  table.rep-table td:last-child{ font-weight:700; color:var(--teal-900); line-height:1.5; }
+  table.rep-table tr:last-child td{ border-bottom:none; }
+
+  /* ---------- extra: compare table (session 4) ---------- */
+  table.cmp-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; font-family:'Trebuchet MS',sans-serif; }
+  table.cmp-table th{
+    background:var(--teal-900); color:#fff; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.4px; padding:8px 2px; font-weight:700;
+  }
+  table.cmp-table td{
+    text-align:center; font-size:19px; font-weight:800; padding:10px 2px;
+    background:#fff; border:1px solid var(--paper-line); color:var(--teal-900);
+  }
+  table.cmp-table td.diff-col{ background:var(--orange-100); color:var(--orange-700); }
+  table.cmp-table tr:first-child td{ border-bottom:2px solid var(--paper-line); }
+
+  .cmp-verdict{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--teal-050); border:1.5px solid var(--teal-100); border-radius:12px;
+    padding:12px; margin-top:12px; font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-verdict .sym{ font-size:22px; color:var(--orange-700); }
+
+  /* quick compare pairs (field test) */
+  .cmp-pair{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; margin-bottom:10px;
+  }
+  .cmp-pair .nums{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-pair .nums .blank{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:26px; border:2px dashed var(--paper-line); border-radius:6px;
+    font-size:14px; color:var(--ink-soft); font-weight:800;
+  }
+  .cmp-pair.open .nums .blank{ border-style:solid; border-color:var(--orange-500); color:var(--orange-700); background:var(--orange-100); }
+  .cmp-pair .why{
+    margin-top:10px; padding-top:10px; border-top:1.5px dashed var(--paper-line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); line-height:1.5; display:none; text-align:center;
+  }
+  .cmp-pair.open .why{ display:block; }
+  .cmp-pair .peek{
+    text-align:center; font-size:9.5px; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-soft); font-weight:800; margin-top:8px;
+  }
+
+  /* ---------- extra: number line components (session 5) ---------- */
+  .numline-wrap{ margin:14px 0 6px; }
+  .numline-title{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin-bottom:6px; }
+  .numline{ position:relative; height:78px; }
+  .numline .track{
+    position:absolute; left:6px; right:6px; top:36px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .numline .tick{ position:absolute; top:26px; width:2px; height:24px; background:var(--ink-soft); transform:translateX(-50%); }
+  .numline .tick.mid{ background:var(--orange-300); width:2px; height:24px; }
+  .numline .ticklabel{
+    position:absolute; top:52px; font-size:11px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline .ticklabel.mid{ color:var(--orange-600); }
+  .numline .dot{
+    position:absolute; top:38px; width:15px; height:15px; border-radius:50%;
+    background:var(--orange-500); border:2.5px solid #fff; box-shadow:0 0 0 2px var(--orange-500);
+    transform:translate(-50%,-50%); z-index:2;
+  }
+  .numline .dotlabel{
+    position:absolute; top:0px; font-size:12px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap; background:#fff; padding:0 3px; border-radius:4px;
+  }
+  .numline .dist{
+    position:absolute; top:14px; font-size:9.5px; font-weight:700; color:var(--ink-soft);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline-verdict{
+    margin-top:10px; text-align:center; font-size:13px; font-weight:800;
+    color:var(--teal-900); background:var(--teal-050); border:1.5px solid var(--teal-100);
+    border-radius:10px; padding:9px 10px;
+  }
+
+  /* halfway zone diagram (deep learning why) */
+  .zone-line{ position:relative; height:100px; margin:14px 0 6px; }
+  .zone-line .half{
+    position:absolute; top:30px; height:34px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11.5px; font-weight:800; color:#fff;
+  }
+  .zone-line .half.down{ left:0; width:calc(50% - 3px); background:var(--teal-600); }
+  .zone-line .half.up{ right:0; width:calc(50% - 3px); background:var(--orange-500); }
+  .zone-line .mid-marker{
+    position:absolute; left:50%; top:20px; width:2px; height:54px; background:var(--ink-soft);
+    transform:translateX(-50%);
+  }
+  .zone-line .mid-label{
+    position:absolute; left:50%; top:76px; transform:translateX(-50%);
+    font-size:10.5px; font-weight:800; color:var(--ink-soft); text-align:center; width:120px;
+  }
+  .zone-line .end-label{
+    position:absolute; top:0px; font-size:10.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .zone-line .end-label.left{ left:0; }
+  .zone-line .end-label.right{ right:0; text-align:right; }
+
+  /* range band (fast learner extension) */
+  .band-line{ position:relative; height:88px; margin:14px 0 6px; }
+  .band-line .track{
+    position:absolute; left:6px; right:6px; top:38px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .band-line .band{
+    position:absolute; top:32px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .band-line .tick{ position:absolute; top:30px; width:2px; height:20px; background:var(--ink-soft); transform:translateX(-50%); }
+  .band-line .ticklabel{
+    position:absolute; top:56px; font-size:10.5px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .band-line .endmark{
+    position:absolute; top:6px; font-size:10px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+
+  /* ---------- extra: reasonableness check-line (session 6) ---------- */
+  .check-line{ position:relative; height:112px; margin:14px 0 6px; }
+  .check-line .track{
+    position:absolute; left:6px; right:6px; top:52px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .check-line .zone{
+    position:absolute; top:46px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .check-line .marker{
+    position:absolute; top:40px; width:15px; height:15px; border-radius:50%;
+    transform:translate(-50%,-50%); border:2.5px solid #fff; z-index:2;
+    box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  }
+  .check-line .marker.estimate{ background:var(--teal-700); }
+  .check-line .marker.exact{ background:var(--success); }
+  .check-line .marker.given{ background:var(--danger); }
+  .check-line .mlabel{
+    position:absolute; font-size:10.5px; font-weight:800; white-space:nowrap;
+    transform:translateX(-50%);
+  }
+  .check-line .mlabel.top{ top:6px; }
+  .check-line .mlabel.bottom{ top:72px; }
+  .check-line .mlabel.estimate-c{ color:var(--teal-700); }
+  .check-line .mlabel.exact-c{ color:var(--success); }
+  .check-line .mlabel.given-c{ color:var(--danger); }
+  .check-line-legend{
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin-top:10px; font-size:11px; font-weight:700; color:var(--ink-soft);
+  }
+  .check-line-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .check-line-legend .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; flex-shrink:0; }
+
+  /* equation display for concept entry */
+  .eq-block{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:12px 14px; margin:8px 0; font-size:15px; font-weight:800;
+    color:var(--teal-900); text-align:center;
+  }
+  .eq-block .tag{
+    display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); font-weight:800; margin-bottom:4px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="6"></circle>
+          <line x1="15" y1="15" x2="21" y2="21"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="kicker">MyMasteryLab</div>
+        <div class="name">Building Confident Problem Solvers</div>
+      </div>
+    </div>
+    <div class="xp-pill">
+      <svg viewBox="0 0 24 24" fill="#FB923C" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>
+      <span id="xpCount">0</span> XP
+    </div>
+  </div>
+
+  <div class="case-title">
+    <div class="stamp">RECAP</div>
+    <h1>Case File: Number Sense Challenge</h1>
+    <p>Session 7 Recap &middot; Grade 4 &middot; Putting It All Together</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track" id="progressTrack"></div>
+    <div class="progress-label">
+      <span id="counterLabel">Card 1 of 13</span>
+      <span id="cardName">Mission Briefing</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- CARD 1: MISSION BRIEFING -->
+    <section class="card" data-name="Mission Briefing">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg> Mission Briefing</div>
+      <h2 class="card-title">Detective, this is the big one.</h2>
+      <p class="card-sub">Every case you've solved so far — place value, comparing, rounding, estimating — comes together today. Tap each clue below once you understand it:</p>
+      <ul class="goal-list" id="goalList">
+        <li><span class="chk" data-goal="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can use <strong>place value flexibly</strong> to solve unfamiliar problems.</li>
+        <li><span class="chk" data-goal="2"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can explain mathematical <strong>patterns and relationships</strong>.</li>
+        <li><span class="chk" data-goal="3"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can choose an <strong>efficient strategy</strong> and justify it.</li>
+      </ul>
+      <div class="callout">🔎 <strong>Big Idea:</strong> Real detectives don't use just one clue — they combine everything they know. That's exactly what today's cases need.</div>
+    </section>
+
+    <!-- CARD 2: VOCABULARY -->
+    <section class="card" data-name="Key Vocabulary">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg> Evidence Log</div>
+      <h2 class="card-title">Vocabulary flashcards</h2>
+      <p class="card-sub">Tap a card to flip it and reveal the meaning.</p>
+      <div class="vocab-grid" id="vocabGrid">
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Pattern<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Something that repeats or changes in a predictable way.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Relationship<span>tap to flip</span></div>
+          <div class="flip-face flip-back">How two numbers or ideas are connected to each other.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Strategy<span>tap to flip</span></div>
+          <div class="flip-face flip-back">A plan or method you choose on purpose to solve a problem.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Justify<span>tap to flip</span></div>
+          <div class="flip-face flip-back">To back up your answer with a clear mathematical reason.</div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- CARD 3: DEEP LEARNING -->
+    <section class="card" data-name="The Pattern">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Clue #1 &middot; The Pattern</div>
+      <h2 class="card-title">What connects these numbers?</h2>
+      <p class="card-sub">5,000 &rarr; 50,000 &rarr; 500,000</p>
+      <div class="chain">
+        <div class="step"><span class="q">5,000 &times; 10</span><span class="a">= 50,000</span></div>
+        <div class="step"><span class="q">50,000 &times; 10</span><span class="a">= 500,000</span></div>
+      </div>
+      <button class="btn secondary" id="patternBtn" style="margin-top:10px;">Continue the pattern, then reverse it</button>
+      <div class="reveal-box" id="patternReveal">
+        <p class="mini-label" style="margin:0 0 6px;">Continue it</p>
+        <div class="chain">
+          <div class="step"><span class="q">500,000 &times; 10</span><span class="a">= 5,000,000</span></div>
+        </div>
+        <p class="mini-label" style="margin:16px 0 6px;">Now reverse it (&divide;10 each time)</p>
+        <div class="chain">
+          <div class="step"><span class="q">500,000 &divide; 10</span><span class="a">= 50,000</span></div>
+          <div class="step"><span class="q">50,000 &divide; 10</span><span class="a">= 5,000</span></div>
+          <div class="step"><span class="q">5,000 &divide; 10</span><span class="a">= 500</span></div>
+        </div>
+        <p style="margin:14px 0 0; font-size:13px; font-weight:700; color:var(--teal-900);">Every step is the <strong>same relationship</strong> — &times;10 going right, &divide;10 going left. That's place value in action.</p>
+      </div>
+    </section>
+
+    <!-- CARD 4: CHALLENGE 1 -->
+    <section class="card" data-name="Challenge 1">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Case #1</div>
+      <h2 class="card-title">I am a six-digit number...</h2>
+      <table class="cmp-table">
+        <thead><tr><th>H-Th</th><th>T-Th</th><th>Th</th><th>H</th><th>T</th><th>O</th></tr></thead>
+        <tbody><tr><td>3</td><td>?</td><td>7</td><td>?</td><td>4</td><td>?</td></tr></tbody>
+      </table>
+      <p class="table-note">Clues: hundred-thousands = 3, thousands = 7, tens = 4. The number rounds to <strong>380,000</strong> to the nearest 10,000. What are the missing digits?</p>
+      <button class="btn secondary" id="c1Btn">Reveal the reasoning</button>
+      <div class="reveal-box" id="c1Reveal">
+        <p style="margin:0 0 10px;">The thousands digit is 7 — that's 5 or more, so the number always rounds <strong>up</strong>. For the rounded answer to land on 380,000, the ten-thousands digit must be <strong>7</strong>.</p>
+        <div class="decomp-list">
+          <div class="decomp-row"><div class="dnum">1</div><div class="dtext">377,040</div></div>
+          <div class="decomp-row"><div class="dnum">2</div><div class="dtext">377,542</div></div>
+          <div class="decomp-row"><div class="dnum">3</div><div class="dtext">377,949</div></div>
+        </div>
+        <p style="margin:12px 0 0; font-size:13px; font-weight:700; color:var(--teal-900);">The hundreds and ones digits can be anything — that's 100 different possible numbers, all starting with 377 and ending in 4_.</p>
+      </div>
+    </section>
+
+    <!-- CARD 5: CHALLENGE 2 -->
+    <section class="card" data-name="Challenge 2">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Case #2</div>
+      <h2 class="card-title">Which is closest to 500,000?</h2>
+      <div class="choice-row">
+        <div class="choice" data-val="a">499,950</div>
+        <div class="choice" data-val="b">500,049</div>
+        <div class="choice" data-val="c">499,499</div>
+      </div>
+      <div class="feedback-text" id="c2Feedback"></div>
+    </section>
+
+    <!-- CARD 6: CHALLENGE 3 -->
+    <section class="card" data-name="Challenge 3">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Suspect Statement</div>
+      <h2 class="card-title">Find the counterexample</h2>
+      <p class="card-sub">A learner says:</p>
+      <div class="callout">"If two numbers have the same number of digits, the one with the larger last digit is greater."</div>
+      <button class="btn secondary" id="c3Btn">Reveal a counterexample</button>
+      <div class="reveal-box" id="c3Reveal">
+        <div class="cmp-verdict"><span>41</span><span class="sym">&gt;</span><span>39</span></div>
+        <p style="margin:12px 0 0; font-size:13px; font-weight:700; color:var(--teal-900); text-align:center;">39 has the bigger last digit (9), but 41 is still the greater number. One counterexample is all it takes to prove a claim false.</p>
+      </div>
+    </section>
+
+    <!-- CARD 7: CHALLENGE 4 -->
+    <section class="card" data-name="Challenge 4">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Your Case</div>
+      <h2 class="card-title">Create two matching numbers</h2>
+      <p class="card-sub">Build two six-digit numbers that: share the same hundred-thousands digit, have <strong>different</strong> thousands digits, but round to the <strong>same</strong> hundred-thousand.</p>
+      <button class="btn secondary" id="c4Btn">See one example</button>
+      <div class="reveal-box" id="c4Reveal">
+        <div class="cmp-verdict"><span>452,000</span><span class="sym">&amp;</span><span>458,900</span></div>
+        <p style="margin:12px 0 0; font-size:13px; font-weight:700; color:var(--teal-900); text-align:center;">Both round to 500,000 — rounding to the nearest hundred-thousand only checks the ten-thousands digit (5 in both), so the thousands digit is free to be different.</p>
+      </div>
+    </section>
+
+    <!-- CARD 8: CRITICAL THINKING A -->
+    <section class="card" data-name="Dilemma A">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5v6c0 5-4 8.5-9 9.5-5-1-9-4.5-9-9.5v-6L12 2z"/></svg> Detective's Dilemma 1/3</div>
+      <h2 class="card-title">Always, sometimes, or never?</h2>
+      <div class="callout">"A six-digit number is always greater than a five-digit number."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="always">Always</div>
+        <div class="choice" data-val="sometimes">Sometimes</div>
+        <div class="choice" data-val="never">Never</div>
+      </div>
+      <div class="feedback-text" id="ctAFeedback"></div>
+    </section>
+
+    <!-- CARD 9: CRITICAL THINKING B -->
+    <section class="card" data-name="Dilemma B">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5v6c0 5-4 8.5-9 9.5-5-1-9-4.5-9-9.5v-6L12 2z"/></svg> Detective's Dilemma 2/3</div>
+      <h2 class="card-title">Always, sometimes, or never?</h2>
+      <div class="callout">"Two different numbers round to the same thousand."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="always">Always</div>
+        <div class="choice" data-val="sometimes">Sometimes</div>
+        <div class="choice" data-val="never">Never</div>
+      </div>
+      <div class="feedback-text" id="ctBFeedback"></div>
+    </section>
+
+    <!-- CARD 10: CRITICAL THINKING C -->
+    <section class="card" data-name="Dilemma C">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5v6c0 5-4 8.5-9 9.5-5-1-9-4.5-9-9.5v-6L12 2z"/></svg> Detective's Dilemma 3/3</div>
+      <h2 class="card-title">Always, sometimes, or never?</h2>
+      <div class="callout">"Moving a digit left always makes its value ten times greater."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="always">Always</div>
+        <div class="choice" data-val="sometimes">Sometimes</div>
+        <div class="choice" data-val="never">Never</div>
+      </div>
+      <div class="feedback-text" id="ctCFeedback"></div>
+    </section>
+
+    <!-- CARD 11: FAST LEARNER EXTENSION -->
+    <section class="card" data-name="Bonus Case">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 9 12 2"/></svg> Bonus Clue</div>
+      <h2 class="card-title">The Mystery Number</h2>
+      <p class="card-sub">A six-digit number where: hundred-thousands = 4; ten-thousands = twice the thousands digit; hundreds = 0; tens = 5. It rounds to <strong>430,000</strong> to the nearest 10,000. Is there such a number?</p>
+      <button class="btn secondary" id="bonusBtn">Check every possibility</button>
+      <div class="reveal-box" id="bonusReveal">
+        <table class="cmp-table">
+          <thead><tr><th>Thousands</th><th>Ten-Thousands</th><th>Number range</th><th>Rounds to</th></tr></thead>
+          <tbody>
+            <tr><td style="font-size:13px;">0</td><td style="font-size:13px;">0</td><td style="font-size:12px;">400,050&ndash;059</td><td style="font-size:12px;">400,000</td></tr>
+            <tr><td style="font-size:13px;">1</td><td style="font-size:13px;">2</td><td style="font-size:12px;">421,050&ndash;059</td><td style="font-size:12px;">420,000</td></tr>
+            <tr><td style="font-size:13px;">2</td><td style="font-size:13px;">4</td><td style="font-size:12px;">442,050&ndash;059</td><td style="font-size:12px;">440,000</td></tr>
+            <tr><td style="font-size:13px;">3</td><td style="font-size:13px;">6</td><td style="font-size:12px;">463,050&ndash;059</td><td style="font-size:12px;">460,000</td></tr>
+            <tr><td style="font-size:13px;">4</td><td style="font-size:13px;">8</td><td style="font-size:12px;">484,050&ndash;059</td><td style="font-size:12px;">480,000</td></tr>
+          </tbody>
+        </table>
+        <p style="margin:12px 0 0; font-size:13px; font-weight:700; color:var(--teal-900);">Every possible thousands digit has been checked — none of them lands on 430,000. <strong>There is no number that fits all five clues.</strong> Sometimes, after checking every case carefully, the answer really is "none exist" — and that's a complete, provable answer too.</p>
+      </div>
+    </section>
+
+    <!-- CARD 12: EXIT TICKET -->
+    <section class="card" data-name="Final Report">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg> Final Report</div>
+      <h2 class="card-title">Exit ticket</h2>
+      <div class="qa-list" id="qaList1">
+        <div class="qa-item"><div class="qrow"><div class="q">Explain the relationship between 6,000 and 60,000.</div><div class="peek">tap</div></div>
+          <div class="a">60,000 = 6,000 &times; 10. Moving the 6 one house to the left makes it ten times bigger.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Create two numbers that round to the same 10,000.</div><div class="peek">tap</div></div>
+          <div class="a">61,200 and 63,800 — both are below the halfway point of 65,000, so both round to 60,000.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Explain why one is greater than the other.</div><div class="peek">tap</div></div>
+          <div class="a">Rounding hides the details — but comparing digit by digit, the thousands place differs (3 vs 1), so 63,800 &gt; 61,200 even though they round the same.</div></div>
+      </div>
+    </section>
+
+    <!-- CARD 13: MASTERY / BADGE -->
+    <section class="card" data-name="Case Closed">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Mastery Check</div>
+      <div class="badge-wrap">
+        <div class="badge-circle"><div class="inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2"><circle cx="12" cy="12" r="7"/><line x1="16.65" y1="16.65" x2="21" y2="21"/></svg>
+        </div></div>
+        <h2 class="card-title" style="text-align:center;">Case Closed, Detective!</h2>
+        <p class="card-sub" style="text-align:center;">You've cracked <strong>Number Sense Challenge</strong> — the biggest case yet.</p>
+      </div>
+      <div class="callout" style="text-align:center;">
+        You've now combined place value, comparing, rounding, and estimating into one toolkit. That's real number sense — using the right strategy, and being able to explain why it works.
+      </div>
+      <div style="text-align:center; margin-top:14px;">
+        <div class="final-xp"><span id="finalXp">0</span> <span>XP earned this session</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost" id="prevBtn">◀ Back</button>
+    <span class="counter" id="counterMini"></span>
+    <button class="btn" id="nextBtn">Next ▶</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const total = cards.length;
+  let current = 0;
+  let xp = 0;
+
+  const progressTrack = document.getElementById('progressTrack');
+  const counterLabel = document.getElementById('counterLabel');
+  const cardName = document.getElementById('cardName');
+  const counterMini = document.getElementById('counterMini');
+  const xpCount = document.getElementById('xpCount');
+  const finalXp = document.getElementById('finalXp');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  for(let i=0;i<total;i++){
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    const bar = document.createElement('i');
+    seg.appendChild(bar);
+    progressTrack.appendChild(seg);
+  }
+  const segs = Array.from(progressTrack.querySelectorAll('.seg > i'));
+
+  function addXp(n){
+    xp += n;
+    xpCount.textContent = xp;
+    finalXp.textContent = xp;
+  }
+
+  function render(){
+    cards.forEach((c,i)=> c.classList.toggle('active', i===current));
+    counterLabel.textContent = 'Card ' + (current+1) + ' of ' + total;
+    counterMini.textContent = (current+1) + ' / ' + total;
+    cardName.textContent = cards[current].dataset.name || '';
+    segs.forEach((bar,i)=> bar.style.width = (i<=current ? '100%':'0%'));
+    prevBtn.disabled = current===0;
+    nextBtn.textContent = current===total-1 ? 'Restart ↺' : 'Next ▶';
+  }
+
+  prevBtn.addEventListener('click', ()=>{ if(current>0){ current--; render(); } });
+  nextBtn.addEventListener('click', ()=>{
+    if(current===total-1){ current=0; } else { current++; }
+    render();
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight') nextBtn.click();
+    if(e.key==='ArrowLeft') prevBtn.click();
+  });
+
+  render();
+
+  // ---------- CARD 1: goal checklist ----------
+  let goalsCompleted = new Set();
+  document.querySelectorAll('#goalList .chk').forEach(chk=>{
+    chk.addEventListener('click', ()=>{
+      const g = chk.dataset.goal;
+      if(!chk.classList.contains('done')){
+        chk.classList.add('done');
+        if(!goalsCompleted.has(g)){ goalsCompleted.add(g); addXp(5); }
+      } else {
+        chk.classList.remove('done');
+      }
+    });
+  });
+
+  // ---------- CARD 2: vocab flip ----------
+  let flippedSet = new Set();
+  document.querySelectorAll('#vocabGrid .flip-card').forEach((card,idx)=>{
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(card.classList.contains('flipped') && !flippedSet.has(idx)){
+        flippedSet.add(idx); addXp(5);
+      }
+    });
+  });
+
+  // ---------- CARD 3: pattern reveal ----------
+  let patternDone = false;
+  document.getElementById('patternBtn').addEventListener('click', function(){
+    document.getElementById('patternReveal').classList.add('show');
+    if(!patternDone){ patternDone = true; addXp(10); }
+  });
+
+  // ---------- CARD 4: challenge 1 reveal ----------
+  let c1Done = false;
+  document.getElementById('c1Btn').addEventListener('click', function(){
+    document.getElementById('c1Reveal').classList.add('show');
+    if(!c1Done){ c1Done = true; addXp(10); }
+  });
+
+  // ---------- CARD 5: challenge 2 mcq ----------
+  let c2Done = false;
+  document.querySelectorAll('.card[data-name="Challenge 2"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Challenge 2"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('c2Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'b'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! You can rule out 499,499 right away \u2014 it's hundreds away, obviously not the closest. Between the other two: 499,950 is 50 away, and 500,049 is only 49 away. 500,049 wins by a single digit.";
+        if(!c2Done){ c2Done = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Rule out 499,499 first \u2014 it's hundreds away, clearly not close. Then compare the other two carefully: 499,950 is 50 away, but 500,049 is only 49 away from 500,000.";
+      }
+    });
+  });
+
+  // ---------- CARD 6: challenge 3 reveal ----------
+  let c3Done = false;
+  document.getElementById('c3Btn').addEventListener('click', function(){
+    document.getElementById('c3Reveal').classList.add('show');
+    if(!c3Done){ c3Done = true; addXp(10); }
+  });
+
+  // ---------- CARD 7: challenge 4 reveal ----------
+  let c4Done = false;
+  document.getElementById('c4Btn').addEventListener('click', function(){
+    document.getElementById('c4Reveal').classList.add('show');
+    if(!c4Done){ c4Done = true; addXp(10); }
+  });
+
+  // ---------- CARD 8: dilemma A ----------
+  let ctADone = false;
+  document.querySelectorAll('.card[data-name="Dilemma A"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Dilemma A"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('ctAFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'always'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct \u2014 always! The smallest six-digit number, 100,000, is still bigger than the largest five-digit number, 99,999. More digits always wins.";
+        if(!ctADone){ ctADone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Compare the extremes: the smallest six-digit number is 100,000, and the largest five-digit number is only 99,999. Six digits always wins \u2014 so the answer is Always.";
+      }
+    });
+  });
+
+  // ---------- CARD 9: dilemma B ----------
+  let ctBDone = false;
+  document.querySelectorAll('.card[data-name="Dilemma B"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Dilemma B"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('ctBFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'sometimes'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct \u2014 sometimes! 4,200 and 4,400 both round to 4,000. But 4,200 and 8,700 round to completely different thousands. It depends on how close the two numbers are.";
+        if(!ctBDone){ ctBDone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Think of two close numbers, like 4,200 and 4,400 \u2014 both round to 4,000. Now think of two far-apart numbers, like 4,200 and 8,700 \u2014 they round differently. So it depends: the answer is Sometimes.";
+      }
+    });
+  });
+
+  // ---------- CARD 10: dilemma C ----------
+  let ctCDone = false;
+  document.querySelectorAll('.card[data-name="Dilemma C"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Dilemma C"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('ctCFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'always'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct \u2014 always! Every place value is exactly ten times the one to its right, with no exceptions. That's the rule the whole number system is built on.";
+        if(!ctCDone){ ctCDone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "This one has no exceptions \u2014 every house in the place-value system is exactly ten times the house to its right. The answer is Always.";
+      }
+    });
+  });
+
+  // ---------- CARD 11: bonus reveal ----------
+  let bonusDone = false;
+  document.getElementById('bonusBtn').addEventListener('click', function(){
+    document.getElementById('bonusReveal').classList.add('show');
+    if(!bonusDone){ bonusDone = true; addXp(15); }
+  });
+
+  // ---------- generic qa-list toggler (exit ticket) ----------
+  let qaXpGiven = new Set();
+  document.querySelectorAll('.qa-item').forEach((item,idx)=>{
+    item.addEventListener('click', function(){
+      item.classList.toggle('open');
+      const key = item.closest('.qa-list').id + '-' + idx;
+      if(item.classList.contains('open') && !qaXpGiven.has(key)){
+        qaXpGiven.add(key); addXp(5);
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
