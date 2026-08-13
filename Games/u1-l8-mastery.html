@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | The Great Mastery Trial</title>
+<style>
+  :root{
+    --space-900:#081522; --space-800:#0F2333; --panel:#0F2A3C; --panel-light:#1A3B50;
+    --acc1:#1AA79B; --acc1-light:#5FD1C5; --acc2:#EA580C; --acc2-light:#FB923C;
+    --gold:#FFD166; --text-light:#EAF6F4; --text-dim:#9FB8B5;
+    --success:#3ED598; --success-bg:rgba(62,213,152,0.14);
+    --danger:#FF6B6B; --danger-bg:rgba(255,107,107,0.14);
+    --radius:18px; --shadow:0 12px 30px rgba(0,0,0,0.35);
+  }
+  body[data-theme="A"]{ --acc1:#8B7CF6; --acc1-light:#B4A9FA; --acc2:#5FD1C5; --acc2-light:#9CE8DF; }
+  body[data-theme="B"]{ --acc1:#F97316; --acc1-light:#FDBA74; --acc2:#EA580C; --acc2-light:#FB923C; }
+  body[data-theme="C"]{ --acc1:#E4572E; --acc1-light:#F2A585; --acc2:#F2B880; --acc2-light:#FBD8A8; }
+  body[data-theme="D"]{ --acc1:#C9A227; --acc1-light:#F2D97D; --acc2:#8B5CF6; --acc2-light:#C4B5FD; }
+  body[data-theme="E"]{ --acc1:#63B3ED; --acc1-light:#BEE3F8; --acc2:#3ED598; --acc2-light:#9EEFC8; }
+  body[data-theme="F"]{ --acc1:#22A6B3; --acc1-light:#7DD8E0; --acc2:#5FD1C5; --acc2-light:#B9F1EA; }
+  body[data-theme="G"]{ --acc1:#6B8E63; --acc1-light:#A9C69C; --acc2:#8B7355; --acc2-light:#C9B79C; }
+  body[data-theme="H"]{ --acc1:#EA580C; --acc1-light:#FB923C; --acc2:#E4572E; --acc2-light:#F2A585; }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Trebuchet MS","Segoe UI Rounded","Segoe UI",Verdana,sans-serif;
+    background: var(--space-900); color:var(--text-light); min-height:100vh; overflow-x:hidden; position:relative;
+    transition: background .4s ease;
+  }
+  #starField{ position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .star{ position:absolute; width:2px; height:2px; background:#fff; border-radius:50%; opacity:0.6; animation: twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle{ 0%,100%{opacity:0.15;} 50%{opacity:0.95;} }
+  .app{ position:relative; z-index:1; max-width:780px; margin:0 auto; padding:16px 14px 40px; }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:center; gap:9px; }
+  .brand-badge{ width:42px; height:42px; border-radius:50%; background: conic-gradient(from 220deg, var(--acc1), var(--acc2), var(--acc1-light)); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); flex-shrink:0; font-size:20px; }
+  .brand-text .kicker{ font-size:10.5px; letter-spacing:1.4px; text-transform:uppercase; color:var(--acc2-light); font-weight:700; }
+  .brand-text .name{ font-size:14px; font-weight:800; color:#fff; line-height:1.1; }
+  .top-actions{ display:flex; align-items:center; gap:8px; position:relative; }
+  .star-pill,.mute-btn{ display:flex; align-items:center; gap:6px; background:var(--panel); border:1.5px solid var(--panel-light); padding:8px 12px; border-radius:999px; font-weight:800; font-size:12.5px; cursor:pointer; color:var(--text-light); }
+  .star-pill svg{ width:14px; height:14px; }
+  .settings-wrap{ position:relative; }
+  .settings-pop{ display:none; position:absolute; right:0; top:44px; background:var(--panel); border:1.5px solid var(--panel-light); border-radius:14px; padding:12px 14px; width:200px; box-shadow:var(--shadow); z-index:20; }
+  .settings-pop.open{ display:block; }
+  .settings-pop label{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; margin-bottom:10px; color:var(--text-light); }
+  .settings-pop input[type="range"]{ flex:1; }
+
+  .screen{ display:none; animation: fadeUp .35s ease; }
+  .screen.active{ display:block; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  .panel{ background:var(--panel); border:1px solid var(--panel-light); border-radius:var(--radius); padding:20px 18px; box-shadow:var(--shadow); }
+
+  .hero-scene{ height:140px; border-radius:16px; margin-bottom:16px; background:linear-gradient(180deg,#0A2233,#123246); display:flex; align-items:center; justify-content:center; font-size:52px; }
+  .story-title{ font-size:21px; font-weight:900; margin:0 0 8px; color:#fff; }
+  .story-text{ font-size:14px; line-height:1.6; color:var(--text-dim); margin:0 0 16px; }
+  .story-text strong{ color:var(--acc2-light); }
+
+  .btn{ border:none; cursor:pointer; font-weight:800; font-size:14px; border-radius:999px; padding:12px 22px; background:var(--acc1); color:#04211d; display:inline-flex; align-items:center; gap:7px; transition: transform .12s, background .15s; }
+  .btn:hover{ background:var(--acc1-light); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn.secondary{ background:var(--acc2); color:#fff; }
+  .btn.secondary:hover{ background:var(--acc2-light); color:#1a1a1a; }
+  .btn.ghost{ background:transparent; border:2px solid var(--panel-light); color:var(--text-light); }
+  .btn.ghost:hover{ border-color:var(--acc1); }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+  .hub-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+  @media (max-width:480px){ .hub-grid{ grid-template-columns:1fr; } }
+  .mission-card{ background:var(--panel); border:1.5px solid var(--panel-light); border-radius:16px; padding:14px; cursor:pointer; transition: transform .15s, border-color .15s; position:relative; }
+  .mission-card:hover{ transform:translateY(-2px); border-color:var(--acc1); }
+  .mission-card .icon-wrap{ width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--space-800); margin-bottom:8px; font-size:24px; }
+  .mission-card h3{ margin:0 0 4px; font-size:14px; color:#fff; }
+  .mission-card p{ margin:0; font-size:11.5px; color:var(--text-dim); line-height:1.4; }
+  .mission-card .stars-row{ display:flex; gap:2px; margin-top:8px; }
+  .mission-card .stars-row svg{ width:13px; height:13px; }
+  .mission-card .done-badge{ position:absolute; top:10px; right:10px; background:var(--success-bg); color:var(--success); font-size:10px; font-weight:800; padding:3px 7px; border-radius:999px; display:none; }
+  .mission-card.completed .done-badge{ display:block; }
+  .report-btn-row{ text-align:center; margin-top:16px; }
+
+  .home-link{ display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700; color:var(--text-dim); cursor:pointer; margin-bottom:10px; }
+  .home-link:hover{ color:var(--acc1-light); }
+
+  .mission-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:10px; flex-wrap:wrap; }
+  .tab{ display:inline-flex; align-items:center; gap:6px; background:var(--space-800); color:var(--acc2-light); font-size:12px; font-weight:800; padding:5px 10px; border-radius:999px; }
+  .round-counter{ font-size:12px; font-weight:700; color:var(--text-dim); }
+  .story-blurb{ font-size:12.5px; color:var(--text-dim); line-height:1.5; margin:6px 0 14px; font-style:italic; }
+  .prog-bar{ height:6px; background:var(--space-800); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .prog-bar>i{ display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--acc2),var(--acc1)); transition: width .3s; }
+
+  .quiz-prompt{ font-size:16px; font-weight:800; color:#fff; line-height:1.5; margin-bottom:10px; }
+  .quiz-visual{ margin-bottom:10px; }
+
+  .place-grid{ display:flex; gap:4px; justify-content:center; margin-bottom:6px; flex-wrap:wrap; }
+  .place-col{ text-align:center; width:50px; }
+  .place-col .lab{ font-size:8.5px; color:var(--text-dim); font-weight:700; height:22px; display:flex; align-items:center; justify-content:center; line-height:1.1; }
+  .place-col .box{ width:42px; height:34px; margin:2px auto; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; background:var(--space-800); border:2px solid var(--panel-light); color:#fff; }
+  .place-col .box.match{ background:var(--success-bg); border-color:var(--success); color:var(--success); }
+  .place-col .box.diff{ background:var(--danger-bg); border-color:var(--acc2-light); color:var(--acc2-light); }
+  .place-col .box.dim{ opacity:0.35; }
+  .compare-note{ text-align:center; font-size:12.5px; color:var(--text-dim); margin-top:4px; }
+  .compare-note strong{ color:var(--acc2-light); }
+
+  .mcq-opt{ text-align:left; padding:12px 14px; border-radius:12px; border:2px solid var(--panel-light); background:var(--space-800); font-size:13.5px; color:#fff; cursor:pointer; line-height:1.4; margin-bottom:8px; }
+  .mcq-opt:hover{ border-color:var(--acc1); }
+  .mcq-opt.correct-opt{ border-color:var(--success); background:var(--success-bg); color:var(--success); }
+  .mcq-opt.wrong-opt{ border-color:var(--danger); background:var(--danger-bg); color:#FF9C9C; }
+
+  .chip{ padding:12px 14px; border-radius:12px; background:var(--panel-light); border:2px solid var(--acc1); font-weight:900; font-size:13.5px; color:#fff; cursor:pointer; transition: transform .12s, opacity .12s; display:inline-flex; }
+  .chip:hover{ transform:translateY(-2px); }
+  .chip.used{ opacity:0.25; pointer-events:none; }
+  .chip.selected{ background:var(--acc1); }
+  .chip.correct-chip{ border-color:var(--success); background:var(--success-bg); color:var(--success); }
+  .chip.wrong-chip{ border-color:var(--danger); background:var(--danger-bg); color:#FF9C9C; }
+  .chip-pool{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+
+  .slots-row{ display:flex; gap:8px; justify-content:center; margin:6px 0 14px; flex-wrap:wrap; }
+  .slot{ width:96px; height:52px; border-radius:12px; border:2px dashed var(--panel-light); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13.5px; color:var(--text-dim); background:var(--space-800); }
+  .slot.filled{ border-style:solid; border-color:var(--acc1); color:#fff; }
+  .slot.correct-slot{ border-color:var(--success); background:var(--success-bg); color:var(--success); }
+  .slot.wrong-slot{ border-color:var(--danger); background:var(--danger-bg); color:#FF9C9C; }
+  .order-direction{ text-align:center; font-size:13px; font-weight:800; color:var(--acc2-light); margin-bottom:10px; }
+
+  .duel-row{ display:flex; align-items:center; justify-content:center; gap:14px; margin:8px 0 14px; }
+  .duel-planet{ flex:1; max-width:180px; text-align:center; background:var(--space-800); border:2px solid var(--panel-light); border-radius:16px; padding:16px 8px; transition: border-color .2s; }
+  .duel-planet.correct-pick{ border-color:var(--success); }
+  .duel-planet.wrong-pick{ border-color:var(--danger); animation: shake .4s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+  .duel-planet .num{ font-size:21px; font-weight:900; color:#fff; }
+  .duel-vs{ font-size:13px; font-weight:800; color:var(--text-dim); }
+  .rocket-track{ position:relative; height:24px; margin:6px 0 14px; }
+  .rocket-track .track-line{ position:absolute; left:0; right:0; top:11px; height:2px; background:var(--panel-light); }
+  .rocket-track .rocket{ position:absolute; left:0; top:0; font-size:20px; transition: left .5s ease; }
+
+  .answer-row{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .answer-btn{ flex:1; min-width:100px; text-align:center; padding:11px 8px; border-radius:12px; border:2px solid var(--panel-light); background:var(--space-800); font-weight:800; font-size:12.5px; color:#fff; cursor:pointer; }
+  .answer-btn:hover{ border-color:var(--acc1); }
+
+  .feedback-banner{ margin-top:12px; padding:10px 12px; border-radius:12px; font-size:13.5px; line-height:1.5; display:none; }
+  .feedback-banner.show{ display:block; animation: fadeUp .25s ease; }
+  .feedback-banner.correct{ background:var(--success-bg); color:var(--success); border:1.5px solid rgba(62,213,152,0.4); }
+  .feedback-banner.wrong{ background:var(--danger-bg); color:#FF9C9C; border:1.5px solid rgba(255,107,107,0.4); }
+  .feedback-banner.info{ background:var(--space-800); color:var(--text-light); border:1.5px solid var(--panel-light); }
+
+  textarea.explain-box{ width:100%; border:2px solid var(--panel-light); border-radius:12px; padding:10px 12px; font-family:inherit; font-size:14px; resize:vertical; background:var(--space-800); color:#fff; }
+  textarea.explain-box:focus{ outline:none; border-color:var(--acc1); }
+  .reveal-box{ margin-top:10px; padding:12px 14px; border-radius:12px; background:var(--success-bg); border:1.5px solid rgba(62,213,152,0.4); font-size:13.5px; line-height:1.55; display:none; color:var(--success); }
+  .reveal-box.show{ display:block; animation: fadeUp .25s ease; }
+
+  .forge-row{ display:flex; gap:6px; justify-content:center; align-items:center; margin:10px 0; flex-wrap:wrap; }
+  .forge-row input{ width:42px; height:48px; text-align:center; font-size:18px; font-weight:900; border-radius:10px; border:2px solid var(--panel-light); background:var(--space-800); color:#fff; font-family:inherit; }
+  .forge-row input:focus{ outline:none; border-color:var(--acc1); }
+  .checklist{ display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+  .checklist .item{ display:flex; align-items:center; gap:8px; background:var(--space-800); border:1.5px solid var(--panel-light); border-radius:10px; padding:9px 12px; font-size:13px; }
+  .checklist .item.ok{ border-color:var(--success); background:var(--success-bg); color:var(--success); }
+  .checklist .item.bad{ border-color:var(--danger); background:var(--danger-bg); color:#FF9C9C; }
+
+  table.mini-table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:12.5px; }
+  table.mini-table th{ background:var(--space-800); color:var(--acc1-light); padding:7px; font-size:10.5px; text-transform:uppercase; }
+  table.mini-table td{ padding:7px; text-align:center; border-bottom:1px solid var(--panel-light); color:#fff; }
+
+  .result-stars{ display:flex; justify-content:center; gap:8px; margin:16px 0; }
+  .result-stars svg{ width:42px; height:42px; }
+  .result-msg{ text-align:center; font-size:15px; font-weight:800; color:#fff; margin-bottom:4px; }
+  .result-sub{ text-align:center; font-size:13px; color:var(--text-dim); margin-bottom:14px; }
+  .center-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .badge-circle{ width:110px; height:110px; border-radius:50%; margin:6px auto 14px; background:conic-gradient(from 200deg, var(--acc1), var(--acc2), var(--acc1-light), var(--acc1)); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); font-size:44px; }
+
+  table.report-table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:12.5px; }
+  table.report-table th{ background:var(--space-800); color:var(--acc1-light); padding:8px; font-size:10.5px; text-transform:uppercase; }
+  table.report-table td{ padding:8px; border-bottom:1px solid var(--panel-light); }
+  .level-pill{ display:inline-block; padding:3px 9px; border-radius:999px; font-size:10.5px; font-weight:800; }
+  .level-Beginning{ background:var(--danger-bg); color:#FF9C9C; }
+  .level-Developing{ background:rgba(255,209,102,0.16); color:var(--gold); }
+  .level-Mastered{ background:var(--success-bg); color:var(--success); }
+
+  .confetti{ position:fixed; top:-10px; width:8px; height:8px; z-index:50; pointer-events:none; border-radius:2px; }
+</style>
+</head>
+<body>
+<div id="starField"></div>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">🧭</div>
+      <div class="brand-text">
+        <div class="kicker">MyMasteryLab</div>
+        <div class="name">Building Confident Problem Solvers</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="star-pill" id="starPill">
+        <svg viewBox="0 0 24 24" fill="#FFD166" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>
+        <span id="totalStars">0</span>/24
+      </div>
+      <div class="settings-wrap">
+        <div class="mute-btn" id="settingsBtn">🎚️ Sound</div>
+        <div class="settings-pop" id="settingsPop">
+          <label><input type="checkbox" id="sfxToggle" checked> Sound Effects</label>
+          <label><input type="checkbox" id="musicToggle"> Background Music</label>
+          <label>Volume<input type="range" id="musicVol" min="0" max="100" value="35"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="screen active" id="screen-intro">
+    <div class="panel">
+      <div class="hero-scene">🗺️</div>
+      <div class="story-title">The Great Mastery Trial</div>
+      <p class="story-text">Welcome, Explorer! <strong>Professor Numera</strong> has mapped <strong>8 realms</strong> across the Kingdom of Place Value — each one guarded by a character who needs your help. Compare, represent, round, estimate, and reason your way through every realm to earn your <strong>Master Explorer</strong> badge!</p>
+      <div class="btn-row"><button class="btn secondary" id="startBtn">🧭 Begin the Trial</button></div>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="screen" id="screen-hub">
+    <div class="panel">
+      <h2 class="story-title" style="font-size:19px;">Realm Map</h2>
+      <p class="story-text" style="margin-bottom:6px;">Choose a realm to explore. Complete all eight for your Mastery Report!</p>
+      <div class="hub-grid" id="hubGrid"></div>
+      <div class="report-btn-row"><button class="btn ghost" id="reportBtn">🏆 View Mastery Report</button></div>
+    </div>
+  </section>
+
+  <!-- GENERIC QUIZ SCREEN -->
+  <section class="screen" id="screen-quiz">
+    <div class="panel">
+      <div class="home-link" data-home="1">🏠 Realm Map</div>
+      <div class="mission-head">
+        <div class="tab" id="quizWorldTab"></div>
+        <div class="round-counter" id="quizCounter"></div>
+      </div>
+      <p class="story-blurb" id="quizStory"></p>
+      <div class="prog-bar"><i id="quizProg"></i></div>
+
+      <div class="quiz-prompt" id="quizPrompt"></div>
+      <div class="quiz-visual" id="quizVisual"></div>
+
+      <!-- MCQ / TF -->
+      <div id="mcqBlock" style="display:none;">
+        <div id="mcqOptions"></div>
+      </div>
+
+      <!-- MULTISELECT -->
+      <div id="multiselectBlock" style="display:none;">
+        <div class="chip-pool" id="msChips"></div>
+        <div class="btn-row" style="justify-content:center;"><button class="btn secondary" id="msCheckBtn">Check</button></div>
+      </div>
+
+      <!-- REFLECTION -->
+      <div id="reflectionBlock" style="display:none;">
+        <p class="story-blurb" id="reflectPromptText" style="font-style:normal; color:var(--text-light); font-weight:700; font-size:13.5px;"></p>
+        <textarea class="explain-box" id="reflectTextarea" rows="2" placeholder="Type your explanation..."></textarea>
+        <div class="btn-row"><button class="btn ghost" id="reflectModelBtn">Compare with model answer</button></div>
+        <div class="reveal-box" id="reflectModelAnswer"></div>
+      </div>
+
+      <!-- COMPARE -->
+      <div id="compareBlock" style="display:none;">
+        <div class="duel-row">
+          <div class="duel-planet" id="cmpLeft"></div>
+          <div class="duel-vs">VS</div>
+          <div class="duel-planet" id="cmpRight"></div>
+        </div>
+        <div class="rocket-track"><div class="track-line"></div><div class="rocket" id="cmpRocket">🚀</div></div>
+        <div class="btn-row" style="justify-content:center;"><button class="btn ghost" id="cmpScanBtn">🔍 Scan Digits</button></div>
+        <div class="quiz-visual" id="cmpViz" style="display:none;"></div>
+        <div class="answer-row" id="cmpAnswers" style="margin-top:12px;">
+          <div class="answer-btn" data-ans="left">⬅ Left is Bigger</div>
+          <div class="answer-btn" data-ans="equal">⚖️ Equal</div>
+          <div class="answer-btn" data-ans="right">Right is Bigger ➡</div>
+        </div>
+      </div>
+
+      <!-- ORDER -->
+      <div id="orderBlock" style="display:none;">
+        <div class="order-direction" id="ordDirection"></div>
+        <div class="slots-row" id="ordSlots"></div>
+        <div class="chip-pool" id="ordPool"></div>
+        <div class="btn-row" style="justify-content:center;"><button class="btn ghost" id="ordResetBtn">↺ Reset</button></div>
+      </div>
+
+      <div class="feedback-banner" id="quizFeedback"></div>
+      <div class="btn-row" id="quizNextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="quizNextBtn">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="screen-results">
+    <div class="panel">
+      <h2 class="story-title" style="text-align:center; font-size:19px;" id="resultsTitle"></h2>
+      <div class="result-stars" id="resultsStars"></div>
+      <p class="result-msg" id="resultsMsg"></p>
+      <p class="result-sub" id="resultsSub"></p>
+      <div class="center-row">
+        <button class="btn ghost" id="resultsReplayBtn">🔁 Try Again</button>
+        <button class="btn secondary" id="resultsDoneBtn">Realm Map ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORLD H: TRANSFER SUMMIT -->
+  <section class="screen" id="screen-transfer">
+    <div class="panel">
+      <div class="home-link" data-home="1">🏠 Realm Map</div>
+      <div class="tab">🧗 Transfer Summit</div>
+      <p class="story-blurb">The final climb! Build a six-digit number that satisfies every clue below.</p>
+      <div class="checklist" id="transferRules">
+        <div class="item">1. Has a <strong>7</strong> worth <strong>70,000</strong> (the Ten-Thousands place)</div>
+        <div class="item">2. Contains at least one <strong>zero</strong> digit</div>
+        <div class="item">3. Rounds to <strong>500,000</strong> to the nearest hundred-thousand</div>
+        <div class="item">4. Is <strong>greater than 470,000</strong></div>
+      </div>
+      <div class="forge-row" id="transferInputs">
+        <input maxlength="1" inputmode="numeric" id="td0">
+        <input maxlength="1" inputmode="numeric" id="td1">
+        <input maxlength="1" inputmode="numeric" id="td2">
+        <input maxlength="1" inputmode="numeric" id="td3">
+        <input maxlength="1" inputmode="numeric" id="td4">
+        <input maxlength="1" inputmode="numeric" id="td5">
+      </div>
+      <div class="btn-row" style="justify-content:center;"><button class="btn secondary" id="transferCheckBtn">🧭 Check My Number</button></div>
+      <div class="feedback-banner" id="transferFeedback"></div>
+      <div class="checklist" id="transferResultChecklist"></div>
+      <div class="quiz-visual" id="transferViz"></div>
+      <div class="btn-row" id="transferNextRow" style="display:none; justify-content:flex-end;">
+        <button class="btn secondary" id="transferNextBtn">Realm Map ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINALE / REPORT -->
+  <section class="screen" id="screen-finale">
+    <div class="panel">
+      <div class="badge-circle">🏆</div>
+      <h2 class="story-title" style="text-align:center;">Mastery Report</h2>
+      <p class="story-text" style="text-align:center;">Here's how your trial through the Kingdom of Place Value is going.</p>
+      <div class="result-stars" id="finaleStars"></div>
+      <p class="result-msg"><span id="finaleTotal">0</span> / 24 stars earned</p>
+      <table class="report-table">
+        <thead><tr><th>Skill</th><th>Stars</th><th>Level</th></tr></thead>
+        <tbody id="reportBody"></tbody>
+      </table>
+      <div class="center-row">
+        <button class="btn ghost" id="finaleHubBtn">Back to Realm Map</button>
+        <button class="btn secondary" id="finaleRestartBtn">🔁 Restart Whole Trial</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ===================== STARFIELD ===================== */
+const starField = document.getElementById('starField');
+for(let i=0;i<60;i++){
+  const s=document.createElement('div'); s.className='star';
+  s.style.top=Math.random()*100+'%'; s.style.left=Math.random()*100+'%';
+  s.style.animationDelay=(Math.random()*3).toFixed(2)+'s';
+  s.style.animationDuration=(2+Math.random()*3).toFixed(2)+'s';
+  starField.appendChild(s);
+}
+
+/* ===================== SOUND ===================== */
+let soundOn=true, musicOn=false, musicVolume=0.07, actx=null, musicInterval=null;
+function ctx(){ if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function tone(freq,start,dur,type,vol){
+  if(!soundOn) return;
+  try{
+    const c=ctx(); const osc=c.createOscillator(); const gain=c.createGain();
+    osc.type=type||'sine'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0,c.currentTime+start);
+    gain.gain.linearRampToValueAtTime(vol||0.16,c.currentTime+start+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001,c.currentTime+start+dur);
+    osc.connect(gain); gain.connect(c.destination);
+    osc.start(c.currentTime+start); osc.stop(c.currentTime+start+dur+0.02);
+  }catch(e){}
+}
+function playClick(){ tone(520,0,0.08,'triangle',0.1); }
+function playCorrect(){ tone(523,0,0.12,'sine',0.15); tone(784,0.1,0.18,'sine',0.15); }
+function playWrong(){ tone(180,0,0.22,'sawtooth',0.13); }
+function playFanfare(){ [523,659,784,1046].forEach((f,i)=> tone(f,i*0.13,0.2,'triangle',0.14)); }
+const PENTA=[261.6,293.7,329.6,392.0,440.0,523.3];
+function tickMusic(){
+  if(!musicOn) return;
+  try{
+    const c=ctx(); const freq=PENTA[Math.floor(Math.random()*PENTA.length)];
+    const osc=c.createOscillator(); osc.type='sine'; osc.frequency.value=freq;
+    const g=c.createGain(); g.gain.setValueAtTime(0,c.currentTime);
+    g.gain.linearRampToValueAtTime(musicVolume,c.currentTime+0.06);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+1.1);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(); osc.stop(c.currentTime+1.2);
+  }catch(e){}
+}
+function setMusicOn(on){
+  musicOn=on;
+  if(on){ ctx(); if(!musicInterval) musicInterval=setInterval(tickMusic,900); }
+  else { if(musicInterval){ clearInterval(musicInterval); musicInterval=null; } }
+}
+document.getElementById('settingsBtn').addEventListener('click', function(){
+  document.getElementById('settingsPop').classList.toggle('open');
+});
+document.getElementById('sfxToggle').addEventListener('change', function(){ soundOn=this.checked; });
+document.getElementById('musicToggle').addEventListener('change', function(){ setMusicOn(this.checked); });
+document.getElementById('musicVol').addEventListener('input', function(){ musicVolume=(Number(this.value)/100)*0.18; });
+
+/* ===================== CONFETTI ===================== */
+function confettiBurst(){
+  const colors=['#1AA79B','#EA580C','#FFD166','#5FD1C5','#FB923C'];
+  for(let i=0;i<26;i++){
+    const el=document.createElement('div'); el.className='confetti';
+    el.style.left=(45+Math.random()*10)+'%';
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    document.body.appendChild(el);
+    const dx=(Math.random()-0.5)*300, dur=900+Math.random()*700;
+    el.animate([
+      {transform:'translate(0,0) rotate(0deg)',opacity:1},
+      {transform:'translate('+dx+'px,'+(400+Math.random()*200)+'px) rotate('+(Math.random()*720)+'deg)',opacity:0}
+    ],{duration:dur, easing:'ease-out'});
+    setTimeout(()=>el.remove(), dur+50);
+  }
+}
+
+/* ===================== NAV ===================== */
+const screens={};
+document.querySelectorAll('.screen').forEach(s=>screens[s.id]=s);
+function goTo(id){ Object.values(screens).forEach(s=>s.classList.remove('active')); screens[id].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+document.querySelectorAll('[data-home]').forEach(el=>el.addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); }));
+document.getElementById('startBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+/* ===================== UTIL ===================== */
+function randomInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function fmt(n){ return n.toLocaleString('en-US'); }
+function capFirst(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+const PLACE_LABELS=["Hundred\nThousands","Ten\nThousands","Thousands","Hundreds","Tens","Ones"];
+
+function buildPlaceValueStrip(n, highlightIdx){
+  const s=String(n); const len=s.length;
+  const labels=PLACE_LABELS.slice(PLACE_LABELS.length-len);
+  let html='<div class="place-grid">';
+  for(let i=0;i<len;i++){
+    const cls='box'+(i===highlightIdx?' diff':'');
+    html+='<div class="place-col"><div class="lab">'+labels[i].replace('\n','<br>')+'</div><div class="'+cls+'">'+s[i]+'</div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+function buildCompareVizInto(container, a, b){
+  const len=Math.max(String(a).length,String(b).length);
+  const labels=PLACE_LABELS.slice(PLACE_LABELS.length-len);
+  const da=String(a).padStart(len,'0').split('').map(Number);
+  const db=String(b).padStart(len,'0').split('').map(Number);
+  let diffIdx=-1;
+  for(let i=0;i<len;i++){ if(da[i]!==db[i]){ diffIdx=i; break; } }
+  function row(digits, isTop){
+    let html='<div class="place-grid">';
+    for(let i=0;i<len;i++){
+      let cls='box';
+      if(diffIdx===-1) cls+=' match';
+      else if(i<diffIdx) cls+=' match';
+      else if(i===diffIdx) cls+=' diff';
+      else cls+=' dim';
+      html+='<div class="place-col">'+(isTop?'<div class="lab">'+labels[i].replace('\n','<br>')+'</div>':'<div class="lab"></div>')+'<div class="'+cls+'">'+digits[i]+'</div></div>';
+    }
+    html+='</div>';
+    return html;
+  }
+  let note;
+  if(diffIdx===-1) note='Every digit matches — these numbers are <strong>equal</strong>!';
+  else note='First difference at the <strong>'+labels[diffIdx].replace('\n',' ')+'</strong> place: '+da[diffIdx]+' vs '+db[diffIdx]+'.';
+  container.innerHTML = row(da,true)+row(db,false)+'<div class="compare-note">'+note+'</div>';
+}
+function relationOf(a,b){ return a>b?'left':(a<b?'right':'equal'); }
+function explainRelation(a,b,rel){
+  if(rel==='equal') return fmt(a)+' equals '+fmt(b)+'.';
+  const bigger=rel==='left'?a:b, smaller=rel==='left'?b:a;
+  return fmt(bigger)+' is greater than '+fmt(smaller)+'.';
+}
+function buildNumericOptions(correct, spread, forced){
+  let set=new Set([correct]);
+  (forced||[]).forEach(v=>{ if(v>=0 && v!==correct) set.add(v); });
+  const offsets=shuffle([spread,-spread,spread*2,-spread*2,Math.round(spread*1.5),Math.round(spread*0.5),-Math.round(spread*0.5)]);
+  let i=0;
+  while(set.size<4 && i<offsets.length){ const v=correct+offsets[i]; if(v>=0 && !set.has(v)) set.add(v); i++; }
+  let extra=1;
+  while(set.size<4){ const v=correct+spread*(3+extra)+3; if(v>=0 && !set.has(v)) set.add(v); extra++; }
+  return shuffle(Array.from(set).slice(0,4));
+}
+function makeMCQFromNumeric(correct, spread, forced){
+  const nums=buildNumericOptions(correct, spread, forced);
+  return { options: nums.map(fmt), correctIndex: nums.indexOf(correct) };
+}
+
+/* number to words */
+const ONES=['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function threeDigitWords(n){
+  let str='';
+  const h=Math.floor(n/100), rem=n%100;
+  if(h>0) str+=ONES[h]+' hundred';
+  if(rem>0){
+    if(str) str+=' ';
+    if(rem<20) str+=ONES[rem];
+    else { str+=TENS[Math.floor(rem/10)]; if(rem%10) str+='-'+ONES[rem%10]; }
+  }
+  return str;
+}
+function numberToWords(n){
+  if(n===0) return 'zero';
+  const thousands=Math.floor(n/1000), rem=n%1000;
+  let parts=[];
+  if(thousands>0) parts.push(threeDigitWords(thousands)+' thousand');
+  if(rem>0) parts.push(threeDigitWords(rem));
+  return parts.join(', ');
+}
+function expandedForm(n){
+  const s=String(n); const len=s.length; let terms=[];
+  for(let i=0;i<len;i++){
+    const d=Number(s[i]); if(d===0) continue;
+    terms.push(d*Math.pow(10,len-1-i));
+  }
+  return terms;
+}
+function pick56DigitNumber(){ return Math.random()<0.5 ? randomInt(10000,99999) : randomInt(100000,999999); }
+
+function starsFromAccuracy(correct,total){
+  const pct=total?correct/total:0;
+  if(pct>=0.9) return 3; if(pct>=0.65) return 2; if(pct>0) return 1; return 0;
+}
+const STAR_ON='<svg viewBox="0 0 24 24" fill="#FFD166" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>';
+const STAR_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="#3A5464" stroke-width="1.6"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>';
+function starRow(n){ let h=''; for(let i=0;i<3;i++) h+= (i<n)?STAR_ON:STAR_OFF; return h; }
+function starMsg(n){
+  if(n===3) return 'Outstanding! Full mastery shown here.';
+  if(n===2) return 'Solid work — a bit more practice for full mastery.';
+  if(n===1) return 'Good start — replay to sharpen this skill.';
+  return 'Let\'s try this realm again with fresh eyes!';
+}
+
+/* ===================== WORLD META ===================== */
+const WORLD_META={
+  A:{name:'Crystal Caves of Value', char:'🦉', skill:'Place Value', tagline:'Professor Hoot needs help reading the glowing crystal digits before the cave dims forever.'},
+  B:{name:'Expansion Factory', char:'🤖', skill:'Representation', tagline:'Robo-Builder\'s assembly line jammed — sort the number parts to keep it running!'},
+  C:{name:'Comparison Canyon', char:'🦅', skill:'Comparison', tagline:'Skyla the Hawk needs sharp eyes to see which cliffs (numbers) stand taller.'},
+  D:{name:'Ten-Times Temple', char:'🦎', skill:'Ten-Times Relationship', tagline:'Wake the temple\'s guardian gecko by proving you understand ×10 and ÷10.'},
+  E:{name:'Rounding Mountain', char:'⛄', skill:'Rounding', tagline:'Frosty needs the mountain trails rounded smooth before the next snowfall.'},
+  F:{name:'Estimation Bay', char:'🐬', skill:'Estimation', tagline:'Essie the Dolphin estimates distances before every dive — think before you calculate!'},
+  G:{name:'Reasoning Ruins', char:'🦥', skill:'Reasoning', tagline:'Slow and careful — these ancient ruins only open for those who explain their thinking.'},
+  H:{name:'Transfer Summit', char:'🧗', skill:'Transfer', tagline:'The final climb — build a number that proves you\'ve mastered it all.'}
+};
+const WORLD_ROUND_TARGET={A:7,B:6,C:10,D:6,E:6,F:6,G:4};
+
+/* ===================== STATE ===================== */
+const state={ stars:{A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0}, completed:{A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0} };
+function totalStars(){ return Object.values(state.stars).reduce((a,b)=>a+b,0); }
+function refreshStarPill(){ document.getElementById('totalStars').textContent=totalStars(); }
+
+/* ===================== HUB ===================== */
+function renderHub(){
+  const grid=document.getElementById('hubGrid'); grid.innerHTML='';
+  Object.keys(WORLD_META).forEach(key=>{
+    const meta=WORLD_META[key];
+    const card=document.createElement('div');
+    card.className='mission-card'+(state.completed[key]?' completed':'');
+    let starsHtml=''; for(let i=0;i<3;i++) starsHtml += (i<state.stars[key])?STAR_ON:STAR_OFF;
+    card.innerHTML='<div class="done-badge">✓ Done</div>'+
+      '<div class="icon-wrap">'+meta.char+'</div>'+
+      '<h3>'+meta.name+'</h3><p>'+meta.skill+'</p>'+
+      '<div class="stars-row">'+starsHtml+'</div>';
+    card.addEventListener('click', ()=>{ playClick(); launchWorld(key); });
+    grid.appendChild(card);
+  });
+  refreshStarPill();
+}
+function launchWorld(key){
+  document.body.setAttribute('data-theme', key);
+  if(key==='H'){ startTransfer(); } else { startWorld(key); }
+}
+document.getElementById('reportBtn').addEventListener('click', ()=>{ playClick(); showFinale(); });
+
+/* ===================== GENERATORS: WORLD A ===================== */
+function digitValueRound(){
+  let n, idx, digitsArr, digit;
+  do{ n=randomInt(100000,999999); digitsArr=String(n).split('').map(Number); idx=randomInt(0,5); digit=digitsArr[idx]; } while(digit===0);
+  const placeValue=Math.pow(10,5-idx);
+  const correct=digit*placeValue;
+  const label=PLACE_LABELS[idx].replace('\n',' ');
+  const forced = placeValue>1 ? [digit] : [];
+  const {options, correctIndex} = makeMCQFromNumeric(correct, placeValue, forced);
+  return {
+    type:'mcq',
+    prompt:'What is the value of the digit <strong>'+digit+'</strong> in <strong>'+fmt(n)+'</strong>?',
+    visual: buildPlaceValueStrip(n, idx),
+    options, correctIndex,
+    explanation:'The digit '+digit+' sits in the '+label+' place, so its value is '+digit+' × '+fmt(placeValue)+' = '+fmt(correct)+'.'
+  };
+}
+function twin7sRound(){
+  function makeWithSeven(){ let n=randomInt(100000,999999); let idx=randomInt(0,5); let arr=String(n).split(''); arr[idx]='7'; return {n:Number(arr.join('')), idx}; }
+  let A=makeWithSeven(); let B;
+  do{ B=makeWithSeven(); }while(B.idx===A.idx || B.n===A.n);
+  const placeA=Math.pow(10,5-A.idx), placeB=Math.pow(10,5-B.idx);
+  const valA=7*placeA, valB=7*placeB;
+  return {
+    type:'reflection',
+    prompt:'Two crystals both have a <strong>7</strong> glowing inside — but the 7s are NOT equal!',
+    visual:'<div class="duel-row"><div class="duel-planet"><div class="num">'+fmt(A.n)+'</div></div><div class="duel-vs">&amp;</div><div class="duel-planet"><div class="num">'+fmt(B.n)+'</div></div></div>'+buildPlaceValueStrip(A.n,A.idx)+buildPlaceValueStrip(B.n,B.idx),
+    reflectPrompt:'In your own words: why are the two 7s worth different amounts?',
+    modelAnswer:'In '+fmt(A.n)+', the 7 is in the '+PLACE_LABELS[A.idx].replace('\n',' ')+' place, worth '+fmt(valA)+'. In '+fmt(B.n)+', the 7 is in the '+PLACE_LABELS[B.idx].replace('\n',' ')+' place, worth '+fmt(valB)+'. Same digit, different <em>position</em> — so a different value!'
+  };
+}
+
+/* ===================== GENERATORS: WORLD B ===================== */
+function expandedRound(){
+  let n=pick56DigitNumber();
+  const terms=expandedForm(n);
+  const s=String(n); const len=s.length;
+  let distractors=[]; let guard=0;
+  const wantCount=Math.min(3, Math.max(2, 6-terms.length));
+  while(distractors.length<wantCount && guard<60){
+    guard++;
+    const i=randomInt(0,len-1); const d=Number(s[i]); if(d===0) continue;
+    const truePlace=Math.pow(10,len-1-i);
+    let cand = Math.random()<0.55 ? d : (truePlace*10*d);
+    if(cand===0 || terms.includes(cand) || distractors.includes(cand)) continue;
+    distractors.push(cand);
+  }
+  const chips=shuffle(terms.map(t=>({label:fmt(t), correct:true})).concat(distractors.map(t=>({label:fmt(t), correct:false}))));
+  return {
+    type:'multiselect',
+    prompt:'Tap ONLY the correct place-value parts that add up to <strong>'+fmt(n)+'</strong>, then hit Check.',
+    visual: buildPlaceValueStrip(n,-1),
+    chips: chips,
+    explanation:'Expanded form: '+terms.map(fmt).join(' + ')+' = '+fmt(n)+'.'
+  };
+}
+function standardFormRound(){
+  let n=pick56DigitNumber();
+  const terms=expandedForm(n);
+  const expandedStr=terms.map(fmt).join(' + ');
+  const spread=Math.pow(10, Math.max(1,String(n).length-2));
+  const {options, correctIndex}=makeMCQFromNumeric(n, spread, []);
+  return {
+    type:'mcq',
+    prompt:'Which standard number matches this expanded form?<br><strong style="font-size:16px;">'+expandedStr+'</strong>',
+    visual:null, options, correctIndex,
+    explanation: expandedStr+' = '+fmt(n)+'.'
+  };
+}
+function wordsRound(){
+  let n=pick56DigitNumber();
+  const spread=Math.pow(10, Math.max(1,String(n).length-3));
+  let candidates=new Set([n]);
+  const offsets=shuffle([spread,-spread,spread*3,-spread*3,spread*10,-spread*10]);
+  let i=0;
+  while(candidates.size<4 && i<offsets.length){ const v=n+offsets[i]; if(v>0 && !candidates.has(v)) candidates.add(v); i++; }
+  let extra=1;
+  while(candidates.size<4){ const v=n+spread*(5+extra); if(v>0) candidates.add(v); extra++; }
+  let nums=shuffle(Array.from(candidates)).slice(0,4);
+  if(!nums.includes(n)) nums[0]=n;
+  const options=nums.map(v=>capFirst(numberToWords(v)));
+  const correctIndex=nums.indexOf(n);
+  return {
+    type:'mcq',
+    prompt:'Which words correctly name the number <strong>'+fmt(n)+'</strong>?',
+    visual:null, options, correctIndex,
+    explanation:'"'+capFirst(numberToWords(n))+'" is the correct word form of '+fmt(n)+'.'
+  };
+}
+
+/* ===================== GENERATORS: WORLD C ===================== */
+function compareRoundGen(){
+  const len=Math.random()<0.5?5:6;
+  const min=Math.pow(10,len-1), max=Math.pow(10,len)-1;
+  let a=randomInt(min,max), b;
+  if(Math.random()<0.15){ b=a; }
+  else{
+    let arr=String(a).split(''); const idx=randomInt(0,len-1);
+    let nd; do{ nd=randomInt(0,9); }while(nd===Number(arr[idx]));
+    arr[idx]=String(nd); b=Number(arr.join(''));
+  }
+  return {type:'compare', a, b};
+}
+function orderRoundGen(){
+  const len=Math.random()<0.5?5:6;
+  const min=Math.pow(10,len-1), max=Math.pow(10,len)-1;
+  const base=randomInt(min,max); const arr=String(base).split('');
+  const nums=new Set([base]); let guard=0;
+  while(nums.size<4 && guard<60){
+    guard++;
+    let a2=arr.slice();
+    const idx=randomInt(Math.max(0,len-3), len-1); a2[idx]=String(randomInt(0,9));
+    const idx2=randomInt(Math.max(0,len-3), len-1); a2[idx2]=String(randomInt(0,9));
+    nums.add(Number(a2.join('')));
+  }
+  const direction=Math.random()<0.5?'asc':'desc';
+  return {type:'order', numbers:Array.from(nums).slice(0,4), direction};
+}
+
+/* ===================== GENERATORS: WORLD D ===================== */
+function tenTimesRound(){
+  const mode=randomInt(0,1);
+  if(mode===0){
+    const op=Math.random()<0.5?'x10':'div10';
+    let n, correct, promptOp;
+    if(op==='x10'){ n=randomInt(2,9999); correct=n*10; promptOp='× 10'; }
+    else { n=randomInt(1,999)*10; correct=n/10; promptOp='÷ 10'; }
+    const {options, correctIndex}=makeMCQFromNumeric(correct, Math.max(10,Math.round(correct*0.2)), [n]);
+    return {
+      type:'mcq',
+      prompt:'What is <strong>'+fmt(n)+' '+promptOp+'</strong>?',
+      visual:null, options, correctIndex,
+      explanation: fmt(n)+' '+promptOp+' = '+fmt(correct)+'.'
+    };
+  } else {
+    const digit=randomInt(1,9);
+    let placeIdx=randomInt(1,5);
+    const placeValue=Math.pow(10,placeIdx);
+    const value=digit*placeValue;
+    let moveRight = placeIdx===5 ? true : Math.random()<0.5;
+    let correct, dir;
+    if(moveRight){ correct=value/10; dir='right'; } else { correct=value*10; dir='left'; }
+    const {options, correctIndex}=makeMCQFromNumeric(correct, placeValue, [value]);
+    return {
+      type:'mcq',
+      prompt:'The value of a digit in a number is <strong>'+fmt(value)+'</strong>. What would its value be if it moved <strong>one place '+dir+'</strong>?',
+      visual:null, options, correctIndex,
+      explanation:'Moving one place '+dir+' means '+(dir==='right'?'÷ 10':'× 10')+': '+fmt(value)+' → '+fmt(correct)+'.'
+    };
+  }
+}
+
+/* ===================== GENERATORS: WORLD E ===================== */
+function roundingRound(){
+  let n;
+  if(Math.random()<0.3){ const base=randomInt(10,899); n=base*1000+500+randomInt(0,99); }
+  else { n=randomInt(10000,899999); }
+  const correct=Math.round(n/1000)*1000;
+  const roundDown=Math.floor(n/1000)*1000, roundUp=Math.ceil(n/1000)*1000, wrongPlace=Math.round(n/10000)*10000;
+  let forced=[];
+  if(roundDown!==correct) forced.push(roundDown);
+  if(roundUp!==correct) forced.push(roundUp);
+  if(wrongPlace!==correct) forced.push(wrongPlace);
+  const {options, correctIndex}=makeMCQFromNumeric(correct, 1000, forced);
+  return {
+    type:'mcq',
+    prompt:'Round <strong>'+fmt(n)+'</strong> to the nearest thousand.',
+    visual:null, options, correctIndex,
+    explanation:'Look at the hundreds digit. '+fmt(n)+' rounds to '+fmt(correct)+'.'
+  };
+}
+function roundingReflectionRound(){
+  const base=randomInt(10,899);
+  const low=base*1000+randomInt(0,499), tie=base*1000+500;
+  return {
+    type:'reflection',
+    prompt:'Compare these two numbers — they\'re close, but they round differently!',
+    visual:'<div class="duel-row"><div class="duel-planet"><div class="num">'+fmt(low)+'</div></div><div class="duel-vs">vs</div><div class="duel-planet"><div class="num">'+fmt(tie)+'</div></div></div><p class="compare-note">'+fmt(low)+' rounds to <strong>'+fmt(Math.round(low/1000)*1000)+'</strong>, but '+fmt(tie)+' rounds to <strong>'+fmt(Math.round(tie/1000)*1000)+'</strong>.</p>',
+    reflectPrompt:'Explain why these two numbers round differently, even though they\'re so close together.',
+    modelAnswer:'The hundreds digit decides the rounding. '+fmt(low)+' has a hundreds digit less than 5, so it rounds down. '+fmt(tie)+' has a hundreds digit of exactly 5, so by the rounding rule it rounds up.'
+  };
+}
+
+/* ===================== GENERATORS: WORLD F ===================== */
+function estimateSumRound(){
+  const a=randomInt(11000,88999), b=randomInt(11000,88999);
+  const estA=Math.round(a/1000)*1000, estB=Math.round(b/1000)*1000, estimate=estA+estB;
+  const {options, correctIndex}=makeMCQFromNumeric(estimate, 1000, [a+b]);
+  return {
+    type:'mcq',
+    prompt:'Estimate: <strong>'+fmt(a)+' + '+fmt(b)+'</strong> (round each number to the nearest thousand first).',
+    visual:null, options, correctIndex,
+    explanation: fmt(a)+' ≈ '+fmt(estA)+', '+fmt(b)+' ≈ '+fmt(estB)+'. '+fmt(estA)+' + '+fmt(estB)+' = '+fmt(estimate)+'.'
+  };
+}
+function reasonablenessRound(){
+  const a=randomInt(11000,88999), b=randomInt(11000,88999);
+  const exact=a+b;
+  const estA=Math.round(a/1000)*1000, estB=Math.round(b/1000)*1000, estimate=estA+estB;
+  const makeUnreasonable=Math.random()<0.5;
+  let claim;
+  if(makeUnreasonable){ const bump=randomInt(3,9)*10000*(Math.random()<0.5?1:-1); claim=exact+bump; if(claim<0) claim=exact+Math.abs(bump); }
+  else { claim=exact; }
+  const isReasonable=Math.abs(claim-estimate)<=3000;
+  return {
+    type:'tf',
+    prompt:'A learner says: <strong>'+fmt(a)+' + '+fmt(b)+' = '+fmt(claim)+'</strong>. Is this reasonable?',
+    visual:null, options:['Yes, reasonable','No, not reasonable'], correctIndex:isReasonable?0:1,
+    explanation:'Estimate: '+fmt(a)+' ≈ '+fmt(estA)+' and '+fmt(b)+' ≈ '+fmt(estB)+', so the sum should be close to '+fmt(estimate)+'. The claimed answer '+fmt(claim)+' is '+(isReasonable?'close to':'far from')+' that estimate — so it '+(isReasonable?'IS':'is NOT')+' reasonable.'
+  };
+}
+
+/* ===================== GENERATORS: WORLD G ===================== */
+function reasoningRound(){
+  const X=randomInt(10,90)*10000;
+  const low=X-5000, high=X+4999;
+  const targetLead=String(X)[0];
+  let allMatch=true, counter=null;
+  for(let v=Math.max(1,low); v<=high; v++){
+    if(String(v)[0]!==targetLead){ allMatch=false; counter=v; break; }
+  }
+  return {
+    type:'tf',
+    prompt:'Every number that rounds to <strong>'+fmt(X)+'</strong> (to the nearest 10,000) must begin with the digit <strong>'+targetLead+'</strong>.',
+    visual:null, options:['True','False'], correctIndex: allMatch?0:1,
+    explanation: allMatch
+      ? 'True! Every number from '+fmt(low)+' to '+fmt(high)+' that rounds to '+fmt(X)+' begins with '+targetLead+'.'
+      : 'False! For example, '+fmt(counter)+' rounds to '+fmt(X)+' (nearest 10,000), but it begins with '+String(counter)[0]+', not '+targetLead+'.'
+  };
+}
+
+/* ===================== ROUND BUILDER DISPATCH ===================== */
+function buildRoundsForWorld(key){
+  if(key==='A'){ const mcqs=[]; for(let i=0;i<6;i++) mcqs.push(digitValueRound()); mcqs.push(twin7sRound()); return mcqs; }
+  if(key==='B'){ return shuffle([expandedRound(),expandedRound(),standardFormRound(),standardFormRound(),wordsRound(),wordsRound()]); }
+  if(key==='C'){ const arr=[]; for(let i=0;i<6;i++) arr.push(compareRoundGen()); for(let i=0;i<4;i++) arr.push(orderRoundGen()); return arr; }
+  if(key==='D'){ const arr=[]; for(let i=0;i<6;i++) arr.push(tenTimesRound()); return arr; }
+  if(key==='E'){ const arr=[]; for(let i=0;i<5;i++) arr.push(roundingRound()); arr.push(roundingReflectionRound()); return arr; }
+  if(key==='F'){ return shuffle([estimateSumRound(),estimateSumRound(),estimateSumRound(),reasonablenessRound(),reasonablenessRound(),reasonablenessRound()]); }
+  if(key==='G'){ const arr=[]; for(let i=0;i<4;i++) arr.push(reasoningRound()); return arr; }
+  return [];
+}
+
+/* ===================== QUIZ ENGINE ===================== */
+let currentWorld=null, currentRounds=[], currentIdx=0, currentCorrectCount=0, roundLocked=false;
+let msSelected=new Set(); let orderFilled=[], orderTarget=null, orderLockedLocal=false;
+
+function startWorld(key){
+  currentWorld=key; currentRounds=buildRoundsForWorld(key); currentIdx=0; currentCorrectCount=0;
+  document.getElementById('quizWorldTab').innerHTML=WORLD_META[key].char+' '+WORLD_META[key].name;
+  document.getElementById('quizStory').textContent=WORLD_META[key].tagline;
+  goTo('screen-quiz');
+  renderRound();
+}
+function renderRound(){
+  const round=currentRounds[currentIdx];
+  roundLocked=false; msSelected=new Set(); orderFilled=[]; orderLockedLocal=false;
+  document.getElementById('quizCounter').textContent='Round '+(currentIdx+1)+' of '+currentRounds.length;
+  document.getElementById('quizProg').style.width=(currentIdx/currentRounds.length*100)+'%';
+  document.getElementById('quizFeedback').className='feedback-banner';
+  document.getElementById('quizFeedback').innerHTML='';
+  document.getElementById('quizNextRow').style.display='none';
+  ['mcqBlock','multiselectBlock','reflectionBlock','compareBlock','orderBlock'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('quizPrompt').innerHTML=round.prompt||'';
+  document.getElementById('quizVisual').innerHTML=round.visual||'';
+
+  if(round.type==='mcq' || round.type==='tf'){
+    document.getElementById('mcqBlock').style.display='block';
+    document.getElementById('mcqOptions').innerHTML=round.options.map((label,i)=>'<div class="mcq-opt" data-idx="'+i+'">'+label+'</div>').join('');
+  } else if(round.type==='multiselect'){
+    document.getElementById('multiselectBlock').style.display='block';
+    document.getElementById('msChips').innerHTML=round.chips.map((c,i)=>'<div class="chip ms-chip" data-idx="'+i+'">'+c.label+'</div>').join('');
+  } else if(round.type==='reflection'){
+    document.getElementById('reflectionBlock').style.display='block';
+    document.getElementById('reflectPromptText').textContent=round.reflectPrompt;
+    document.getElementById('reflectTextarea').value='';
+    document.getElementById('reflectModelAnswer').classList.remove('show');
+    document.getElementById('reflectModelAnswer').innerHTML=round.modelAnswer;
+  } else if(round.type==='compare'){
+    document.getElementById('compareBlock').style.display='block';
+    renderCompareUI(round);
+  } else if(round.type==='order'){
+    document.getElementById('orderBlock').style.display='block';
+    renderOrderUI(round);
+  }
+}
+document.getElementById('mcqOptions').addEventListener('click', function(e){
+  const btn=e.target.closest('.mcq-opt'); if(!btn || roundLocked) return;
+  const round=currentRounds[currentIdx]; roundLocked=true;
+  const idx=Number(btn.dataset.idx);
+  document.querySelectorAll('#mcqOptions .mcq-opt').forEach(o=>o.style.pointerEvents='none');
+  const fb=document.getElementById('quizFeedback'); fb.classList.add('show');
+  if(idx===round.correctIndex){
+    playCorrect(); currentCorrectCount++; btn.classList.add('correct-opt');
+    fb.className='feedback-banner show correct'; fb.innerHTML='✅ '+round.explanation;
+  } else {
+    playWrong(); btn.classList.add('wrong-opt');
+    document.querySelectorAll('#mcqOptions .mcq-opt')[round.correctIndex].classList.add('correct-opt');
+    fb.className='feedback-banner show wrong'; fb.innerHTML='🔎 '+round.explanation;
+  }
+  document.getElementById('quizNextRow').style.display='flex';
+});
+document.getElementById('msChips').addEventListener('click', function(e){
+  if(roundLocked) return;
+  const chip=e.target.closest('.ms-chip'); if(!chip) return;
+  playClick();
+  const idx=chip.dataset.idx;
+  if(msSelected.has(idx)){ msSelected.delete(idx); chip.classList.remove('selected'); }
+  else { msSelected.add(idx); chip.classList.add('selected'); }
+});
+document.getElementById('msCheckBtn').addEventListener('click', function(){
+  if(roundLocked) return; roundLocked=true;
+  const round=currentRounds[currentIdx];
+  const correctSetIdx=new Set(round.chips.map((c,i)=>c.correct?String(i):null).filter(x=>x!==null));
+  const allCorrect = msSelected.size===correctSetIdx.size && [...msSelected].every(i=>correctSetIdx.has(i));
+  document.querySelectorAll('#msChips .ms-chip').forEach((chip,i)=>{
+    chip.style.pointerEvents='none';
+    if(round.chips[i].correct) chip.classList.add('correct-chip');
+    else if(msSelected.has(String(i))) chip.classList.add('wrong-chip');
+  });
+  const fb=document.getElementById('quizFeedback'); fb.classList.add('show');
+  if(allCorrect){ playCorrect(); currentCorrectCount++; fb.className='feedback-banner show correct'; fb.innerHTML='✅ '+round.explanation; }
+  else { playWrong(); fb.className='feedback-banner show wrong'; fb.innerHTML='🔎 '+round.explanation; }
+  document.getElementById('quizNextRow').style.display='flex';
+});
+document.getElementById('reflectModelBtn').addEventListener('click', function(){
+  if(roundLocked) return; roundLocked=true; playClick();
+  document.getElementById('reflectModelAnswer').classList.add('show');
+  currentCorrectCount++;
+  document.getElementById('quizNextRow').style.display='flex';
+});
+function renderCompareUI(round){
+  document.getElementById('cmpLeft').innerHTML='<div class="num">'+fmt(round.a)+'</div>';
+  document.getElementById('cmpRight').innerHTML='<div class="num">'+fmt(round.b)+'</div>';
+  document.getElementById('cmpLeft').classList.remove('correct-pick','wrong-pick');
+  document.getElementById('cmpRight').classList.remove('correct-pick','wrong-pick');
+  document.getElementById('cmpRocket').style.left='0%';
+  document.getElementById('cmpViz').style.display='none'; document.getElementById('cmpViz').innerHTML='';
+  document.querySelectorAll('#cmpAnswers .answer-btn').forEach(b=>b.style.pointerEvents='auto');
+}
+document.getElementById('cmpScanBtn').addEventListener('click', function(){
+  playClick(); const round=currentRounds[currentIdx];
+  const viz=document.getElementById('cmpViz'); buildCompareVizInto(viz, round.a, round.b); viz.style.display='block';
+});
+document.getElementById('cmpAnswers').addEventListener('click', function(e){
+  const btn=e.target.closest('.answer-btn'); if(!btn || roundLocked) return; roundLocked=true;
+  const round=currentRounds[currentIdx]; const correct=relationOf(round.a, round.b); const chosen=btn.dataset.ans;
+  document.querySelectorAll('#cmpAnswers .answer-btn').forEach(b=>b.style.pointerEvents='none');
+  const fb=document.getElementById('quizFeedback'); fb.classList.add('show');
+  if(chosen===correct){
+    playCorrect(); currentCorrectCount++;
+    document.getElementById('cmpRocket').style.left='92%';
+    if(correct==='left') document.getElementById('cmpLeft').classList.add('correct-pick');
+    else if(correct==='right') document.getElementById('cmpRight').classList.add('correct-pick');
+    fb.className='feedback-banner show correct'; fb.innerHTML='✅ '+explainRelation(round.a,round.b,correct);
+  } else {
+    playWrong();
+    if(chosen==='left') document.getElementById('cmpLeft').classList.add('wrong-pick');
+    else if(chosen==='right') document.getElementById('cmpRight').classList.add('wrong-pick');
+    fb.className='feedback-banner show wrong'; fb.innerHTML='🔎 '+explainRelation(round.a,round.b,correct);
+  }
+  const viz=document.getElementById('cmpViz'); buildCompareVizInto(viz, round.a, round.b); viz.style.display='block';
+  document.getElementById('quizNextRow').style.display='flex';
+});
+function renderOrderUI(round){
+  orderTarget=[...round.numbers].sort((x,y)=> round.direction==='asc'? x-y : y-x);
+  document.getElementById('ordDirection').textContent = round.direction==='asc' ? '🔼 Least to Greatest' : '🔽 Greatest to Least';
+  const slotsEl=document.getElementById('ordSlots'); slotsEl.innerHTML='';
+  round.numbers.forEach((n,i)=>{ const s=document.createElement('div'); s.className='slot'; s.id='ordSlot'+i; s.textContent='?'; slotsEl.appendChild(s); });
+  const poolEl=document.getElementById('ordPool'); poolEl.innerHTML='';
+  shuffle(round.numbers).forEach(n=>{
+    const c=document.createElement('div'); c.className='chip'; c.textContent=fmt(n); c.dataset.val=n;
+    c.addEventListener('click', onOrderChipClick); poolEl.appendChild(c);
+  });
+}
+function onOrderChipClick(e){
+  if(orderLockedLocal || roundLocked) return;
+  const chip=e.currentTarget; if(chip.classList.contains('used')) return;
+  playClick(); chip.classList.add('used');
+  orderFilled.push(Number(chip.dataset.val));
+  const slot=document.getElementById('ordSlot'+(orderFilled.length-1));
+  slot.textContent=fmt(Number(chip.dataset.val)); slot.classList.add('filled');
+  if(orderFilled.length===orderTarget.length) checkOrder();
+}
+function checkOrder(){
+  orderLockedLocal=true; roundLocked=true;
+  let allCorrect=true;
+  for(let i=0;i<orderTarget.length;i++){
+    const s=document.getElementById('ordSlot'+i);
+    if(orderFilled[i]===orderTarget[i]) s.classList.add('correct-slot'); else { s.classList.add('wrong-slot'); allCorrect=false; }
+  }
+  const fb=document.getElementById('quizFeedback'); fb.classList.add('show');
+  if(allCorrect){ playCorrect(); currentCorrectCount++; fb.className='feedback-banner show correct'; fb.innerHTML='✅ Perfect order!'; }
+  else { playWrong(); fb.className='feedback-banner show wrong'; fb.innerHTML='🔎 Correct order: '+orderTarget.map(fmt).join(' → '); }
+  document.getElementById('quizNextRow').style.display='flex';
+}
+document.getElementById('ordResetBtn').addEventListener('click', function(){
+  if(orderLockedLocal) return; playClick();
+  document.querySelectorAll('#ordPool .chip').forEach(c=>c.classList.remove('used'));
+  document.querySelectorAll('#ordSlots .slot').forEach(s=>{ s.textContent='?'; s.classList.remove('filled','correct-slot','wrong-slot'); });
+  orderFilled=[];
+});
+document.getElementById('quizNextBtn').addEventListener('click', function(){
+  playClick(); currentIdx++;
+  if(currentIdx>=currentRounds.length){ document.getElementById('quizProg').style.width='100%'; finishWorld(); }
+  else { renderRound(); }
+});
+function finishWorld(){
+  const key=currentWorld;
+  const stars=starsFromAccuracy(currentCorrectCount, currentRounds.length);
+  state.stars[key]=Math.max(state.stars[key], stars);
+  state.completed[key]=1;
+  document.getElementById('resultsTitle').textContent=WORLD_META[key].name+' Complete!';
+  document.getElementById('resultsStars').innerHTML=starRow(stars);
+  document.getElementById('resultsMsg').textContent=currentCorrectCount+' / '+currentRounds.length+' correct!';
+  document.getElementById('resultsSub').textContent=starMsg(stars);
+  if(stars>=2){ confettiBurst(); playFanfare(); }
+  refreshStarPill();
+  goTo('screen-results');
+}
+document.getElementById('resultsReplayBtn').addEventListener('click', ()=>{ playClick(); startWorld(currentWorld); });
+document.getElementById('resultsDoneBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+/* ===================== WORLD H: TRANSFER SUMMIT ===================== */
+function startTransfer(){
+  ['td0','td1','td2','td3','td4','td5'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('transferFeedback').className='feedback-banner';
+  document.getElementById('transferFeedback').innerHTML='';
+  document.getElementById('transferResultChecklist').innerHTML='';
+  document.getElementById('transferViz').innerHTML='';
+  document.getElementById('transferNextRow').style.display='none';
+  goTo('screen-transfer');
+}
+document.querySelectorAll('#transferInputs input').forEach((inp, idx, all)=>{
+  inp.addEventListener('input', function(){
+    this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);
+    if(this.value && all[idx+1]) all[idx+1].focus();
+  });
+});
+document.getElementById('transferCheckBtn').addEventListener('click', function(){
+  playClick();
+  const vals=['td0','td1','td2','td3','td4','td5'].map(id=>document.getElementById(id).value);
+  const fb=document.getElementById('transferFeedback'); fb.classList.add('show');
+  if(vals.some(v=>v==='')){
+    fb.className='feedback-banner show wrong';
+    fb.innerHTML='🧗 Fill in all six digit boxes first!';
+    return;
+  }
+  const n=Number(vals.join(''));
+  const digitsArr=vals.map(Number);
+  const checks=[
+    { ok: digitsArr[1]===7, label:'Has a 7 worth 70,000 (Ten-Thousands place)' },
+    { ok: digitsArr.includes(0), label:'Contains at least one zero digit' },
+    { ok: Math.round(n/100000)*100000===500000, label:'Rounds to 500,000 to the nearest hundred-thousand' },
+    { ok: n>470000, label:'Is greater than 470,000' }
+  ];
+  const allOk = checks.every(c=>c.ok);
+  document.getElementById('transferResultChecklist').innerHTML = checks.map(c=>'<div class="item '+(c.ok?'ok':'bad')+'">'+(c.ok?'✅':'❌')+' '+c.label+'</div>').join('');
+  const viz=document.getElementById('transferViz');
+  viz.innerHTML = buildPlaceValueStrip(n, 1);
+  if(allOk){
+    playCorrect(); confettiBurst();
+    fb.className='feedback-banner show correct';
+    fb.innerHTML='✅ Summit reached! '+fmt(n)+' satisfies every clue.';
+    state.stars.H=3; state.completed.H=1;
+    refreshStarPill();
+    document.getElementById('transferNextRow').style.display='flex';
+  } else {
+    playWrong();
+    fb.className='feedback-banner show wrong';
+    fb.innerHTML='🧗 Not quite yet — check the clues below and try again.';
+  }
+});
+document.getElementById('transferNextBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+
+/* ===================== FINALE / REPORT ===================== */
+function levelFor(stars){ if(stars>=3) return 'Mastered'; if(stars>=2) return 'Developing'; return 'Beginning'; }
+function showFinale(){
+  document.body.removeAttribute('data-theme');
+  const total=totalStars();
+  document.getElementById('finaleTotal').textContent=total;
+  document.getElementById('finaleStars').innerHTML=starRow(Math.round((total/24)*3));
+  const body=document.getElementById('reportBody'); body.innerHTML='';
+  Object.keys(WORLD_META).forEach(key=>{
+    const meta=WORLD_META[key]; const stars=state.stars[key]; const level=levelFor(stars);
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+meta.skill+'</td><td>'+starRow(stars)+'</td><td><span class="level-pill level-'+level+'">'+level+'</span></td>';
+    body.appendChild(tr);
+  });
+  if(total>=18){ confettiBurst(); playFanfare(); }
+  goTo('screen-finale');
+}
+document.getElementById('finaleHubBtn').addEventListener('click', ()=>{ playClick(); renderHub(); goTo('screen-hub'); });
+document.getElementById('finaleRestartBtn').addEventListener('click', function(){
+  playClick();
+  Object.keys(state.stars).forEach(k=>state.stars[k]=0);
+  Object.keys(state.completed).forEach(k=>state.completed[k]=0);
+  document.body.removeAttribute('data-theme');
+  renderHub();
+  goTo('screen-intro');
+});
+
+/* ===================== INIT ===================== */
+renderHub();
+})();
+</script>
+</body>
+</html>
