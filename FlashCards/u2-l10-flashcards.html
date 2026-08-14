@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | Quest Log: Build the Sum</title>
+<style>
+  :root{
+    --teal-900:#0B4F4A;
+    --teal-700:#0F766E;
+    --teal-600:#128077;
+    --teal-500:#1AA79B;
+    --teal-100:#E3F3F1;
+    --teal-050:#F1FAF9;
+    --orange-700:#C2410C;
+    --orange-600:#D9520F;
+    --orange-500:#EA580C;
+    --orange-300:#FB923C;
+    --orange-100:#FEECDC;
+    --cream:#FFFBF4;
+    --paper:#FFF7EA;
+    --paper-line:#EADFC8;
+    --ink:#20302F;
+    --ink-soft:#5B6B69;
+    --success:#1E8F63;
+    --success-bg:#E4F5EC;
+    --danger:#C2483C;
+    --danger-bg:#FBEAE7;
+    --shadow: 0 10px 30px rgba(11,79,74,0.14);
+    --radius: 18px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: "Trebuchet MS", "Segoe UI Rounded", "Segoe UI", Verdana, sans-serif;
+    background:
+      radial-gradient(circle at 8% 8%, rgba(26,167,155,0.10), transparent 40%),
+      radial-gradient(circle at 95% 12%, rgba(234,88,12,0.10), transparent 38%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    padding: 18px 14px 40px;
+  }
+
+  .app{ max-width: 760px; margin: 0 auto; }
+
+  /* ---------- HEADER ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-badge{
+    width:44px; height:44px; border-radius:50%;
+    background: conic-gradient(from 220deg, var(--teal-700), var(--orange-500), var(--teal-500));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+    flex-shrink:0;
+  }
+  .brand-badge svg{ width:24px; height:24px; }
+  .brand-text .kicker{
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--orange-600); font-weight:700;
+  }
+  .brand-text .name{ font-size:15px; font-weight:800; color:var(--teal-900); line-height:1.1; }
+
+  .xp-pill{
+    display:flex; align-items:center; gap:6px;
+    background: var(--teal-900); color:#fff;
+    padding: 8px 14px; border-radius: 999px;
+    font-size:13px; font-weight:700;
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+  }
+  .xp-pill svg{ width:16px; height:16px; }
+
+  .case-title{
+    background: var(--teal-900);
+    color:#fff;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+  .case-title::before{
+    content:"";
+    position:absolute; right:-30px; top:-30px;
+    width:140px; height:140px; border-radius:50%;
+    background: rgba(251,146,60,0.18);
+  }
+  .case-title h1{
+    margin:0 0 4px; font-size: 21px; letter-spacing:0.3px; position:relative;
+  }
+  .case-title p{ margin:0; font-size:13px; color:#BFE6E1; position:relative; }
+  .case-title .stamp{
+    position:absolute; top:14px; right:16px;
+    border:2px solid var(--orange-300); color:var(--orange-300);
+    padding:3px 9px; border-radius:6px; font-size:10px; font-weight:800;
+    letter-spacing:1.5px; transform: rotate(6deg); opacity:0.9;
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-wrap{ margin-bottom: 14px; }
+  .progress-track{
+    display:flex; gap:5px; margin-bottom:6px;
+  }
+  .progress-track .seg{
+    flex:1; height:6px; border-radius:4px; background: var(--teal-100);
+    overflow:hidden;
+  }
+  .progress-track .seg > i{
+    display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--orange-500), var(--teal-500));
+    transition: width .3s ease;
+  }
+  .progress-label{
+    display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-weight:600;
+  }
+
+  /* ---------- STAGE / CARDS ---------- */
+  .stage{ position:relative; min-height: 430px; }
+  .card{
+    display:none;
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: var(--radius);
+    padding: 22px 20px 24px;
+    box-shadow: var(--shadow);
+    animation: rise .35s ease;
+  }
+  .card.active{ display:block; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .tab{
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--orange-100); color:var(--orange-700);
+    font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+    padding:5px 10px; border-radius: 999px; margin-bottom:12px;
+  }
+  .tab svg{ width:13px; height:13px; }
+
+  h2.card-title{
+    margin: 0 0 6px; font-size:19px; color:var(--teal-900); line-height:1.25;
+  }
+  .card-sub{ margin:0 0 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
+
+  .divider{ border:none; border-top:1.5px dashed var(--paper-line); margin: 16px 0; }
+
+  /* ---------- GENERIC UI PIECES ---------- */
+  .goal-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+  .goal-list li{
+    display:flex; align-items:flex-start; gap:10px;
+    background: var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.4;
+  }
+  .goal-list li .chk{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--teal-500);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; margin-top:1px; background:#fff; transition: background .15s, border-color .15s;
+  }
+  .goal-list li .chk.done{ background: var(--teal-500); border-color:var(--teal-500); }
+  .goal-list li .chk svg{ width:12px; height:12px; opacity:0; transition:opacity .15s; }
+  .goal-list li .chk.done svg{ opacity:1; }
+
+  .btn{
+    border:none; cursor:pointer; font-weight:800; font-size:13.5px;
+    border-radius: 999px; padding: 10px 18px;
+    background: var(--teal-700); color:#fff;
+    display:inline-flex; align-items:center; gap:6px;
+    transition: transform .12s ease, background .15s ease;
+  }
+  .btn:hover{ background: var(--teal-600); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn.secondary{ background: var(--orange-500); }
+  .btn.secondary:hover{ background: var(--orange-600); }
+  .btn.ghost{ background: transparent; color:var(--teal-700); border:2px solid var(--teal-100); }
+  .btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .btn svg{ width:14px; height:14px; }
+
+  .reveal-box{
+    margin-top:12px; border-radius:12px; padding:14px 14px;
+    background: var(--success-bg); border:1.5px solid #BFE3CE;
+    font-size:14px; line-height:1.55; display:none;
+  }
+  .reveal-box.show{ display:block; animation: rise .3s ease; }
+  .reveal-box strong{ color:var(--success); }
+
+  /* Vocabulary flip cards */
+  .vocab-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  @media (max-width:480px){ .vocab-grid{ grid-template-columns: 1fr; } }
+  .flip-card{ perspective: 1000px; height: 108px; cursor:pointer; }
+  .flip-inner{
+    position:relative; width:100%; height:100%; text-align:center;
+    transition: transform .5s; transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform: rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:10px; font-size:13px;
+  }
+  .flip-front{ background: var(--teal-700); color:#fff; font-weight:800; font-size:15px; }
+  .flip-front span{ font-size:10px; font-weight:600; opacity:0.75; margin-top:4px; }
+  .flip-back{ background:#fff; border:2px solid var(--teal-100); color:var(--ink); transform: rotateY(180deg); line-height:1.35; }
+
+  /* SVG viz container */
+  .viz{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding: 10px 6px 4px; margin: 6px 0 4px; overflow:hidden;
+  }
+  .viz svg{ width:100%; height:auto; display:block; }
+  .viz-caption{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin: 2px 0 8px; font-weight:600; }
+
+  /* Table */
+  table.pv-table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:14px; }
+  table.pv-table th{
+    background: var(--teal-700); color:#fff; padding:9px 8px; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:0.4px;
+  }
+  table.pv-table th:first-child{ border-radius:8px 0 0 0; }
+  table.pv-table th:last-child{ border-radius:0 8px 0 0; }
+  table.pv-table td{ padding:9px 8px; border-bottom:1px solid var(--paper-line); text-align:center; }
+  table.pv-table tr:nth-child(even) td{ background: var(--teal-050); }
+  table.pv-table input{
+    width: 78px; padding:6px 4px; text-align:center; font-size:14px;
+    border:2px solid var(--teal-100); border-radius:8px; font-family:inherit;
+  }
+  table.pv-table input:focus{ outline:none; border-color:var(--teal-500); }
+  .cell-status{ display:inline-block; margin-left:4px; }
+
+  /* quick problem chain */
+  .chain{ display:flex; flex-direction:column; gap:8px; margin: 4px 0 6px; }
+  .chain .step{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:10px; padding:10px 12px;
+  }
+  .chain .step .q{ font-size:15px; font-weight:700; color:var(--teal-900); }
+  .chain .step .a{
+    font-size:15px; font-weight:800; color: var(--orange-700);
+    min-width:50px; text-align:right;
+  }
+
+  /* choice buttons */
+  .choice-row{ display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0; }
+  .choice{
+    flex:1; min-width:90px; text-align:center;
+    padding:10px 8px; border-radius:10px; border:2px solid var(--teal-100);
+    background:#fff; font-weight:800; font-size:13.5px; cursor:pointer; color:var(--teal-900);
+    transition: all .15s ease;
+  }
+  .choice:hover{ border-color: var(--teal-500); }
+  .choice.selected{ background: var(--teal-700); color:#fff; border-color:var(--teal-700); }
+
+  .input-line{ display:flex; align-items:center; gap:10px; margin: 10px 0; flex-wrap:wrap; }
+  .input-line input[type="text"], .input-line input[type="number"]{
+    width: 110px; padding:9px 10px; font-size:15px; text-align:center;
+    border:2px solid var(--teal-100); border-radius:10px; font-family:inherit; font-weight:700;
+  }
+  .input-line input:focus{ outline:none; border-color:var(--teal-500); }
+
+  .callout{
+    background: var(--orange-100); border-left:4px solid var(--orange-500);
+    border-radius:10px; padding:10px 12px; font-size:13.5px; line-height:1.5; margin: 12px 0;
+  }
+  .callout strong{ color:var(--orange-700); }
+
+  .mini-label{ font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; color:var(--teal-700); margin: 14px 0 6px; }
+
+  /* Badge / final card */
+  .badge-wrap{ text-align:center; padding: 6px 0 4px; }
+  .badge-circle{
+    width:110px; height:110px; border-radius:50%; margin: 4px auto 12px;
+    background: conic-gradient(from 200deg, var(--teal-700), var(--orange-500), var(--teal-500), var(--teal-700));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+  }
+  .badge-circle .inner{
+    width:86px; height:86px; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .badge-circle svg{ width:44px; height:44px; }
+  .final-xp{ font-size:26px; font-weight:900; color:var(--teal-900); }
+  .final-xp span{ font-size:14px; color:var(--ink-soft); font-weight:700; }
+
+  /* nav controls */
+  .controls{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:16px; gap:10px;
+  }
+  .controls .btn{ padding:10px 16px; }
+  .counter{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+
+  .feedback-text{ font-size:13.5px; margin-top:8px; line-height:1.5; display:none; padding:10px 12px; border-radius:10px; }
+  .feedback-text.show{ display:block; animation: rise .25s ease; }
+  .feedback-text.correct{ background: var(--success-bg); color:var(--success); border:1.5px solid #BFE3CE; }
+  .feedback-text.wrong{ background: var(--danger-bg); color:var(--danger); border:1.5px solid #F1C6BE; }
+  .feedback-text.info{ background: var(--teal-050); color:var(--teal-900); border:1.5px solid var(--teal-100); }
+
+  /* ---------- extra: Q&A reveal cards (session 3) ---------- */
+  .qa-list{ display:flex; flex-direction:column; gap:10px; margin:10px 0 4px; }
+  .qa-item{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; transition:border-color .15s ease;
+  }
+  .qa-item:hover{ border-color:var(--teal-500); }
+  .qa-item .qrow{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .qa-item .q{ font-size:14.5px; font-weight:700; color:var(--teal-900); line-height:1.45; }
+  .qa-item .peek{
+    font-size:9.5px; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink-soft);
+    font-weight:800; white-space:nowrap; margin-top:2px; flex-shrink:0;
+  }
+  .qa-item .a{
+    margin-top:12px; padding-top:12px; border-top:1.5px dashed var(--paper-line);
+    font-size:14px; font-weight:700; color:var(--orange-700); line-height:1.6; display:none;
+  }
+  .qa-item.open .a{ display:block; }
+
+  /* place-value table with placeholder zeros */
+  table.pv-table td.zero-cell{ background:var(--teal-050); color:var(--ink-soft); font-style:italic; }
+  .table-note{ font-size:12px; color:var(--ink-soft); font-weight:600; margin-top:8px; line-height:1.5; }
+
+  /* decomposition breakdown rows (spaced) */
+  .decomp-list{ display:flex; flex-direction:column; gap:10px; margin:12px 0 4px; }
+  .decomp-row{
+    display:flex; align-items:center; gap:12px;
+    background:var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:10px; padding:10px 13px;
+  }
+  .decomp-row .dnum{
+    width:26px; height:26px; border-radius:7px; flex-shrink:0;
+    background:var(--teal-700); color:#fff; font-weight:800; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .decomp-row .dtext{ flex:1; font-size:13.5px; font-weight:700; color:var(--teal-900); line-height:1.4; }
+
+  /* representation table (standard / expanded / word) */
+  table.rep-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; }
+  table.rep-table td{
+    padding:12px 14px; border-bottom:1px solid var(--paper-line); font-size:14px;
+  }
+  table.rep-table td:first-child{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); width:92px; vertical-align:top; padding-top:14px;
+  }
+  table.rep-table td:last-child{ font-weight:700; color:var(--teal-900); line-height:1.5; }
+  table.rep-table tr:last-child td{ border-bottom:none; }
+
+  /* ---------- extra: compare table (session 4) ---------- */
+  table.cmp-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; font-family:'Trebuchet MS',sans-serif; }
+  table.cmp-table th{
+    background:var(--teal-900); color:#fff; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.4px; padding:8px 2px; font-weight:700;
+  }
+  table.cmp-table td{
+    text-align:center; font-size:19px; font-weight:800; padding:10px 2px;
+    background:#fff; border:1px solid var(--paper-line); color:var(--teal-900);
+  }
+  table.cmp-table td.diff-col{ background:var(--orange-100); color:var(--orange-700); }
+  table.cmp-table tr:first-child td{ border-bottom:2px solid var(--paper-line); }
+
+  .cmp-verdict{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--teal-050); border:1.5px solid var(--teal-100); border-radius:12px;
+    padding:12px; margin-top:12px; font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-verdict .sym{ font-size:22px; color:var(--orange-700); }
+
+  /* quick compare pairs (field test) */
+  .cmp-pair{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; margin-bottom:10px;
+  }
+  .cmp-pair .nums{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-pair .nums .blank{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:26px; border:2px dashed var(--paper-line); border-radius:6px;
+    font-size:14px; color:var(--ink-soft); font-weight:800;
+  }
+  .cmp-pair.open .nums .blank{ border-style:solid; border-color:var(--orange-500); color:var(--orange-700); background:var(--orange-100); }
+  .cmp-pair .why{
+    margin-top:10px; padding-top:10px; border-top:1.5px dashed var(--paper-line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); line-height:1.5; display:none; text-align:center;
+  }
+  .cmp-pair.open .why{ display:block; }
+  .cmp-pair .peek{
+    text-align:center; font-size:9.5px; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-soft); font-weight:800; margin-top:8px;
+  }
+
+  /* ---------- extra: number line components (session 5) ---------- */
+  .numline-wrap{ margin:14px 0 6px; }
+  .numline-title{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin-bottom:6px; }
+  .numline{ position:relative; height:78px; }
+  .numline .track{
+    position:absolute; left:6px; right:6px; top:36px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .numline .tick{ position:absolute; top:26px; width:2px; height:24px; background:var(--ink-soft); transform:translateX(-50%); }
+  .numline .tick.mid{ background:var(--orange-300); width:2px; height:24px; }
+  .numline .ticklabel{
+    position:absolute; top:52px; font-size:11px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline .ticklabel.mid{ color:var(--orange-600); }
+  .numline .dot{
+    position:absolute; top:38px; width:15px; height:15px; border-radius:50%;
+    background:var(--orange-500); border:2.5px solid #fff; box-shadow:0 0 0 2px var(--orange-500);
+    transform:translate(-50%,-50%); z-index:2;
+  }
+  .numline .dotlabel{
+    position:absolute; top:0px; font-size:12px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap; background:#fff; padding:0 3px; border-radius:4px;
+  }
+  .numline .dist{
+    position:absolute; top:14px; font-size:9.5px; font-weight:700; color:var(--ink-soft);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline-verdict{
+    margin-top:10px; text-align:center; font-size:13px; font-weight:800;
+    color:var(--teal-900); background:var(--teal-050); border:1.5px solid var(--teal-100);
+    border-radius:10px; padding:9px 10px;
+  }
+
+  /* halfway zone diagram (deep learning why) */
+  .zone-line{ position:relative; height:100px; margin:14px 0 6px; }
+  .zone-line .half{
+    position:absolute; top:30px; height:34px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11.5px; font-weight:800; color:#fff;
+  }
+  .zone-line .half.down{ left:0; width:calc(50% - 3px); background:var(--teal-600); }
+  .zone-line .half.up{ right:0; width:calc(50% - 3px); background:var(--orange-500); }
+  .zone-line .mid-marker{
+    position:absolute; left:50%; top:20px; width:2px; height:54px; background:var(--ink-soft);
+    transform:translateX(-50%);
+  }
+  .zone-line .mid-label{
+    position:absolute; left:50%; top:76px; transform:translateX(-50%);
+    font-size:10.5px; font-weight:800; color:var(--ink-soft); text-align:center; width:120px;
+  }
+  .zone-line .end-label{
+    position:absolute; top:0px; font-size:10.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .zone-line .end-label.left{ left:0; }
+  .zone-line .end-label.right{ right:0; text-align:right; }
+
+  /* range band (fast learner extension) */
+  .band-line{ position:relative; height:88px; margin:14px 0 6px; }
+  .band-line .track{
+    position:absolute; left:6px; right:6px; top:38px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .band-line .band{
+    position:absolute; top:32px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .band-line .tick{ position:absolute; top:30px; width:2px; height:20px; background:var(--ink-soft); transform:translateX(-50%); }
+  .band-line .ticklabel{
+    position:absolute; top:56px; font-size:10.5px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .band-line .endmark{
+    position:absolute; top:6px; font-size:10px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+
+  /* ---------- extra: reasonableness check-line (session 6) ---------- */
+  .check-line{ position:relative; height:112px; margin:14px 0 6px; }
+  .check-line .track{
+    position:absolute; left:6px; right:6px; top:52px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .check-line .zone{
+    position:absolute; top:46px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .check-line .marker{
+    position:absolute; top:40px; width:15px; height:15px; border-radius:50%;
+    transform:translate(-50%,-50%); border:2.5px solid #fff; z-index:2;
+    box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  }
+  .check-line .marker.estimate{ background:var(--teal-700); }
+  .check-line .marker.exact{ background:var(--success); }
+  .check-line .marker.given{ background:var(--danger); }
+  .check-line .mlabel{
+    position:absolute; font-size:10.5px; font-weight:800; white-space:nowrap;
+    transform:translateX(-50%);
+  }
+  .check-line .mlabel.top{ top:6px; }
+  .check-line .mlabel.bottom{ top:72px; }
+  .check-line .mlabel.estimate-c{ color:var(--teal-700); }
+  .check-line .mlabel.exact-c{ color:var(--success); }
+  .check-line .mlabel.given-c{ color:var(--danger); }
+  .check-line-legend{
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin-top:10px; font-size:11px; font-weight:700; color:var(--ink-soft);
+  }
+  .check-line-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .check-line-legend .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; flex-shrink:0; }
+
+  /* equation display for concept entry */
+  .eq-block{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:12px 14px; margin:8px 0; font-size:15px; font-weight:800;
+    color:var(--teal-900); text-align:center;
+  }
+  .eq-block .tag{
+    display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); font-weight:800; margin-bottom:4px;
+  }
+
+  /* ---------- extra: vertical addition (Lesson 10) ---------- */
+  .vadd-wrap{ margin:14px 0 6px; display:flex; justify-content:center; }
+  .vadd{ display:grid; row-gap:5px; column-gap:6px; align-items:center; }
+  .vadd .opcell{ font-size:19px; font-weight:800; color:var(--ink-soft); text-align:left; }
+  .vadd .digit{
+    text-align:center; font-size:20px; font-weight:800; color:var(--teal-900);
+    min-width:30px;
+  }
+  .vadd .digit.blank{ color:transparent; }
+  .vadd .carry{
+    text-align:center; font-size:12px; font-weight:800; color:var(--orange-600);
+    min-height:16px;
+  }
+  .vadd .rule{ grid-column:1/-1; border-top:3px solid var(--teal-900); margin:2px 0 3px; }
+  .vadd .sumdigit{ text-align:center; font-size:21px; font-weight:900; color:var(--teal-900); }
+
+  /* correct vs incorrect alignment compare */
+  .align-compare{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin:12px 0 4px; }
+  .align-box{
+    flex:1; min-width:135px; border-radius:12px; padding:12px 10px; text-align:center;
+  }
+  .align-box.good{ background:var(--teal-050); border:2px solid var(--teal-500); }
+  .align-box.bad{ background:#FEECEC; border:2px solid var(--danger); }
+  .align-box .albl{ font-size:11.5px; font-weight:800; margin-bottom:8px; }
+  .align-box.good .albl{ color:var(--teal-700); }
+  .align-box.bad .albl{ color:var(--danger); }
+
+  .quest-tag{
+    display:inline-flex; align-items:center; gap:6px; font-family:'Special Elite',monospace;
+    font-size:11px; letter-spacing:0.5px; text-transform:uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="6"></circle>
+          <line x1="15" y1="15" x2="21" y2="21"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="kicker">MyMasteryLab</div>
+        <div class="name">Building Confident Problem Solvers</div>
+      </div>
+    </div>
+    <div class="xp-pill">
+      <svg viewBox="0 0 24 24" fill="#FB923C" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>
+      <span id="xpCount">0</span> XP
+    </div>
+  </div>
+
+  <div class="case-title">
+    <div class="stamp">RECAP</div>
+    <h1>🎪 Quest Log: Build the Sum</h1>
+    <p>Lesson 10 Recap &middot; Grade 4 &middot; Addition &amp; Regrouping</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track" id="progressTrack"></div>
+    <div class="progress-label">
+      <span id="counterLabel">Card 1 of 16</span>
+      <span id="cardName">Mission Briefing</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- CARD 1: MISSION BRIEFING -->
+    <section class="card" data-name="Mission Briefing">
+      <div class="tab"><span class="quest-tag">🎪 Festival Math Explorer</span></div>
+      <h2 class="card-title">Welcome back, Explorer!</h2>
+      <p class="card-sub">The festival's number records got scrambled. Tap each clue below once you understand it — you'll need all of them to open the gates:</p>
+      <ul class="goal-list" id="goalList">
+        <li><span class="chk" data-goal="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>align</strong> digits by place value.</li>
+        <li><span class="chk" data-goal="2"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>add like units</strong> together.</li>
+        <li><span class="chk" data-goal="3"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>regroup</strong> correctly.</li>
+        <li><span class="chk" data-goal="4"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>estimate</strong> to check my work.</li>
+        <li><span class="chk" data-goal="5"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>explain</strong> my thinking.</li>
+      </ul>
+      <div class="callout">🎯 <strong>Quest Rule:</strong> Don't just get the answer — explain why the mathematics works.</div>
+    </section>
+
+    <!-- CARD 2: VOCABULARY -->
+    <section class="card" data-name="Key Vocabulary">
+      <div class="tab"><span class="quest-tag">📖 Explorer's Notebook</span></div>
+      <h2 class="card-title">Vocabulary flashcards</h2>
+      <p class="card-sub">Tap a card to flip it and reveal the meaning.</p>
+      <div class="vocab-grid" id="vocabGrid">
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Addend<span>tap to flip</span></div>
+          <div class="flip-face flip-back">A number being added.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Sum<span>tap to flip</span></div>
+          <div class="flip-face flip-back">The total when numbers are added.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Align<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Line up digits by place value, starting from the ones place.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Regroup<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Rename 10 units as 1 unit of the next place value.</div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- CARD 3: CONCEPT ENTRY -->
+    <section class="card" data-name="Rescue the Visitor Count">
+      <div class="tab"><span class="quest-tag">🎟️ Mission 2</span></div>
+      <h2 class="card-title">36,241 + 12,315</h2>
+      <p class="card-sub">Gate A has 36,241 visitors. Gate B has 12,315 visitors. Add like units:</p>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:24px repeat(5,1fr);">
+          <div class="opcell"></div>
+          <div class="digit">3</div><div class="digit">6</div><div class="digit">2</div><div class="digit">4</div><div class="digit">1</div>
+          <div class="opcell">+</div>
+          <div class="digit">1</div><div class="digit">2</div><div class="digit">3</div><div class="digit">1</div><div class="digit">5</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">4</div><div class="sumdigit">8</div><div class="sumdigit">5</div><div class="sumdigit">5</div><div class="sumdigit">6</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">36,241 + 12,315 = <strong>48,556</strong></p>
+      <hr class="divider">
+      <p class="card-sub" style="margin-bottom:6px;">The 6 in 36,241 and the 2 in 12,315 are combined — why?</p>
+      <div class="callout">Both digits sit in the <strong>thousands</strong> place: 6 thousands + 2 thousands = 8 thousands. They're combined because they're the <strong>same place-value unit</strong> — not because they look alike or sit in the middle.</div>
+    </section>
+
+    <!-- CARD 4: DEEP LEARNING WHY -->
+    <section class="card" data-name="Why Alignment Matters">
+      <div class="tab"><span class="quest-tag">🚚 Mission 3</span></div>
+      <h2 class="card-title">Why does alignment matter?</h2>
+      <p class="card-sub">Truck A brings 34,500 packages. Truck B brings 7,200. Compare two ways of lining them up:</p>
+      <div class="align-compare">
+        <div class="align-box good">
+          <div class="albl">&check; ALIGNED BY PLACE VALUE</div>
+          <div class="vadd" style="grid-template-columns:16px repeat(5,1fr); justify-content:center;">
+            <div class="opcell"></div>
+            <div class="digit">3</div><div class="digit">4</div><div class="digit">5</div><div class="digit">0</div><div class="digit">0</div>
+            <div class="opcell">+</div>
+            <div class="digit blank">0</div><div class="digit">7</div><div class="digit">2</div><div class="digit">0</div><div class="digit">0</div>
+          </div>
+        </div>
+        <div class="align-box bad">
+          <div class="albl">&#10007; ALIGNED BY LEFT EDGE</div>
+          <div class="vadd" style="grid-template-columns:16px repeat(5,1fr); justify-content:center;">
+            <div class="opcell"></div>
+            <div class="digit">3</div><div class="digit">4</div><div class="digit">5</div><div class="digit">0</div><div class="digit">0</div>
+            <div class="opcell">+</div>
+            <div class="digit">7</div><div class="digit">2</div><div class="digit">0</div><div class="digit">0</div><div class="digit blank">0</div>
+          </div>
+        </div>
+      </div>
+      <p class="table-note">In the wrong version, the 7 (thousands) lines up under the 3 (ten-thousands). Different units get added together — the answer would be meaningless.</p>
+      <button class="btn secondary" id="c1Btn" style="margin-top:6px;">Is 34,500 + 720 the same as 34,500 + 7,200?</button>
+      <div class="reveal-box" id="c1Reveal">
+        <p style="margin:0;">No! In <strong>720</strong>, the 7 is in the <strong>hundreds</strong> place (700). In <strong>7,200</strong>, the 7 is in the <strong>thousands</strong> place (7,000) — ten times bigger. So:</p>
+        <div class="decomp-list" style="margin-top:12px;">
+          <div class="decomp-row"><div class="dnum">A</div><div class="dtext">34,500 + 720 = 35,220</div></div>
+          <div class="decomp-row"><div class="dnum">B</div><div class="dtext">34,500 + 7,200 = 41,700</div></div>
+        </div>
+        <p style="margin:12px 0 0; font-size:13px; font-weight:700; color:var(--teal-900);">A missing zero changes the whole answer — that's why place value matters so much.</p>
+      </div>
+    </section>
+
+    <!-- CARD 5: FIELD TEST 1 -->
+    <section class="card" data-name="Warm-Up Sums">
+      <div class="tab"><span class="quest-tag">🍕 Mission 4</span></div>
+      <h2 class="card-title">Warm-up sums</h2>
+      <p class="card-sub">Tap each card to check your answer.</p>
+      <div class="qa-list" id="qaList1">
+        <div class="qa-item"><div class="qrow"><div class="q">1,240 + 2,315 = ?</div><div class="peek">tap</div></div>
+          <div class="a">3,555 — no regrouping needed, every column adds to less than 10.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">4,205 + 3,142 = ?</div><div class="peek">tap</div></div>
+          <div class="a">7,347 — again, no regrouping needed here.</div></div>
+      </div>
+    </section>
+
+    <!-- CARD 6: REGROUPING SPOTLIGHT -->
+    <section class="card" data-name="Regrouping Spotlight">
+      <div class="tab"><span class="quest-tag">🍕 Mission 4 &middot; Rescue!</span></div>
+      <h2 class="card-title">2,486 + 1,735</h2>
+      <p class="card-sub">This time, some columns add up to 10 or more. Watch the carries:</p>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:24px repeat(4,1fr);">
+          <div class="opcell"></div>
+          <div class="carry">1</div><div class="carry">1</div><div class="carry">1</div><div class="carry"></div>
+          <div class="opcell"></div>
+          <div class="digit">2</div><div class="digit">4</div><div class="digit">8</div><div class="digit">6</div>
+          <div class="opcell">+</div>
+          <div class="digit">1</div><div class="digit">7</div><div class="digit">3</div><div class="digit">5</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">4</div><div class="sumdigit">2</div><div class="sumdigit">2</div><div class="sumdigit">1</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">2,486 + 1,735 = <strong>4,221</strong></p>
+      <div class="decomp-list" style="margin-top:6px;">
+        <div class="decomp-row"><div class="dnum">1</div><div class="dtext">Ones: 6 + 5 = 11 &rarr; write 1, regroup (carry) 1 ten</div></div>
+        <div class="decomp-row"><div class="dnum">2</div><div class="dtext">Tens: 8 + 3 + 1 = 12 &rarr; write 2, regroup 1 hundred</div></div>
+        <div class="decomp-row"><div class="dnum">3</div><div class="dtext">Hundreds: 4 + 7 + 1 = 12 &rarr; write 2, regroup 1 thousand</div></div>
+        <div class="decomp-row"><div class="dnum">4</div><div class="dtext">Thousands: 2 + 1 + 1 = 4</div></div>
+      </div>
+      <p class="table-note" style="margin-top:10px;">The regrouped 1 is never just "one" — it always represents <strong>one whole group</strong> of the next place value.</p>
+    </section>
+
+    <!-- CARD 7: CHALLENGE - EXPANDED FORM -->
+    <section class="card" data-name="Expanded Form Challenge">
+      <div class="tab"><span class="quest-tag">🍕 Mission 4 &middot; Challenge</span></div>
+      <h2 class="card-title">24,315 + 13,204</h2>
+      <p class="card-sub">A bigger number doesn't always mean regrouping. See why with expanded form:</p>
+      <table class="rep-table">
+        <tr><td>24,315</td><td>20,000 + 4,000 + 300 + 10 + 5</td></tr>
+        <tr><td>13,204</td><td>10,000 + 3,000 + 200 + 0 + 4</td></tr>
+      </table>
+      <button class="btn secondary" id="c7Btn">Add the matching units</button>
+      <div class="reveal-box" id="c7Reveal">
+        <div class="decomp-list">
+          <div class="decomp-row"><div class="dnum">✓</div><div class="dtext">20,000 + 10,000 = 30,000</div></div>
+          <div class="decomp-row"><div class="dnum">✓</div><div class="dtext">4,000 + 3,000 = 7,000</div></div>
+          <div class="decomp-row"><div class="dnum">✓</div><div class="dtext">300 + 200 = 500</div></div>
+          <div class="decomp-row"><div class="dnum">✓</div><div class="dtext">10 + 0 = 10</div></div>
+          <div class="decomp-row"><div class="dnum">✓</div><div class="dtext">5 + 4 = 9</div></div>
+        </div>
+        <p style="margin:12px 0 0; font-size:13px; font-weight:700; color:var(--teal-900);">30,000 + 7,000 + 500 + 10 + 9 = <strong>37,519</strong>. Expanded form shows exactly what's being combined — no columns reached 10, so no regrouping was needed.</p>
+      </div>
+    </section>
+
+    <!-- CARD 8: DETECTIVE CHECK A -->
+    <section class="card" data-name="Suspicious Record A">
+      <div class="tab"><span class="quest-tag">🕵️ Mission 5</span></div>
+      <h2 class="card-title">Is this record correct?</h2>
+      <div class="callout">45,230 + 6,400 = 51,630</div>
+      <div class="choice-row">
+        <div class="choice" data-val="yes">Correct</div>
+        <div class="choice" data-val="no">Incorrect</div>
+      </div>
+      <div class="feedback-text" id="detAFeedback"></div>
+    </section>
+
+    <!-- CARD 9: DETECTIVE CHECK B -->
+    <section class="card" data-name="Suspicious Record B">
+      <div class="tab"><span class="quest-tag">🕵️ Mission 5</span></div>
+      <h2 class="card-title">Spot the error</h2>
+      <p class="card-sub">The intended addend was 6,400, but the record shows:</p>
+      <div class="callout">45,230 + 640 = 45,870</div>
+      <button class="btn secondary" id="detBBtn">Reveal the error</button>
+      <div class="reveal-box" id="detBReveal">
+        <p style="margin:0;">A zero went missing! <strong>640</strong> is ten times smaller than <strong>6,400</strong> — its 6 sits in the hundreds place, not the thousands place. One missing zero shifted every digit's value down a whole house.</p>
+      </div>
+    </section>
+
+    <!-- CARD 10: DETECTIVE CHECK C -->
+    <section class="card" data-name="Suspicious Record C">
+      <div class="tab"><span class="quest-tag">🕵️ Mission 5</span></div>
+      <h2 class="card-title">"I'll just write 11"</h2>
+      <p class="card-sub">A worker says:</p>
+      <div class="callout">"11 ones means I write 11 in the ones column."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="detCFeedback"></div>
+    </section>
+
+    <!-- CARD 11: TARGET CHALLENGE -->
+    <section class="card" data-name="Unlock 50,000">
+      <div class="tab"><span class="quest-tag">🏆 Mission 6</span></div>
+      <h2 class="card-title">Unlock the 50,000 target</h2>
+      <p class="card-sub">The festival needs exactly 50,000 visitors. Find pairs that add up to it:</p>
+      <button class="btn secondary" id="targetBtn">Reveal some pairs</button>
+      <div class="reveal-box" id="targetReveal">
+        <div class="decomp-list">
+          <div class="decomp-row"><div class="dnum">1</div><div class="dtext">30,000 + 20,000 = 50,000</div></div>
+          <div class="decomp-row"><div class="dnum">2</div><div class="dtext">45,000 + 5,000 = 50,000</div></div>
+          <div class="decomp-row"><div class="dnum">&#9733;</div><div class="dtext">49,999 + 1 = 50,000 — neither number is a multiple of 1,000!</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 12: DETECTIVE DILEMMA -->
+    <section class="card" data-name="Detectives Dilemma">
+      <div class="tab"><span class="quest-tag">🏆 Mission 6 &middot; Dilemma</span></div>
+      <h2 class="card-title">Always, sometimes, or never?</h2>
+      <div class="callout">"If two numbers total 50,000, their thousands digits must add to 50."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="always">Always</div>
+        <div class="choice" data-val="sometimes">Sometimes</div>
+        <div class="choice" data-val="never">Never</div>
+      </div>
+      <div class="feedback-text" id="dilemmaFeedback"></div>
+    </section>
+
+    <!-- CARD 13: SUBTRACTION TRICK -->
+    <section class="card" data-name="How Many More">
+      <div class="tab"><span class="quest-tag">🏆 Mission 6</span></div>
+      <h2 class="card-title">How many more to reach 50,000?</h2>
+      <p class="card-sub">The festival has counted 19,999 visitors so far.</p>
+      <button class="btn secondary" id="subBtn">Reveal the answer</button>
+      <div class="reveal-box" id="subReveal">
+        <div class="eq-block" style="margin:0;"><span class="tag">50,000 &minus; 19,999</span>30,001</div>
+        <p style="margin:12px 0 0; font-size:13px; font-weight:700; color:var(--teal-900);">Handy shortcut: 19,999 is just 1 less than 20,000. So 50,000 &minus; 20,000 = 30,000, then add that 1 back: 30,001.</p>
+      </div>
+    </section>
+
+    <!-- CARD 14: EXIT TICKET PART 1 -->
+    <section class="card" data-name="Open the Festival 1">
+      <div class="tab"><span class="quest-tag">🎪 Final Mission</span></div>
+      <h2 class="card-title">Solve &amp; estimate</h2>
+      <p class="card-sub">34,728 + 12,156</p>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:24px repeat(5,1fr);">
+          <div class="opcell"></div>
+          <div class="carry"></div><div class="carry"></div><div class="carry"></div><div class="carry">1</div><div class="carry"></div>
+          <div class="opcell"></div>
+          <div class="digit">3</div><div class="digit">4</div><div class="digit">7</div><div class="digit">2</div><div class="digit">8</div>
+          <div class="opcell">+</div>
+          <div class="digit">1</div><div class="digit">2</div><div class="digit">1</div><div class="digit">5</div><div class="digit">6</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">4</div><div class="sumdigit">6</div><div class="sumdigit">8</div><div class="sumdigit">8</div><div class="sumdigit">4</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">34,728 + 12,156 = <strong>46,884</strong> (only the ones column regroups: 8 + 6 = 14)</p>
+      <div class="qa-list" id="qaList2" style="margin-top:12px;">
+        <div class="qa-item"><div class="qrow"><div class="q">Estimate to the nearest thousand.</div><div class="peek">tap</div></div>
+          <div class="a">35,000 + 12,000 &asymp; 47,000</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Is 46,884 reasonable compared to the estimate?</div><div class="peek">tap</div></div>
+          <div class="a">Yes — 46,884 is only 116 away from the estimate of 47,000. That's close enough to trust.</div></div>
+      </div>
+    </section>
+
+    <!-- CARD 15: EXIT TICKET PART 2 -->
+    <section class="card" data-name="Open the Festival 2">
+      <div class="tab"><span class="quest-tag">🎪 Final Mission</span></div>
+      <h2 class="card-title">The golden rule</h2>
+      <p class="card-sub">Which rule is correct?</p>
+      <div class="choice-row">
+        <div class="choice" data-val="a">A) Align from the left</div>
+        <div class="choice" data-val="b">B) Align by place value</div>
+        <div class="choice" data-val="c">C) Align by number of digits</div>
+      </div>
+      <div class="feedback-text" id="ruleFeedback"></div>
+      <p class="mini-label" style="margin-top:16px;">Complete the rule</p>
+      <p class="card-sub" style="margin-bottom:6px;">"We align digits because we need to add __________ place-value units together."</p>
+      <textarea id="exitExplain" rows="2" style="width:100%; border:2px solid var(--teal-100); border-radius:10px; padding:8px 10px; font-family:inherit; font-size:14px; resize:vertical;" placeholder="Type your answer here..."></textarea>
+      <div style="margin-top:10px;"><button class="btn ghost" id="exitExplainBtn">Compare with a model answer</button></div>
+      <div class="reveal-box" id="exitExplainReveal">
+        <p style="margin:0;">Model answer: we align digits because we need to add the <strong>same (matching)</strong> place-value units together.</p>
+      </div>
+    </section>
+
+    <!-- CARD 16: MASTERY / BADGE -->
+    <section class="card" data-name="Festival Open">
+      <div class="tab"><span class="quest-tag">🏅 Mastery Check</span></div>
+      <div class="badge-wrap">
+        <div class="badge-circle"><div class="inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2"><circle cx="12" cy="12" r="7"/><line x1="16.65" y1="16.65" x2="21" y2="21"/></svg>
+        </div></div>
+        <h2 class="card-title" style="text-align:center;">🎪 The Festival is Open!</h2>
+        <p class="card-sub" style="text-align:center;">You've rescued the numbers, Festival Math Explorer.</p>
+      </div>
+      <div class="callout" style="text-align:center;">
+        Place value tells us which units can combine. Alignment keeps those units together. Regrouping renames groups of ten. That's why addition works.
+      </div>
+      <div style="text-align:center; margin-top:14px;">
+        <div class="final-xp"><span id="finalXp">0</span> <span>XP earned this session</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost" id="prevBtn">◀ Back</button>
+    <span class="counter" id="counterMini"></span>
+    <button class="btn" id="nextBtn">Next ▶</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const total = cards.length;
+  let current = 0;
+  let xp = 0;
+
+  const progressTrack = document.getElementById('progressTrack');
+  const counterLabel = document.getElementById('counterLabel');
+  const cardName = document.getElementById('cardName');
+  const counterMini = document.getElementById('counterMini');
+  const xpCount = document.getElementById('xpCount');
+  const finalXp = document.getElementById('finalXp');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  for(let i=0;i<total;i++){
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    const bar = document.createElement('i');
+    seg.appendChild(bar);
+    progressTrack.appendChild(seg);
+  }
+  const segs = Array.from(progressTrack.querySelectorAll('.seg > i'));
+
+  function addXp(n){
+    xp += n;
+    xpCount.textContent = xp;
+    finalXp.textContent = xp;
+  }
+
+  function render(){
+    cards.forEach((c,i)=> c.classList.toggle('active', i===current));
+    counterLabel.textContent = 'Card ' + (current+1) + ' of ' + total;
+    counterMini.textContent = (current+1) + ' / ' + total;
+    cardName.textContent = cards[current].dataset.name || '';
+    segs.forEach((bar,i)=> bar.style.width = (i<=current ? '100%':'0%'));
+    prevBtn.disabled = current===0;
+    nextBtn.textContent = current===total-1 ? 'Restart ↺' : 'Next ▶';
+  }
+
+  prevBtn.addEventListener('click', ()=>{ if(current>0){ current--; render(); } });
+  nextBtn.addEventListener('click', ()=>{
+    if(current===total-1){ current=0; } else { current++; }
+    render();
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight') nextBtn.click();
+    if(e.key==='ArrowLeft') prevBtn.click();
+  });
+
+  render();
+
+  // ---------- CARD 1: goal checklist ----------
+  let goalsCompleted = new Set();
+  document.querySelectorAll('#goalList .chk').forEach(chk=>{
+    chk.addEventListener('click', ()=>{
+      const g = chk.dataset.goal;
+      if(!chk.classList.contains('done')){
+        chk.classList.add('done');
+        if(!goalsCompleted.has(g)){ goalsCompleted.add(g); addXp(5); }
+      } else {
+        chk.classList.remove('done');
+      }
+    });
+  });
+
+  // ---------- CARD 2: vocab flip ----------
+  let flippedSet = new Set();
+  document.querySelectorAll('#vocabGrid .flip-card').forEach((card,idx)=>{
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(card.classList.contains('flipped') && !flippedSet.has(idx)){
+        flippedSet.add(idx); addXp(5);
+      }
+    });
+  });
+
+  // ---------- CARD 4: 720 vs 7200 reveal ----------
+  let c1Done = false;
+  document.getElementById('c1Btn').addEventListener('click', function(){
+    document.getElementById('c1Reveal').classList.add('show');
+    if(!c1Done){ c1Done = true; addXp(10); }
+  });
+
+  // ---------- CARD 7: expanded form reveal ----------
+  let c7Done = false;
+  document.getElementById('c7Btn').addEventListener('click', function(){
+    document.getElementById('c7Reveal').classList.add('show');
+    if(!c7Done){ c7Done = true; addXp(10); }
+  });
+
+  // ---------- CARD 8: detective check A ----------
+  let detADone = false;
+  document.querySelectorAll('.card[data-name="Suspicious Record A"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Suspicious Record A"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('detAFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'yes'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! 45,230 + 6,400 really does equal 51,630. Not every flagged record is wrong \u2014 good detectives check carefully instead of assuming.";
+        if(!detADone){ detADone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Try adding it column by column: 45,230 + 6,400 = 51,630. This one actually checks out \u2014 it's correct!";
+      }
+    });
+  });
+
+  // ---------- CARD 9: detective check B reveal ----------
+  let detBDone = false;
+  document.getElementById('detBBtn').addEventListener('click', function(){
+    document.getElementById('detBReveal').classList.add('show');
+    if(!detBDone){ detBDone = true; addXp(10); }
+  });
+
+  // ---------- CARD 10: detective check C ----------
+  let detCDone = false;
+  document.querySelectorAll('.card[data-name="Suspicious Record C"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Suspicious Record C"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('detCFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! Only one digit (0\u20139) can go in a single column. 11 ones must be renamed as 1 ten + 1 one \u2014 write the 1 one in the ones column, and carry the 1 ten to the tens column.";
+        if(!detCDone){ detCDone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "A column can only hold one digit (0\u20139). 11 ones must be regrouped: write 1 one, and carry 1 ten to the next column.";
+      }
+    });
+  });
+
+  // ---------- CARD 11: target reveal ----------
+  let targetDone = false;
+  document.getElementById('targetBtn').addEventListener('click', function(){
+    document.getElementById('targetReveal').classList.add('show');
+    if(!targetDone){ targetDone = true; addXp(10); }
+  });
+
+  // ---------- CARD 12: dilemma ----------
+  let dilemmaDone = false;
+  document.querySelectorAll('.card[data-name="Detectives Dilemma"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Detectives Dilemma"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('dilemmaFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'never'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct \u2014 never! A single digit can only be 0 through 9. Even the two biggest digits, 9 and 9, only add to 18. Two digits can never add up to 50.";
+        if(!dilemmaDone){ dilemmaDone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "A digit can only be 0\u20139. The largest possible sum of two digits is 9 + 9 = 18 \u2014 nowhere close to 50. So the answer is Never.";
+      }
+    });
+  });
+
+  // ---------- CARD 13: subtraction reveal ----------
+  let subDone = false;
+  document.getElementById('subBtn').addEventListener('click', function(){
+    document.getElementById('subReveal').classList.add('show');
+    if(!subDone){ subDone = true; addXp(10); }
+  });
+
+  // ---------- generic qa-list toggler (cards 5, 14) ----------
+  let qaXpGiven = new Set();
+  document.querySelectorAll('.qa-item').forEach((item,idx)=>{
+    item.addEventListener('click', function(){
+      item.classList.toggle('open');
+      const key = item.closest('.qa-list').id + '-' + idx;
+      if(item.classList.contains('open') && !qaXpGiven.has(key)){
+        qaXpGiven.add(key); addXp(5);
+      }
+    });
+  });
+
+  // ---------- CARD 15: golden rule mcq ----------
+  let ruleDone = false;
+  document.querySelectorAll('.card[data-name="Open the Festival 2"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Open the Festival 2"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('ruleFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'b'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! We always align by place value \u2014 ones under ones, tens under tens, and so on.";
+        if(!ruleDone){ ruleDone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Not quite \u2014 aligning by the left edge or by digit count can mix up different place values. The correct rule is B: align by place value.";
+      }
+    });
+  });
+
+  // ---------- CARD 15: exit explain reveal ----------
+  let exitExplainDone = false;
+  document.getElementById('exitExplainBtn').addEventListener('click', function(){
+    document.getElementById('exitExplainReveal').classList.add('show');
+    if(!exitExplainDone){ exitExplainDone = true; addXp(10); }
+  });
+
+})();
+</script>
+</body>
+</html>
