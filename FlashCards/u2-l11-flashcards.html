@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | Vault Log: The Regrouping Mystery</title>
+<style>
+  :root{
+    --teal-900:#0B4F4A;
+    --teal-700:#0F766E;
+    --teal-600:#128077;
+    --teal-500:#1AA79B;
+    --teal-100:#E3F3F1;
+    --teal-050:#F1FAF9;
+    --orange-700:#C2410C;
+    --orange-600:#D9520F;
+    --orange-500:#EA580C;
+    --orange-300:#FB923C;
+    --orange-100:#FEECDC;
+    --cream:#FFFBF4;
+    --paper:#FFF7EA;
+    --paper-line:#EADFC8;
+    --ink:#20302F;
+    --ink-soft:#5B6B69;
+    --success:#1E8F63;
+    --success-bg:#E4F5EC;
+    --danger:#C2483C;
+    --danger-bg:#FBEAE7;
+    --shadow: 0 10px 30px rgba(11,79,74,0.14);
+    --radius: 18px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: "Trebuchet MS", "Segoe UI Rounded", "Segoe UI", Verdana, sans-serif;
+    background:
+      radial-gradient(circle at 8% 8%, rgba(26,167,155,0.10), transparent 40%),
+      radial-gradient(circle at 95% 12%, rgba(234,88,12,0.10), transparent 38%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    padding: 18px 14px 40px;
+  }
+
+  .app{ max-width: 760px; margin: 0 auto; }
+
+  /* ---------- HEADER ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-badge{
+    width:44px; height:44px; border-radius:50%;
+    background: conic-gradient(from 220deg, var(--teal-700), var(--orange-500), var(--teal-500));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+    flex-shrink:0;
+  }
+  .brand-badge svg{ width:24px; height:24px; }
+  .brand-text .kicker{
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--orange-600); font-weight:700;
+  }
+  .brand-text .name{ font-size:15px; font-weight:800; color:var(--teal-900); line-height:1.1; }
+
+  .xp-pill{
+    display:flex; align-items:center; gap:6px;
+    background: var(--teal-900); color:#fff;
+    padding: 8px 14px; border-radius: 999px;
+    font-size:13px; font-weight:700;
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+  }
+  .xp-pill svg{ width:16px; height:16px; }
+
+  .case-title{
+    background: var(--teal-900);
+    color:#fff;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+  .case-title::before{
+    content:"";
+    position:absolute; right:-30px; top:-30px;
+    width:140px; height:140px; border-radius:50%;
+    background: rgba(251,146,60,0.18);
+  }
+  .case-title h1{
+    margin:0 0 4px; font-size: 21px; letter-spacing:0.3px; position:relative;
+  }
+  .case-title p{ margin:0; font-size:13px; color:#BFE6E1; position:relative; }
+  .case-title .stamp{
+    position:absolute; top:14px; right:16px;
+    border:2px solid var(--orange-300); color:var(--orange-300);
+    padding:3px 9px; border-radius:6px; font-size:10px; font-weight:800;
+    letter-spacing:1.5px; transform: rotate(6deg); opacity:0.9;
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-wrap{ margin-bottom: 14px; }
+  .progress-track{
+    display:flex; gap:5px; margin-bottom:6px;
+  }
+  .progress-track .seg{
+    flex:1; height:6px; border-radius:4px; background: var(--teal-100);
+    overflow:hidden;
+  }
+  .progress-track .seg > i{
+    display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--orange-500), var(--teal-500));
+    transition: width .3s ease;
+  }
+  .progress-label{
+    display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-weight:600;
+  }
+
+  /* ---------- STAGE / CARDS ---------- */
+  .stage{ position:relative; min-height: 430px; }
+  .card{
+    display:none;
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: var(--radius);
+    padding: 22px 20px 24px;
+    box-shadow: var(--shadow);
+    animation: rise .35s ease;
+  }
+  .card.active{ display:block; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .tab{
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--orange-100); color:var(--orange-700);
+    font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+    padding:5px 10px; border-radius: 999px; margin-bottom:12px;
+  }
+  .tab svg{ width:13px; height:13px; }
+
+  h2.card-title{
+    margin: 0 0 6px; font-size:19px; color:var(--teal-900); line-height:1.25;
+  }
+  .card-sub{ margin:0 0 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
+
+  .divider{ border:none; border-top:1.5px dashed var(--paper-line); margin: 16px 0; }
+
+  /* ---------- GENERIC UI PIECES ---------- */
+  .goal-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+  .goal-list li{
+    display:flex; align-items:flex-start; gap:10px;
+    background: var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.4;
+  }
+  .goal-list li .chk{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--teal-500);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; margin-top:1px; background:#fff; transition: background .15s, border-color .15s;
+  }
+  .goal-list li .chk.done{ background: var(--teal-500); border-color:var(--teal-500); }
+  .goal-list li .chk svg{ width:12px; height:12px; opacity:0; transition:opacity .15s; }
+  .goal-list li .chk.done svg{ opacity:1; }
+
+  .btn{
+    border:none; cursor:pointer; font-weight:800; font-size:13.5px;
+    border-radius: 999px; padding: 10px 18px;
+    background: var(--teal-700); color:#fff;
+    display:inline-flex; align-items:center; gap:6px;
+    transition: transform .12s ease, background .15s ease;
+  }
+  .btn:hover{ background: var(--teal-600); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn.secondary{ background: var(--orange-500); }
+  .btn.secondary:hover{ background: var(--orange-600); }
+  .btn.ghost{ background: transparent; color:var(--teal-700); border:2px solid var(--teal-100); }
+  .btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .btn svg{ width:14px; height:14px; }
+
+  .reveal-box{
+    margin-top:12px; border-radius:12px; padding:14px 14px;
+    background: var(--success-bg); border:1.5px solid #BFE3CE;
+    font-size:14px; line-height:1.55; display:none;
+  }
+  .reveal-box.show{ display:block; animation: rise .3s ease; }
+  .reveal-box strong{ color:var(--success); }
+
+  /* Vocabulary flip cards */
+  .vocab-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  @media (max-width:480px){ .vocab-grid{ grid-template-columns: 1fr; } }
+  .flip-card{ perspective: 1000px; height: 108px; cursor:pointer; }
+  .flip-inner{
+    position:relative; width:100%; height:100%; text-align:center;
+    transition: transform .5s; transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform: rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:10px; font-size:13px;
+  }
+  .flip-front{ background: var(--teal-700); color:#fff; font-weight:800; font-size:15px; }
+  .flip-front span{ font-size:10px; font-weight:600; opacity:0.75; margin-top:4px; }
+  .flip-back{ background:#fff; border:2px solid var(--teal-100); color:var(--ink); transform: rotateY(180deg); line-height:1.35; }
+
+  /* SVG viz container */
+  .viz{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding: 10px 6px 4px; margin: 6px 0 4px; overflow:hidden;
+  }
+  .viz svg{ width:100%; height:auto; display:block; }
+  .viz-caption{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin: 2px 0 8px; font-weight:600; }
+
+  /* Table */
+  table.pv-table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:14px; }
+  table.pv-table th{
+    background: var(--teal-700); color:#fff; padding:9px 8px; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:0.4px;
+  }
+  table.pv-table th:first-child{ border-radius:8px 0 0 0; }
+  table.pv-table th:last-child{ border-radius:0 8px 0 0; }
+  table.pv-table td{ padding:9px 8px; border-bottom:1px solid var(--paper-line); text-align:center; }
+  table.pv-table tr:nth-child(even) td{ background: var(--teal-050); }
+  table.pv-table input{
+    width: 78px; padding:6px 4px; text-align:center; font-size:14px;
+    border:2px solid var(--teal-100); border-radius:8px; font-family:inherit;
+  }
+  table.pv-table input:focus{ outline:none; border-color:var(--teal-500); }
+  .cell-status{ display:inline-block; margin-left:4px; }
+
+  /* quick problem chain */
+  .chain{ display:flex; flex-direction:column; gap:8px; margin: 4px 0 6px; }
+  .chain .step{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:10px; padding:10px 12px;
+  }
+  .chain .step .q{ font-size:15px; font-weight:700; color:var(--teal-900); }
+  .chain .step .a{
+    font-size:15px; font-weight:800; color: var(--orange-700);
+    min-width:50px; text-align:right;
+  }
+
+  /* choice buttons */
+  .choice-row{ display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0; }
+  .choice{
+    flex:1; min-width:90px; text-align:center;
+    padding:10px 8px; border-radius:10px; border:2px solid var(--teal-100);
+    background:#fff; font-weight:800; font-size:13.5px; cursor:pointer; color:var(--teal-900);
+    transition: all .15s ease;
+  }
+  .choice:hover{ border-color: var(--teal-500); }
+  .choice.selected{ background: var(--teal-700); color:#fff; border-color:var(--teal-700); }
+
+  .input-line{ display:flex; align-items:center; gap:10px; margin: 10px 0; flex-wrap:wrap; }
+  .input-line input[type="text"], .input-line input[type="number"]{
+    width: 110px; padding:9px 10px; font-size:15px; text-align:center;
+    border:2px solid var(--teal-100); border-radius:10px; font-family:inherit; font-weight:700;
+  }
+  .input-line input:focus{ outline:none; border-color:var(--teal-500); }
+
+  .callout{
+    background: var(--orange-100); border-left:4px solid var(--orange-500);
+    border-radius:10px; padding:10px 12px; font-size:13.5px; line-height:1.5; margin: 12px 0;
+  }
+  .callout strong{ color:var(--orange-700); }
+
+  .mini-label{ font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; color:var(--teal-700); margin: 14px 0 6px; }
+
+  /* Badge / final card */
+  .badge-wrap{ text-align:center; padding: 6px 0 4px; }
+  .badge-circle{
+    width:110px; height:110px; border-radius:50%; margin: 4px auto 12px;
+    background: conic-gradient(from 200deg, var(--teal-700), var(--orange-500), var(--teal-500), var(--teal-700));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+  }
+  .badge-circle .inner{
+    width:86px; height:86px; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .badge-circle svg{ width:44px; height:44px; }
+  .final-xp{ font-size:26px; font-weight:900; color:var(--teal-900); }
+  .final-xp span{ font-size:14px; color:var(--ink-soft); font-weight:700; }
+
+  /* nav controls */
+  .controls{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:16px; gap:10px;
+  }
+  .controls .btn{ padding:10px 16px; }
+  .counter{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+
+  .feedback-text{ font-size:13.5px; margin-top:8px; line-height:1.5; display:none; padding:10px 12px; border-radius:10px; }
+  .feedback-text.show{ display:block; animation: rise .25s ease; }
+  .feedback-text.correct{ background: var(--success-bg); color:var(--success); border:1.5px solid #BFE3CE; }
+  .feedback-text.wrong{ background: var(--danger-bg); color:var(--danger); border:1.5px solid #F1C6BE; }
+  .feedback-text.info{ background: var(--teal-050); color:var(--teal-900); border:1.5px solid var(--teal-100); }
+
+  /* ---------- extra: Q&A reveal cards (session 3) ---------- */
+  .qa-list{ display:flex; flex-direction:column; gap:10px; margin:10px 0 4px; }
+  .qa-item{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; transition:border-color .15s ease;
+  }
+  .qa-item:hover{ border-color:var(--teal-500); }
+  .qa-item .qrow{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .qa-item .q{ font-size:14.5px; font-weight:700; color:var(--teal-900); line-height:1.45; }
+  .qa-item .peek{
+    font-size:9.5px; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink-soft);
+    font-weight:800; white-space:nowrap; margin-top:2px; flex-shrink:0;
+  }
+  .qa-item .a{
+    margin-top:12px; padding-top:12px; border-top:1.5px dashed var(--paper-line);
+    font-size:14px; font-weight:700; color:var(--orange-700); line-height:1.6; display:none;
+  }
+  .qa-item.open .a{ display:block; }
+
+  /* place-value table with placeholder zeros */
+  table.pv-table td.zero-cell{ background:var(--teal-050); color:var(--ink-soft); font-style:italic; }
+  .table-note{ font-size:12px; color:var(--ink-soft); font-weight:600; margin-top:8px; line-height:1.5; }
+
+  /* decomposition breakdown rows (spaced) */
+  .decomp-list{ display:flex; flex-direction:column; gap:10px; margin:12px 0 4px; }
+  .decomp-row{
+    display:flex; align-items:center; gap:12px;
+    background:var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:10px; padding:10px 13px;
+  }
+  .decomp-row .dnum{
+    width:26px; height:26px; border-radius:7px; flex-shrink:0;
+    background:var(--teal-700); color:#fff; font-weight:800; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .decomp-row .dtext{ flex:1; font-size:13.5px; font-weight:700; color:var(--teal-900); line-height:1.4; }
+
+  /* representation table (standard / expanded / word) */
+  table.rep-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; }
+  table.rep-table td{
+    padding:12px 14px; border-bottom:1px solid var(--paper-line); font-size:14px;
+  }
+  table.rep-table td:first-child{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); width:92px; vertical-align:top; padding-top:14px;
+  }
+  table.rep-table td:last-child{ font-weight:700; color:var(--teal-900); line-height:1.5; }
+  table.rep-table tr:last-child td{ border-bottom:none; }
+
+  /* ---------- extra: compare table (session 4) ---------- */
+  table.cmp-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; font-family:'Trebuchet MS',sans-serif; }
+  table.cmp-table th{
+    background:var(--teal-900); color:#fff; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.4px; padding:8px 2px; font-weight:700;
+  }
+  table.cmp-table td{
+    text-align:center; font-size:19px; font-weight:800; padding:10px 2px;
+    background:#fff; border:1px solid var(--paper-line); color:var(--teal-900);
+  }
+  table.cmp-table td.diff-col{ background:var(--orange-100); color:var(--orange-700); }
+  table.cmp-table tr:first-child td{ border-bottom:2px solid var(--paper-line); }
+
+  .cmp-verdict{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--teal-050); border:1.5px solid var(--teal-100); border-radius:12px;
+    padding:12px; margin-top:12px; font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-verdict .sym{ font-size:22px; color:var(--orange-700); }
+
+  /* quick compare pairs (field test) */
+  .cmp-pair{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; margin-bottom:10px;
+  }
+  .cmp-pair .nums{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-pair .nums .blank{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:26px; border:2px dashed var(--paper-line); border-radius:6px;
+    font-size:14px; color:var(--ink-soft); font-weight:800;
+  }
+  .cmp-pair.open .nums .blank{ border-style:solid; border-color:var(--orange-500); color:var(--orange-700); background:var(--orange-100); }
+  .cmp-pair .why{
+    margin-top:10px; padding-top:10px; border-top:1.5px dashed var(--paper-line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); line-height:1.5; display:none; text-align:center;
+  }
+  .cmp-pair.open .why{ display:block; }
+  .cmp-pair .peek{
+    text-align:center; font-size:9.5px; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-soft); font-weight:800; margin-top:8px;
+  }
+
+  /* ---------- extra: number line components (session 5) ---------- */
+  .numline-wrap{ margin:14px 0 6px; }
+  .numline-title{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin-bottom:6px; }
+  .numline{ position:relative; height:78px; }
+  .numline .track{
+    position:absolute; left:6px; right:6px; top:36px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .numline .tick{ position:absolute; top:26px; width:2px; height:24px; background:var(--ink-soft); transform:translateX(-50%); }
+  .numline .tick.mid{ background:var(--orange-300); width:2px; height:24px; }
+  .numline .ticklabel{
+    position:absolute; top:52px; font-size:11px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline .ticklabel.mid{ color:var(--orange-600); }
+  .numline .dot{
+    position:absolute; top:38px; width:15px; height:15px; border-radius:50%;
+    background:var(--orange-500); border:2.5px solid #fff; box-shadow:0 0 0 2px var(--orange-500);
+    transform:translate(-50%,-50%); z-index:2;
+  }
+  .numline .dotlabel{
+    position:absolute; top:0px; font-size:12px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap; background:#fff; padding:0 3px; border-radius:4px;
+  }
+  .numline .dist{
+    position:absolute; top:14px; font-size:9.5px; font-weight:700; color:var(--ink-soft);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline-verdict{
+    margin-top:10px; text-align:center; font-size:13px; font-weight:800;
+    color:var(--teal-900); background:var(--teal-050); border:1.5px solid var(--teal-100);
+    border-radius:10px; padding:9px 10px;
+  }
+
+  /* halfway zone diagram (deep learning why) */
+  .zone-line{ position:relative; height:100px; margin:14px 0 6px; }
+  .zone-line .half{
+    position:absolute; top:30px; height:34px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11.5px; font-weight:800; color:#fff;
+  }
+  .zone-line .half.down{ left:0; width:calc(50% - 3px); background:var(--teal-600); }
+  .zone-line .half.up{ right:0; width:calc(50% - 3px); background:var(--orange-500); }
+  .zone-line .mid-marker{
+    position:absolute; left:50%; top:20px; width:2px; height:54px; background:var(--ink-soft);
+    transform:translateX(-50%);
+  }
+  .zone-line .mid-label{
+    position:absolute; left:50%; top:76px; transform:translateX(-50%);
+    font-size:10.5px; font-weight:800; color:var(--ink-soft); text-align:center; width:120px;
+  }
+  .zone-line .end-label{
+    position:absolute; top:0px; font-size:10.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .zone-line .end-label.left{ left:0; }
+  .zone-line .end-label.right{ right:0; text-align:right; }
+
+  /* range band (fast learner extension) */
+  .band-line{ position:relative; height:88px; margin:14px 0 6px; }
+  .band-line .track{
+    position:absolute; left:6px; right:6px; top:38px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .band-line .band{
+    position:absolute; top:32px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .band-line .tick{ position:absolute; top:30px; width:2px; height:20px; background:var(--ink-soft); transform:translateX(-50%); }
+  .band-line .ticklabel{
+    position:absolute; top:56px; font-size:10.5px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .band-line .endmark{
+    position:absolute; top:6px; font-size:10px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+
+  /* ---------- extra: reasonableness check-line (session 6) ---------- */
+  .check-line{ position:relative; height:112px; margin:14px 0 6px; }
+  .check-line .track{
+    position:absolute; left:6px; right:6px; top:52px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .check-line .zone{
+    position:absolute; top:46px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .check-line .marker{
+    position:absolute; top:40px; width:15px; height:15px; border-radius:50%;
+    transform:translate(-50%,-50%); border:2.5px solid #fff; z-index:2;
+    box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  }
+  .check-line .marker.estimate{ background:var(--teal-700); }
+  .check-line .marker.exact{ background:var(--success); }
+  .check-line .marker.given{ background:var(--danger); }
+  .check-line .mlabel{
+    position:absolute; font-size:10.5px; font-weight:800; white-space:nowrap;
+    transform:translateX(-50%);
+  }
+  .check-line .mlabel.top{ top:6px; }
+  .check-line .mlabel.bottom{ top:72px; }
+  .check-line .mlabel.estimate-c{ color:var(--teal-700); }
+  .check-line .mlabel.exact-c{ color:var(--success); }
+  .check-line .mlabel.given-c{ color:var(--danger); }
+  .check-line-legend{
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin-top:10px; font-size:11px; font-weight:700; color:var(--ink-soft);
+  }
+  .check-line-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .check-line-legend .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; flex-shrink:0; }
+
+  /* equation display for concept entry */
+  .eq-block{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:12px 14px; margin:8px 0; font-size:15px; font-weight:800;
+    color:var(--teal-900); text-align:center;
+  }
+  .eq-block .tag{
+    display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); font-weight:800; margin-bottom:4px;
+  }
+
+  /* ---------- extra: vertical addition (Lesson 10) ---------- */
+  .vadd-wrap{ margin:14px 0 6px; display:flex; justify-content:center; }
+  .vadd{ display:grid; row-gap:5px; column-gap:6px; align-items:center; }
+  .vadd .opcell{ font-size:19px; font-weight:800; color:var(--ink-soft); text-align:left; }
+  .vadd .digit{
+    text-align:center; font-size:20px; font-weight:800; color:var(--teal-900);
+    min-width:30px;
+  }
+  .vadd .digit.blank{ color:transparent; }
+  .vadd .carry{
+    text-align:center; font-size:12px; font-weight:800; color:var(--orange-600);
+    min-height:16px;
+  }
+  .vadd .rule{ grid-column:1/-1; border-top:3px solid var(--teal-900); margin:2px 0 3px; }
+  .vadd .sumdigit{ text-align:center; font-size:21px; font-weight:900; color:var(--teal-900); }
+
+  /* correct vs incorrect alignment compare */
+  .align-compare{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin:12px 0 4px; }
+  .align-box{
+    flex:1; min-width:135px; border-radius:12px; padding:12px 10px; text-align:center;
+  }
+  .align-box.good{ background:var(--teal-050); border:2px solid var(--teal-500); }
+  .align-box.bad{ background:#FEECEC; border:2px solid var(--danger); }
+  .align-box .albl{ font-size:11.5px; font-weight:800; margin-bottom:8px; }
+  .align-box.good .albl{ color:var(--teal-700); }
+  .align-box.bad .albl{ color:var(--danger); }
+
+  .quest-tag{
+    display:inline-flex; align-items:center; gap:6px; font-family:'Special Elite',monospace;
+    font-size:11px; letter-spacing:0.5px; text-transform:uppercase;
+  }
+
+  /* ---------- extra: kingdom room tower (Session 11) ---------- */
+  .room-tower{ display:flex; flex-direction:column; align-items:center; margin:14px 0 6px; }
+  .room-box{
+    width:100%; max-width:290px; background:var(--teal-050); border:2px solid var(--teal-500);
+    border-radius:12px; padding:11px 14px; text-align:center; font-weight:800;
+    color:var(--teal-900); font-size:14.5px;
+  }
+  .room-box .sub{ display:block; font-size:10.5px; font-weight:700; color:var(--ink-soft); margin-top:2px; }
+  .room-arrow{
+    display:flex; flex-direction:column; align-items:center; padding:6px 0; color:var(--orange-600);
+  }
+  .room-arrow svg{ width:16px; height:16px; }
+  .room-arrow span{ font-size:10.5px; font-weight:800; margin-top:2px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="6"></circle>
+          <line x1="15" y1="15" x2="21" y2="21"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="kicker">MyMasteryLab</div>
+        <div class="name">Building Confident Problem Solvers</div>
+      </div>
+    </div>
+    <div class="xp-pill">
+      <svg viewBox="0 0 24 24" fill="#FB923C" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>
+      <span id="xpCount">0</span> XP
+    </div>
+  </div>
+
+  <div class="case-title">
+    <div class="stamp">RECAP</div>
+    <h1>🏰 Vault Log: The Regrouping Mystery</h1>
+    <p>Session 11 Recap &middot; Grade 4 &middot; What Does "Carrying" Mean?</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track" id="progressTrack"></div>
+    <div class="progress-label">
+      <span id="counterLabel">Card 1 of 17</span>
+      <span id="cardName">Mission Briefing</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- CARD 1: MISSION BRIEFING -->
+    <section class="card" data-name="Mission Briefing">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg> Mission Briefing</div>
+      <h2 class="card-title">Welcome to the Number Kingdom</h2>
+      <p class="card-sub">The Ones Room is overflowing! Tap each clue below once you understand it — you'll need them to solve the mystery of "carrying":</p>
+      <ul class="goal-list" id="goalList">
+        <li><span class="chk" data-goal="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can explain <strong>regrouping</strong> using place-value language.</li>
+        <li><span class="chk" data-goal="2"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I know <strong>10 of one place</strong> = 1 of the next place.</li>
+        <li><span class="chk" data-goal="3"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can regroup accurately, even <strong>across zeros</strong>.</li>
+        <li><span class="chk" data-goal="4"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can explain what the <strong>regrouped 1</strong> really represents.</li>
+      </ul>
+      <div class="callout">🔑 <strong>Big Question:</strong> What does "carrying" actually mean?</div>
+    </section>
+
+    <!-- CARD 2: THE KINGDOM MAP -->
+    <section class="card" data-name="The Kingdom Map">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21V12h6v9"/></svg> The Kingdom Map</div>
+      <h2 class="card-title">One rule rules every room</h2>
+      <p class="card-sub">Every room in the Number Kingdom follows the same rule: 10 units can be exchanged for 1 unit of the next room.</p>
+      <div class="room-tower">
+        <div class="room-box">Ones Room<span class="sub">1, 2, 3 ...</span></div>
+        <div class="room-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 4v16M6 14l6 6 6-6"/></svg><span>10 ones = 1 ten</span></div>
+        <div class="room-box">Tens Room<span class="sub">10, 20, 30 ...</span></div>
+        <div class="room-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 4v16M6 14l6 6 6-6"/></svg><span>10 tens = 1 hundred</span></div>
+        <div class="room-box">Hundreds Room<span class="sub">100, 200, 300 ...</span></div>
+        <div class="room-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 4v16M6 14l6 6 6-6"/></svg><span>10 hundreds = 1 thousand</span></div>
+        <div class="room-box">Thousands Room<span class="sub">1,000, 2,000 ...</span></div>
+        <div class="room-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 4v16M6 14l6 6 6-6"/></svg><span>10 thousands = 1 ten-thousand</span></div>
+        <div class="room-box">Ten-Thousands Room<span class="sub">10,000, 20,000 ...</span></div>
+      </div>
+    </section>
+
+    <!-- CARD 3: CONCEPT ENTRY -->
+    <section class="card" data-name="The Overflowing Vault">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Clue #1</div>
+      <h2 class="card-title">27,458 + 15,736</h2>
+      <p class="card-sub">Start with the ones: 8 + 6 = 14 ones. Can 14 ones stay as 14 separate ones?</p>
+      <div class="callout">14 ones = <strong>1 ten + 4 ones</strong></div>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:22px repeat(5,1fr);">
+          <div class="opcell"></div>
+          <div class="carry">1</div><div class="carry">1</div><div class="carry"></div><div class="carry">1</div><div class="carry"></div>
+          <div class="opcell"></div>
+          <div class="digit">2</div><div class="digit">7</div><div class="digit">4</div><div class="digit">5</div><div class="digit">8</div>
+          <div class="opcell">+</div>
+          <div class="digit">1</div><div class="digit">5</div><div class="digit">7</div><div class="digit">3</div><div class="digit">6</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">4</div><div class="sumdigit">3</div><div class="sumdigit">1</div><div class="sumdigit">9</div><div class="sumdigit">4</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">27,458 + 15,736 = <strong>43,194</strong></p>
+      <div class="callout">✨ <strong>Key Discovery:</strong> Regrouping is renaming. The quantity doesn't disappear — it's just represented with a different place-value unit.</div>
+    </section>
+
+    <!-- CARD 4: DEEP LEARNING WHY -->
+    <section class="card" data-name="Why It Works">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Clue #2 &middot; The Why</div>
+      <h2 class="card-title">Not "carry the 1" — regroup it</h2>
+      <p class="card-sub">Instead of saying "carry the 1," say what's really happening:</p>
+      <button class="btn secondary" id="whyBtn">Is the "1" always worth 1?</button>
+      <div class="reveal-box" id="whyReveal">
+        <p style="margin:0;">No! The regrouped 1 is <strong>never</strong> just "one." In the tens column, it's worth <strong>1 ten (10)</strong>. In the hundreds column, it's worth <strong>1 hundred (100)</strong>. Its value always depends on which column it lands in.</p>
+      </div>
+    </section>
+
+    <!-- CARD 5: FIELD TEST 1 -->
+    <section class="card" data-name="Quick Regroups">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Field Test #1</div>
+      <h2 class="card-title">One regrouping at a time</h2>
+      <p class="card-sub">Tap each card to check your answer.</p>
+      <div class="qa-list" id="qaList1">
+        <div class="qa-item"><div class="qrow"><div class="q">27 + 18 = ?</div><div class="peek">tap</div></div>
+          <div class="a">45 — ones: 7 + 8 = 15, regroup 1 ten; tens: 2 + 1 + 1 = 4.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">34 + 29 = ?</div><div class="peek">tap</div></div>
+          <div class="a">63 — ones: 4 + 9 = 13, regroup 1 ten; tens: 3 + 2 + 1 = 6.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">126 + 157 = ?</div><div class="peek">tap</div></div>
+          <div class="a">283 — ones: 6 + 7 = 13, regroup 1 ten; tens: 2 + 5 + 1 = 8; hundreds: 1 + 1 = 2.</div></div>
+      </div>
+    </section>
+
+    <!-- CARD 6: FIELD TEST 2 -->
+    <section class="card" data-name="Bigger Regroups">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg> Field Test #2</div>
+      <h2 class="card-title">Regrouping in 4-digit numbers</h2>
+      <p class="card-sub">Tap each card to check your answer.</p>
+      <div class="qa-list" id="qaList2">
+        <div class="qa-item"><div class="qrow"><div class="q">2,458 + 1,763 = ?</div><div class="peek">tap</div></div>
+          <div class="a">4,221 — regroups happen in the ones, tens, and hundreds columns.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">3,679 + 2,485 = ?</div><div class="peek">tap</div></div>
+          <div class="a">6,164 — regroups happen in the ones, tens, and hundreds columns.</div></div>
+      </div>
+    </section>
+
+    <!-- CARD 7: ZERO CROSSING SPOTLIGHT -->
+    <section class="card" data-name="Regrouping Across Zeros">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5v6c0 5-4 8.5-9 9.5-5-1-9-4.5-9-9.5v-6L12 2z"/></svg> Tricky Vault</div>
+      <h2 class="card-title">2,095 + 1,907</h2>
+      <p class="card-sub">Watch the carry march straight through two zero columns:</p>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:22px repeat(4,1fr);">
+          <div class="opcell"></div>
+          <div class="carry">1</div><div class="carry">1</div><div class="carry">1</div><div class="carry"></div>
+          <div class="opcell"></div>
+          <div class="digit">2</div><div class="digit">0</div><div class="digit">9</div><div class="digit">5</div>
+          <div class="opcell">+</div>
+          <div class="digit">1</div><div class="digit">9</div><div class="digit">0</div><div class="digit">7</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">4</div><div class="sumdigit">0</div><div class="sumdigit">0</div><div class="sumdigit">2</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">2,095 + 1,907 = <strong>4,002</strong></p>
+      <div class="decomp-list" style="margin-top:6px;">
+        <div class="decomp-row"><div class="dnum">1</div><div class="dtext">Ones: 5 + 7 = 12 &rarr; write 2, regroup 1 ten</div></div>
+        <div class="decomp-row"><div class="dnum">2</div><div class="dtext">Tens: 9 + 0 + 1 = 10 &rarr; write 0, regroup 1 hundred</div></div>
+        <div class="decomp-row"><div class="dnum">3</div><div class="dtext">Hundreds: 0 + 9 + 1 = 10 &rarr; write 0, regroup 1 thousand</div></div>
+        <div class="decomp-row"><div class="dnum">4</div><div class="dtext">Thousands: 2 + 1 + 1 = 4</div></div>
+      </div>
+      <p class="table-note" style="margin-top:10px;">Even a column that starts at 0 can still regroup — the carry doesn't care what was there before.</p>
+    </section>
+
+    <!-- CARD 8: BIGGER NUMBERS LADDER -->
+    <section class="card" data-name="Bigger Numbers">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Level Ladder</div>
+      <h2 class="card-title">The same rule, bigger numbers</h2>
+      <table class="rep-table">
+        <tr><td>5-digit</td><td>24,687 + 18,759 = 43,446</td></tr>
+        <tr><td>6-digit</td><td>125,678 + 247,895 = 373,573</td></tr>
+      </table>
+      <p class="table-note">Regroup 10 ones as 1 ten, 10 tens as 1 hundred, and keep going — the rule never changes, no matter how big the numbers get.</p>
+    </section>
+
+    <!-- CARD 9: REGROUPING SPOTLIGHT -->
+    <section class="card" data-name="The 40,000 Mystery">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> The Big Mystery</div>
+      <h2 class="card-title">39,999 + 2,001</h2>
+      <p class="card-sub">This one is unusual — watch what happens to EVERY column:</p>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:22px repeat(5,1fr);">
+          <div class="opcell"></div>
+          <div class="carry">1</div><div class="carry">1</div><div class="carry">1</div><div class="carry">1</div><div class="carry"></div>
+          <div class="opcell"></div>
+          <div class="digit">3</div><div class="digit">9</div><div class="digit">9</div><div class="digit">9</div><div class="digit">9</div>
+          <div class="opcell">+</div>
+          <div class="digit">0</div><div class="digit">2</div><div class="digit">0</div><div class="digit">0</div><div class="digit">1</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">4</div><div class="sumdigit">2</div><div class="sumdigit">0</div><div class="sumdigit">0</div><div class="sumdigit">0</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">39,999 + 2,001 = <strong>42,000</strong></p>
+      <p class="table-note">Ones, tens, hundreds, AND thousands all overflow one after another — a chain reaction of regrouping, all the way up to the ten-thousands.</p>
+    </section>
+
+    <!-- CARD 10: MISCONCEPTION A -->
+    <section class="card" data-name="Mystery Statement 1">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Misconception Lab</div>
+      <h2 class="card-title">Agree or disagree?</h2>
+      <div class="callout">"When I carry 1, I add one."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="mis1Feedback"></div>
+    </section>
+
+    <!-- CARD 11: MISCONCEPTION B -->
+    <section class="card" data-name="Mystery Statement 2">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Misconception Lab</div>
+      <h2 class="card-title">Find the mistake</h2>
+      <p class="card-sub">A learner writes:</p>
+      <div class="callout">38 + 27 = 515 <br><span style="font-size:12px; font-weight:700;">"8 + 7 = 15, so I wrote 15."</span></div>
+      <button class="btn secondary" id="mis2Btn">Reveal what went wrong</button>
+      <div class="reveal-box" id="mis2Reveal">
+        <p style="margin:0 0 10px;">The ones are right — 8 + 7 = 15 — but 15 ones can't stay in one column! It must regroup: <strong>1 ten + 5 ones</strong>. Write the 5, and carry the 1 ten into the tens column.</p>
+        <div class="cmp-verdict"><span>38 + 27</span><span class="sym">=</span><span>65</span></div>
+      </div>
+    </section>
+
+    <!-- CARD 12: MISCONCEPTION C -->
+    <section class="card" data-name="Mystery Statement 3">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Misconception Lab</div>
+      <h2 class="card-title">Agree or disagree?</h2>
+      <div class="callout">"Regrouping changes the total."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="mis3Feedback"></div>
+    </section>
+
+    <!-- CARD 13: MISCONCEPTION D -->
+    <section class="card" data-name="Mystery Statement 4">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Misconception Lab</div>
+      <h2 class="card-title">Agree or disagree?</h2>
+      <div class="callout">"The 1 I write above a column always means 1."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="mis4Feedback"></div>
+    </section>
+
+    <!-- CARD 14: TREASURY CHALLENGE -->
+    <section class="card" data-name="The Kingdom Treasury">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V4h8v3"/></svg> Real-World Case</div>
+      <h2 class="card-title">The Number Kingdom Treasury</h2>
+      <table class="rep-table">
+        <tr><td>Gold</td><td>27,458 coins</td></tr>
+        <tr><td>Silver</td><td>15,736 coins</td></tr>
+        <tr><td>Bronze</td><td>8,925 coins</td></tr>
+      </table>
+      <div class="qa-list" id="qaList3" style="margin-top:10px;">
+        <div class="qa-item"><div class="qrow"><div class="q">Silver + Bronze together?</div><div class="peek">tap</div></div>
+          <div class="a">15,736 + 8,925 = 24,661 coins</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">All three treasures combined?</div><div class="peek">tap</div></div>
+          <div class="a">27,458 + 15,736 + 8,925 = 52,119 coins</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Is the estimate close? (Round each to the nearest thousand)</div><div class="peek">tap</div></div>
+          <div class="a">27,000 + 16,000 + 9,000 &asymp; 52,000 &mdash; only 119 away. Reasonable!</div></div>
+      </div>
+    </section>
+
+    <!-- CARD 15: EXIT TICKET PART 1 -->
+    <section class="card" data-name="Final Report 1">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg> Final Report</div>
+      <h2 class="card-title">Calculate &amp; regroup</h2>
+      <p class="card-sub">47,586 + 26,749</p>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:22px repeat(5,1fr);">
+          <div class="opcell"></div>
+          <div class="carry">1</div><div class="carry">1</div><div class="carry">1</div><div class="carry">1</div><div class="carry"></div>
+          <div class="opcell"></div>
+          <div class="digit">4</div><div class="digit">7</div><div class="digit">5</div><div class="digit">8</div><div class="digit">6</div>
+          <div class="opcell">+</div>
+          <div class="digit">2</div><div class="digit">6</div><div class="digit">7</div><div class="digit">4</div><div class="digit">9</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">7</div><div class="sumdigit">4</div><div class="sumdigit">3</div><div class="sumdigit">3</div><div class="sumdigit">5</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">47,586 + 26,749 = <strong>74,335</strong></p>
+      <div class="qa-list" id="qaList4" style="margin-top:12px;">
+        <div class="qa-item"><div class="qrow"><div class="q">10 ones = ? &nbsp;&nbsp; 10 tens = ? &nbsp;&nbsp; 10 hundreds = ?</div><div class="peek">tap</div></div>
+          <div class="a">10 ones = 1 ten. 10 tens = 1 hundred. 10 hundreds = 1 thousand.</div></div>
+      </div>
+    </section>
+
+    <!-- CARD 16: EXIT TICKET PART 2 -->
+    <section class="card" data-name="Final Report 2">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg> Final Report</div>
+      <h2 class="card-title">Explain your thinking</h2>
+      <p class="card-sub" style="margin-bottom:6px;">What does the "1" represent when you regroup 10 ones?</p>
+      <textarea id="exitExplain" rows="2" style="width:100%; border:2px solid var(--teal-100); border-radius:10px; padding:8px 10px; font-family:inherit; font-size:14px; resize:vertical;" placeholder="Type your answer here..."></textarea>
+      <div style="margin-top:10px;"><button class="btn ghost" id="exitExplainBtn">Compare with a model answer</button></div>
+      <div class="reveal-box" id="exitExplainReveal">
+        <p style="margin:0;">Model answer: the regrouped 1 represents <strong>one whole ten</strong> — a bundle of 10 ones, now renamed and moved into the tens column.</p>
+      </div>
+      <hr class="divider">
+      <p class="card-sub" style="margin-bottom:6px;">A learner says: "Regrouping creates extra value." Do you agree?</p>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="extraValueFeedback"></div>
+    </section>
+
+    <!-- CARD 17: MASTERY / BADGE -->
+    <section class="card" data-name="Vault Secured">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Mastery Check</div>
+      <div class="badge-wrap">
+        <div class="badge-circle"><div class="inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2"><circle cx="12" cy="12" r="7"/><line x1="16.65" y1="16.65" x2="21" y2="21"/></svg>
+        </div></div>
+        <h2 class="card-title" style="text-align:center;">🔑 Vault Secured!</h2>
+        <p class="card-sub" style="text-align:center;">You've solved <strong>The Regrouping Mystery</strong>.</p>
+      </div>
+      <div class="callout" style="text-align:center;">
+        Regrouping = renaming. 10 ones become 1 ten. 10 tens become 1 hundred. The quantity never changes — only how it's represented.
+      </div>
+      <div style="text-align:center; margin-top:14px;">
+        <div class="final-xp"><span id="finalXp">0</span> <span>XP earned this session</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost" id="prevBtn">◀ Back</button>
+    <span class="counter" id="counterMini"></span>
+    <button class="btn" id="nextBtn">Next ▶</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const total = cards.length;
+  let current = 0;
+  let xp = 0;
+
+  const progressTrack = document.getElementById('progressTrack');
+  const counterLabel = document.getElementById('counterLabel');
+  const cardName = document.getElementById('cardName');
+  const counterMini = document.getElementById('counterMini');
+  const xpCount = document.getElementById('xpCount');
+  const finalXp = document.getElementById('finalXp');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  for(let i=0;i<total;i++){
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    const bar = document.createElement('i');
+    seg.appendChild(bar);
+    progressTrack.appendChild(seg);
+  }
+  const segs = Array.from(progressTrack.querySelectorAll('.seg > i'));
+
+  function addXp(n){
+    xp += n;
+    xpCount.textContent = xp;
+    finalXp.textContent = xp;
+  }
+
+  function render(){
+    cards.forEach((c,i)=> c.classList.toggle('active', i===current));
+    counterLabel.textContent = 'Card ' + (current+1) + ' of ' + total;
+    counterMini.textContent = (current+1) + ' / ' + total;
+    cardName.textContent = cards[current].dataset.name || '';
+    segs.forEach((bar,i)=> bar.style.width = (i<=current ? '100%':'0%'));
+    prevBtn.disabled = current===0;
+    nextBtn.textContent = current===total-1 ? 'Restart ↺' : 'Next ▶';
+  }
+
+  prevBtn.addEventListener('click', ()=>{ if(current>0){ current--; render(); } });
+  nextBtn.addEventListener('click', ()=>{
+    if(current===total-1){ current=0; } else { current++; }
+    render();
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight') nextBtn.click();
+    if(e.key==='ArrowLeft') prevBtn.click();
+  });
+
+  render();
+
+  // ---------- CARD 1: goal checklist ----------
+  let goalsCompleted = new Set();
+  document.querySelectorAll('#goalList .chk').forEach(chk=>{
+    chk.addEventListener('click', ()=>{
+      const g = chk.dataset.goal;
+      if(!chk.classList.contains('done')){
+        chk.classList.add('done');
+        if(!goalsCompleted.has(g)){ goalsCompleted.add(g); addXp(5); }
+      } else {
+        chk.classList.remove('done');
+      }
+    });
+  });
+
+  // ---------- CARD 4: why reveal ----------
+  let whyDone = false;
+  document.getElementById('whyBtn').addEventListener('click', function(){
+    document.getElementById('whyReveal').classList.add('show');
+    if(!whyDone){ whyDone = true; addXp(10); }
+  });
+
+  // ---------- generic qa-list toggler (cards 5,6,14,15) ----------
+  let qaXpGiven = new Set();
+  document.querySelectorAll('.qa-item').forEach((item,idx)=>{
+    item.addEventListener('click', function(){
+      item.classList.toggle('open');
+      const key = item.closest('.qa-list').id + '-' + idx;
+      if(item.classList.contains('open') && !qaXpGiven.has(key)){
+        qaXpGiven.add(key); addXp(5);
+      }
+    });
+  });
+
+  // ---------- CARD 10: misconception A ----------
+  let mis1Done = false;
+  document.querySelectorAll('.card[data-name="Mystery Statement 1"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Mystery Statement 1"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('mis1Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! The regrouped 1 isn't just \"one\" \u2014 it's one whole group of the next place value (1 ten, 1 hundred, and so on), depending on which column it lands in.";
+        if(!mis1Done){ mis1Done = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Not quite \u2014 the regrouped 1 stands for a whole bundle: 1 ten, or 1 hundred, depending on the column. It's never just \"one.\"";
+      }
+    });
+  });
+
+  // ---------- CARD 11: misconception B reveal ----------
+  let mis2Done = false;
+  document.getElementById('mis2Btn').addEventListener('click', function(){
+    document.getElementById('mis2Reveal').classList.add('show');
+    if(!mis2Done){ mis2Done = true; addXp(10); }
+  });
+
+  // ---------- CARD 12: misconception C ----------
+  let mis3Done = false;
+  document.querySelectorAll('.card[data-name="Mystery Statement 3"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Mystery Statement 3"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('mis3Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! Regrouping only renames the amount \u2014 14 ones and \"1 ten + 4 ones\" are exactly the same quantity, just represented differently.";
+        if(!mis3Done){ mis3Done = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Think about 14 ones vs. 1 ten + 4 ones \u2014 same amount, just renamed. Regrouping never changes the total.";
+      }
+    });
+  });
+
+  // ---------- CARD 13: misconception D ----------
+  let mis4Done = false;
+  document.querySelectorAll('.card[data-name="Mystery Statement 4"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Mystery Statement 4"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('mis4Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! In the tens column, the 1 means 1 ten (10). In the hundreds column, it means 1 hundred (100). Its place always decides its value.";
+        if(!mis4Done){ mis4Done = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Look where the 1 is written \u2014 in the tens column it's worth 10, in the hundreds column it's worth 100. Its position changes its value.";
+      }
+    });
+  });
+
+  // ---------- CARD 16: exit explain reveal ----------
+  let exitExplainDone = false;
+  document.getElementById('exitExplainBtn').addEventListener('click', function(){
+    document.getElementById('exitExplainReveal').classList.add('show');
+    if(!exitExplainDone){ exitExplainDone = true; addXp(10); }
+  });
+
+  // ---------- CARD 16: extra value reasoning ----------
+  let extraValueDone = false;
+  document.querySelectorAll('.card[data-name="Final Report 2"] .choice').forEach(ch=>{
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.card[data-name="Final Report 2"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('extraValueFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = "\u2705 Correct! Regrouping never creates new value \u2014 it just renames an amount using bigger place-value units. The quantity stays exactly the same.";
+        if(!extraValueDone){ extraValueDone = true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = "Careful \u2014 regrouping is just renaming, not creating. 10 ones and 1 ten are the exact same amount, so no extra value appears.";
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
