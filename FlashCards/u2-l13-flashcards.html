@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | Case File: Crossing the Zeros</title>
+<style>
+  :root{
+    --teal-900:#0B4F4A;
+    --teal-700:#0F766E;
+    --teal-600:#128077;
+    --teal-500:#1AA79B;
+    --teal-100:#E3F3F1;
+    --teal-050:#F1FAF9;
+    --orange-700:#C2410C;
+    --orange-600:#D9520F;
+    --orange-500:#EA580C;
+    --orange-300:#FB923C;
+    --orange-100:#FEECDC;
+    --cream:#FFFBF4;
+    --paper:#FFF7EA;
+    --paper-line:#EADFC8;
+    --ink:#20302F;
+    --ink-soft:#5B6B69;
+    --success:#1E8F63;
+    --success-bg:#E4F5EC;
+    --danger:#C2483C;
+    --danger-bg:#FBEAE7;
+    --shadow: 0 10px 30px rgba(11,79,74,0.14);
+    --radius: 18px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: "Trebuchet MS", "Segoe UI Rounded", "Segoe UI", Verdana, sans-serif;
+    background:
+      radial-gradient(circle at 8% 8%, rgba(26,167,155,0.10), transparent 40%),
+      radial-gradient(circle at 95% 12%, rgba(234,88,12,0.10), transparent 38%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    padding: 18px 14px 40px;
+  }
+
+  .app{ max-width: 760px; margin: 0 auto; }
+
+  /* ---------- HEADER ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-badge{
+    width:44px; height:44px; border-radius:50%;
+    background: conic-gradient(from 220deg, var(--teal-700), var(--orange-500), var(--teal-500));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+    flex-shrink:0;
+  }
+  .brand-badge svg{ width:24px; height:24px; }
+  .brand-text .kicker{
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--orange-600); font-weight:700;
+  }
+  .brand-text .name{ font-size:15px; font-weight:800; color:var(--teal-900); line-height:1.1; }
+
+  .xp-pill{
+    display:flex; align-items:center; gap:6px;
+    background: var(--teal-900); color:#fff;
+    padding: 8px 14px; border-radius: 999px;
+    font-size:13px; font-weight:700;
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+  }
+  .xp-pill svg{ width:16px; height:16px; }
+
+  .case-title{
+    background: var(--teal-900);
+    color:#fff;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+  .case-title::before{
+    content:"";
+    position:absolute; right:-30px; top:-30px;
+    width:140px; height:140px; border-radius:50%;
+    background: rgba(251,146,60,0.18);
+  }
+  .case-title h1{
+    margin:0 0 4px; font-size: 21px; letter-spacing:0.3px; position:relative;
+  }
+  .case-title p{ margin:0; font-size:13px; color:#BFE6E1; position:relative; }
+  .case-title .stamp{
+    position:absolute; top:14px; right:16px;
+    border:2px solid var(--orange-300); color:var(--orange-300);
+    padding:3px 9px; border-radius:6px; font-size:10px; font-weight:800;
+    letter-spacing:1.5px; transform: rotate(6deg); opacity:0.9;
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-wrap{ margin-bottom: 14px; }
+  .progress-track{
+    display:flex; gap:5px; margin-bottom:6px;
+  }
+  .progress-track .seg{
+    flex:1; height:6px; border-radius:4px; background: var(--teal-100);
+    overflow:hidden;
+  }
+  .progress-track .seg > i{
+    display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--orange-500), var(--teal-500));
+    transition: width .3s ease;
+  }
+  .progress-label{
+    display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-weight:600;
+  }
+
+  /* ---------- STAGE / CARDS ---------- */
+  .stage{ position:relative; min-height: 430px; }
+  .card{
+    display:none;
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: var(--radius);
+    padding: 22px 20px 24px;
+    box-shadow: var(--shadow);
+    animation: rise .35s ease;
+  }
+  .card.active{ display:block; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .tab{
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--orange-100); color:var(--orange-700);
+    font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+    padding:5px 10px; border-radius: 999px; margin-bottom:12px;
+  }
+  .tab svg{ width:13px; height:13px; }
+
+  h2.card-title{
+    margin: 0 0 6px; font-size:19px; color:var(--teal-900); line-height:1.25;
+  }
+  .card-sub{ margin:0 0 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
+
+  .divider{ border:none; border-top:1.5px dashed var(--paper-line); margin: 16px 0; }
+
+  /* ---------- GENERIC UI PIECES ---------- */
+  .goal-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+  .goal-list li{
+    display:flex; align-items:flex-start; gap:10px;
+    background: var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.4;
+  }
+  .goal-list li .chk{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--teal-500);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; margin-top:1px; background:#fff; transition: background .15s, border-color .15s;
+  }
+  .goal-list li .chk.done{ background: var(--teal-500); border-color:var(--teal-500); }
+  .goal-list li .chk svg{ width:12px; height:12px; opacity:0; transition:opacity .15s; }
+  .goal-list li .chk.done svg{ opacity:1; }
+
+  .btn{
+    border:none; cursor:pointer; font-weight:800; font-size:13.5px;
+    border-radius: 999px; padding: 10px 18px;
+    background: var(--teal-700); color:#fff;
+    display:inline-flex; align-items:center; gap:6px;
+    transition: transform .12s ease, background .15s ease;
+  }
+  .btn:hover{ background: var(--teal-600); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn.secondary{ background: var(--orange-500); }
+  .btn.secondary:hover{ background: var(--orange-600); }
+  .btn.ghost{ background: transparent; color:var(--teal-700); border:2px solid var(--teal-100); }
+  .btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .btn svg{ width:14px; height:14px; }
+
+  .reveal-box{
+    margin-top:12px; border-radius:12px; padding:14px 14px;
+    background: var(--success-bg); border:1.5px solid #BFE3CE;
+    font-size:14px; line-height:1.55; display:none;
+  }
+  .reveal-box.show{ display:block; animation: rise .3s ease; }
+  .reveal-box strong{ color:var(--success); }
+
+  /* Vocabulary flip cards */
+  .vocab-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  @media (max-width:480px){ .vocab-grid{ grid-template-columns: 1fr; } }
+  .flip-card{ perspective: 1000px; height: 108px; cursor:pointer; }
+  .flip-inner{
+    position:relative; width:100%; height:100%; text-align:center;
+    transition: transform .5s; transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform: rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:10px; font-size:13px;
+  }
+  .flip-front{ background: var(--teal-700); color:#fff; font-weight:800; font-size:15px; }
+  .flip-front span{ font-size:10px; font-weight:600; opacity:0.75; margin-top:4px; }
+  .flip-back{ background:#fff; border:2px solid var(--teal-100); color:var(--ink); transform: rotateY(180deg); line-height:1.35; }
+
+  /* SVG viz container */
+  .viz{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding: 10px 6px 4px; margin: 6px 0 4px; overflow:hidden;
+  }
+  .viz svg{ width:100%; height:auto; display:block; }
+  .viz-caption{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin: 2px 0 8px; font-weight:600; }
+
+  /* Table */
+  table.pv-table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:14px; }
+  table.pv-table th{
+    background: var(--teal-700); color:#fff; padding:9px 8px; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:0.4px;
+  }
+  table.pv-table th:first-child{ border-radius:8px 0 0 0; }
+  table.pv-table th:last-child{ border-radius:0 8px 0 0; }
+  table.pv-table td{ padding:9px 8px; border-bottom:1px solid var(--paper-line); text-align:center; }
+  table.pv-table tr:nth-child(even) td{ background: var(--teal-050); }
+  table.pv-table input{
+    width: 78px; padding:6px 4px; text-align:center; font-size:14px;
+    border:2px solid var(--teal-100); border-radius:8px; font-family:inherit;
+  }
+  table.pv-table input:focus{ outline:none; border-color:var(--teal-500); }
+  .cell-status{ display:inline-block; margin-left:4px; }
+
+  /* quick problem chain */
+  .chain{ display:flex; flex-direction:column; gap:8px; margin: 4px 0 6px; }
+  .chain .step{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:10px; padding:10px 12px;
+  }
+  .chain .step .q{ font-size:15px; font-weight:700; color:var(--teal-900); }
+  .chain .step .a{
+    font-size:15px; font-weight:800; color: var(--orange-700);
+    min-width:50px; text-align:right;
+  }
+
+  /* choice buttons */
+  .choice-row{ display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0; }
+  .choice{
+    flex:1; min-width:90px; text-align:center;
+    padding:10px 8px; border-radius:10px; border:2px solid var(--teal-100);
+    background:#fff; font-weight:800; font-size:13.5px; cursor:pointer; color:var(--teal-900);
+    transition: all .15s ease;
+  }
+  .choice:hover{ border-color: var(--teal-500); }
+  .choice.selected{ background: var(--teal-700); color:#fff; border-color:var(--teal-700); }
+
+  .input-line{ display:flex; align-items:center; gap:10px; margin: 10px 0; flex-wrap:wrap; }
+  .input-line input[type="text"], .input-line input[type="number"]{
+    width: 110px; padding:9px 10px; font-size:15px; text-align:center;
+    border:2px solid var(--teal-100); border-radius:10px; font-family:inherit; font-weight:700;
+  }
+  .input-line input:focus{ outline:none; border-color:var(--teal-500); }
+
+  .callout{
+    background: var(--orange-100); border-left:4px solid var(--orange-500);
+    border-radius:10px; padding:10px 12px; font-size:13.5px; line-height:1.5; margin: 12px 0;
+  }
+  .callout strong{ color:var(--orange-700); }
+
+  .mini-label{ font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; color:var(--teal-700); margin: 14px 0 6px; }
+
+  /* Badge / final card */
+  .badge-wrap{ text-align:center; padding: 6px 0 4px; }
+  .badge-circle{
+    width:110px; height:110px; border-radius:50%; margin: 4px auto 12px;
+    background: conic-gradient(from 200deg, var(--teal-700), var(--orange-500), var(--teal-500), var(--teal-700));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+  }
+  .badge-circle .inner{
+    width:86px; height:86px; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .badge-circle svg{ width:44px; height:44px; }
+  .final-xp{ font-size:26px; font-weight:900; color:var(--teal-900); }
+  .final-xp span{ font-size:14px; color:var(--ink-soft); font-weight:700; }
+
+  /* nav controls */
+  .controls{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:16px; gap:10px;
+  }
+  .controls .btn{ padding:10px 16px; }
+  .counter{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+
+  .feedback-text{ font-size:13.5px; margin-top:8px; line-height:1.5; display:none; padding:10px 12px; border-radius:10px; }
+  .feedback-text.show{ display:block; animation: rise .25s ease; }
+  .feedback-text.correct{ background: var(--success-bg); color:var(--success); border:1.5px solid #BFE3CE; }
+  .feedback-text.wrong{ background: var(--danger-bg); color:var(--danger); border:1.5px solid #F1C6BE; }
+  .feedback-text.info{ background: var(--teal-050); color:var(--teal-900); border:1.5px solid var(--teal-100); }
+
+  /* ---------- extra: Q&A reveal cards (session 3) ---------- */
+  .qa-list{ display:flex; flex-direction:column; gap:10px; margin:10px 0 4px; }
+  .qa-item{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; transition:border-color .15s ease;
+  }
+  .qa-item:hover{ border-color:var(--teal-500); }
+  .qa-item .qrow{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .qa-item .q{ font-size:14.5px; font-weight:700; color:var(--teal-900); line-height:1.45; }
+  .qa-item .peek{
+    font-size:9.5px; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink-soft);
+    font-weight:800; white-space:nowrap; margin-top:2px; flex-shrink:0;
+  }
+  .qa-item .a{
+    margin-top:12px; padding-top:12px; border-top:1.5px dashed var(--paper-line);
+    font-size:14px; font-weight:700; color:var(--orange-700); line-height:1.6; display:none;
+  }
+  .qa-item.open .a{ display:block; }
+
+  /* place-value table with placeholder zeros */
+  table.pv-table td.zero-cell{ background:var(--teal-050); color:var(--ink-soft); font-style:italic; }
+  .table-note{ font-size:12px; color:var(--ink-soft); font-weight:600; margin-top:8px; line-height:1.5; }
+
+  /* decomposition breakdown rows (spaced) */
+  .decomp-list{ display:flex; flex-direction:column; gap:10px; margin:12px 0 4px; }
+  .decomp-row{
+    display:flex; align-items:center; gap:12px;
+    background:var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:10px; padding:10px 13px;
+  }
+  .decomp-row .dnum{
+    width:26px; height:26px; border-radius:7px; flex-shrink:0;
+    background:var(--teal-700); color:#fff; font-weight:800; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .decomp-row .dtext{ flex:1; font-size:13.5px; font-weight:700; color:var(--teal-900); line-height:1.4; }
+
+  /* representation table (standard / expanded / word) */
+  table.rep-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; }
+  table.rep-table td{
+    padding:12px 14px; border-bottom:1px solid var(--paper-line); font-size:14px;
+  }
+  table.rep-table td:first-child{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); width:92px; vertical-align:top; padding-top:14px;
+  }
+  table.rep-table td:last-child{ font-weight:700; color:var(--teal-900); line-height:1.5; }
+  table.rep-table tr:last-child td{ border-bottom:none; }
+
+  /* ---------- extra: compare table (session 4) ---------- */
+  table.cmp-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; font-family:'Trebuchet MS',sans-serif; }
+  table.cmp-table th{
+    background:var(--teal-900); color:#fff; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.4px; padding:8px 2px; font-weight:700;
+  }
+  table.cmp-table td{
+    text-align:center; font-size:19px; font-weight:800; padding:10px 2px;
+    background:#fff; border:1px solid var(--paper-line); color:var(--teal-900);
+  }
+  table.cmp-table td.diff-col{ background:var(--orange-100); color:var(--orange-700); }
+  table.cmp-table tr:first-child td{ border-bottom:2px solid var(--paper-line); }
+
+  .cmp-verdict{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--teal-050); border:1.5px solid var(--teal-100); border-radius:12px;
+    padding:12px; margin-top:12px; font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-verdict .sym{ font-size:22px; color:var(--orange-700); }
+
+  /* quick compare pairs (field test) */
+  .cmp-pair{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; margin-bottom:10px;
+  }
+  .cmp-pair .nums{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-pair .nums .blank{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:26px; border:2px dashed var(--paper-line); border-radius:6px;
+    font-size:14px; color:var(--ink-soft); font-weight:800;
+  }
+  .cmp-pair.open .nums .blank{ border-style:solid; border-color:var(--orange-500); color:var(--orange-700); background:var(--orange-100); }
+  .cmp-pair .why{
+    margin-top:10px; padding-top:10px; border-top:1.5px dashed var(--paper-line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); line-height:1.5; display:none; text-align:center;
+  }
+  .cmp-pair.open .why{ display:block; }
+  .cmp-pair .peek{
+    text-align:center; font-size:9.5px; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-soft); font-weight:800; margin-top:8px;
+  }
+
+  /* ---------- extra: number line components (session 5) ---------- */
+  .numline-wrap{ margin:14px 0 6px; }
+  .numline-title{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin-bottom:6px; }
+  .numline{ position:relative; height:78px; }
+  .numline .track{
+    position:absolute; left:6px; right:6px; top:36px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .numline .tick{ position:absolute; top:26px; width:2px; height:24px; background:var(--ink-soft); transform:translateX(-50%); }
+  .numline .tick.mid{ background:var(--orange-300); width:2px; height:24px; }
+  .numline .ticklabel{
+    position:absolute; top:52px; font-size:11px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline .ticklabel.mid{ color:var(--orange-600); }
+  .numline .dot{
+    position:absolute; top:38px; width:15px; height:15px; border-radius:50%;
+    background:var(--orange-500); border:2.5px solid #fff; box-shadow:0 0 0 2px var(--orange-500);
+    transform:translate(-50%,-50%); z-index:2;
+  }
+  .numline .dotlabel{
+    position:absolute; top:0px; font-size:12px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap; background:#fff; padding:0 3px; border-radius:4px;
+  }
+  .numline .dist{
+    position:absolute; top:14px; font-size:9.5px; font-weight:700; color:var(--ink-soft);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline-verdict{
+    margin-top:10px; text-align:center; font-size:13px; font-weight:800;
+    color:var(--teal-900); background:var(--teal-050); border:1.5px solid var(--teal-100);
+    border-radius:10px; padding:9px 10px;
+  }
+
+  /* halfway zone diagram (deep learning why) */
+  .zone-line{ position:relative; height:100px; margin:14px 0 6px; }
+  .zone-line .half{
+    position:absolute; top:30px; height:34px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11.5px; font-weight:800; color:#fff;
+  }
+  .zone-line .half.down{ left:0; width:calc(50% - 3px); background:var(--teal-600); }
+  .zone-line .half.up{ right:0; width:calc(50% - 3px); background:var(--orange-500); }
+  .zone-line .mid-marker{
+    position:absolute; left:50%; top:20px; width:2px; height:54px; background:var(--ink-soft);
+    transform:translateX(-50%);
+  }
+  .zone-line .mid-label{
+    position:absolute; left:50%; top:76px; transform:translateX(-50%);
+    font-size:10.5px; font-weight:800; color:var(--ink-soft); text-align:center; width:120px;
+  }
+  .zone-line .end-label{
+    position:absolute; top:0px; font-size:10.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .zone-line .end-label.left{ left:0; }
+  .zone-line .end-label.right{ right:0; text-align:right; }
+
+  /* range band (fast learner extension) */
+  .band-line{ position:relative; height:88px; margin:14px 0 6px; }
+  .band-line .track{
+    position:absolute; left:6px; right:6px; top:38px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .band-line .band{
+    position:absolute; top:32px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .band-line .tick{ position:absolute; top:30px; width:2px; height:20px; background:var(--ink-soft); transform:translateX(-50%); }
+  .band-line .ticklabel{
+    position:absolute; top:56px; font-size:10.5px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .band-line .endmark{
+    position:absolute; top:6px; font-size:10px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+
+  /* ---------- extra: reasonableness check-line (session 6) ---------- */
+  .check-line{ position:relative; height:112px; margin:14px 0 6px; }
+  .check-line .track{
+    position:absolute; left:6px; right:6px; top:52px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .check-line .zone{
+    position:absolute; top:46px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .check-line .marker{
+    position:absolute; top:40px; width:15px; height:15px; border-radius:50%;
+    transform:translate(-50%,-50%); border:2.5px solid #fff; z-index:2;
+    box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  }
+  .check-line .marker.estimate{ background:var(--teal-700); }
+  .check-line .marker.exact{ background:var(--success); }
+  .check-line .marker.given{ background:var(--danger); }
+  .check-line .mlabel{
+    position:absolute; font-size:10.5px; font-weight:800; white-space:nowrap;
+    transform:translateX(-50%);
+  }
+  .check-line .mlabel.top{ top:6px; }
+  .check-line .mlabel.bottom{ top:72px; }
+  .check-line .mlabel.estimate-c{ color:var(--teal-700); }
+  .check-line .mlabel.exact-c{ color:var(--success); }
+  .check-line .mlabel.given-c{ color:var(--danger); }
+  .check-line-legend{
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin-top:10px; font-size:11px; font-weight:700; color:var(--ink-soft);
+  }
+  .check-line-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .check-line-legend .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; flex-shrink:0; }
+
+  /* equation display for concept entry */
+  .eq-block{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:12px 14px; margin:8px 0; font-size:15px; font-weight:800;
+    color:var(--teal-900); text-align:center;
+  }
+  .eq-block .tag{
+    display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); font-weight:800; margin-bottom:4px;
+  }
+
+  /* ---------- extra: vertical addition (Lesson 10) ---------- */
+  .vadd-wrap{ margin:14px 0 6px; display:flex; justify-content:center; }
+  .vadd{ display:grid; row-gap:5px; column-gap:6px; align-items:center; }
+  .vadd .opcell{ font-size:19px; font-weight:800; color:var(--ink-soft); text-align:left; }
+  .vadd .digit{
+    text-align:center; font-size:20px; font-weight:800; color:var(--teal-900);
+    min-width:30px;
+  }
+  .vadd .digit.blank{ color:transparent; }
+  .vadd .carry{
+    text-align:center; font-size:12px; font-weight:800; color:var(--orange-600);
+    min-height:16px;
+  }
+  .vadd .rule{ grid-column:1/-1; border-top:3px solid var(--teal-900); margin:2px 0 3px; }
+  .vadd .sumdigit{ text-align:center; font-size:21px; font-weight:900; color:var(--teal-900); }
+
+  /* correct vs incorrect alignment compare */
+  .align-compare{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin:12px 0 4px; }
+  .align-box{
+    flex:1; min-width:135px; border-radius:12px; padding:12px 10px; text-align:center;
+  }
+  .align-box.good{ background:var(--teal-050); border:2px solid var(--teal-500); }
+  .align-box.bad{ background:#FEECEC; border:2px solid var(--danger); }
+  .align-box .albl{ font-size:11.5px; font-weight:800; margin-bottom:8px; }
+  .align-box.good .albl{ color:var(--teal-700); }
+  .align-box.bad .albl{ color:var(--danger); }
+
+  .quest-tag{
+    display:inline-flex; align-items:center; gap:6px; font-family:'Special Elite',monospace;
+    font-size:11px; letter-spacing:0.5px; text-transform:uppercase;
+  }
+
+  /* ---------- extra: kingdom room tower (Session 11) ---------- */
+  .room-tower{ display:flex; flex-direction:column; align-items:center; margin:14px 0 6px; }
+  .room-box{
+    width:100%; max-width:290px; background:var(--teal-050); border:2px solid var(--teal-500);
+    border-radius:12px; padding:11px 14px; text-align:center; font-weight:800;
+    color:var(--teal-900); font-size:14.5px;
+  }
+  .room-box .sub{ display:block; font-size:10.5px; font-weight:700; color:var(--ink-soft); margin-top:2px; }
+  .room-arrow{
+    display:flex; flex-direction:column; align-items:center; padding:6px 0; color:var(--orange-600);
+  }
+  .room-arrow svg{ width:16px; height:16px; }
+  .room-arrow span{ font-size:10.5px; font-weight:800; margin-top:2px; text-align:center; }
+
+  /* ---------- extra: bar model (Session 12) ---------- */
+  .bar-model{ margin:14px 0 8px; }
+  .bar-model .bm-label{ font-size:11px; font-weight:800; color:var(--ink-soft); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.4px; }
+  .bar-model .bm-whole{
+    height:36px; background:var(--teal-600); border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:900; color:#fff; margin-bottom:6px;
+  }
+  .bar-model .bm-parts{ display:flex; gap:4px; }
+  .bar-model .bm-part{
+    height:36px; border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-size:13px; font-weight:800;
+  }
+  .bar-model .bm-part.known{ background:var(--teal-100); border:2px solid var(--teal-500); color:var(--teal-900); }
+  .bar-model .bm-part.unknown{ background:#FEF3C7; border:2px dashed var(--orange-500); color:var(--orange-700); }
+
+  /* fact family triangle */
+  .fact-triangle{ margin:14px auto; width:100%; max-width:280px; }
+  .fact-triangle svg{ width:100%; }
+
+  /* meaning badge row */
+  .meaning-row{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 4px; }
+  .mbadge{
+    flex:1; min-width:80px; border-radius:10px; padding:10px 8px; text-align:center;
+    font-size:12px; font-weight:800; cursor:default;
+  }
+  .mbadge.ta{ background:#E0F2FE; border:2px solid #38BDF8; color:#0369A1; }
+  .mbadge.df{ background:var(--teal-050); border:2px solid var(--teal-500); color:var(--teal-700); }
+  .mbadge.ma{ background:#FEF3C7; border:2px solid var(--orange-400); color:var(--orange-700); }
+  .mbadge span{ display:block; font-size:10px; font-weight:700; margin-top:3px; opacity:0.8; }
+
+  /* ---------- extra: exchange chain tower (Session 13) ---------- */
+  .exchange-chain{ display:flex; flex-direction:column; align-items:center; gap:0; margin:14px 0 6px; }
+  .exc-box{
+    width:100%; max-width:280px; border-radius:10px; padding:10px 14px;
+    text-align:center; font-size:14px; font-weight:800;
+  }
+  .exc-box.empty{ background:#FEF3C7; border:2px dashed var(--orange-400); color:var(--orange-700); }
+  .exc-box.filled{ background:var(--teal-050); border:2px solid var(--teal-500); color:var(--teal-900); }
+  .exc-arrow{ padding:4px 0; font-size:11px; font-weight:800; color:var(--orange-600); text-align:center; }
+
+  /* subtraction vertical layout (reuse .vadd but with subtraction sign) */
+  .vsub-wrap{ margin:14px 0 6px; display:flex; justify-content:center; }
+  .vsub{ display:grid; row-gap:5px; column-gap:6px; align-items:center; }
+  .vsub .opcell{ font-size:19px; font-weight:800; color:var(--ink-soft); text-align:left; }
+  .vsub .digit{ text-align:center; font-size:20px; font-weight:800; color:var(--teal-900); min-width:30px; }
+  .vsub .digit.zero{ color:var(--orange-500); }
+  .vsub .digit.xd{ text-decoration:line-through; color:var(--ink-soft); font-size:16px; }
+  .vsub .above{ text-align:center; font-size:12px; font-weight:800; color:var(--orange-600); min-height:16px; }
+  .vsub .rule{ grid-column:1/-1; border-top:3px solid var(--teal-900); margin:2px 0 3px; }
+  .vsub .diffdigit{ text-align:center; font-size:21px; font-weight:900; color:var(--teal-900); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="6"></circle><line x1="15" y1="15" x2="21" y2="21"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="kicker">MyMasteryLab</div>
+        <div class="name">Building Confident Problem Solvers</div>
+      </div>
+    </div>
+    <div class="xp-pill">
+      <svg viewBox="0 0 24 24" fill="#FB923C" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>
+      <span id="xpCount">0</span> XP
+    </div>
+  </div>
+
+  <div class="case-title">
+    <div class="stamp">RECAP</div>
+    <h1>🌉 Case File: Crossing the Zeros</h1>
+    <p>Session 13 Recap &middot; Grade 4 &middot; Regrouping Across Zeros</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track" id="progressTrack"></div>
+    <div class="progress-label">
+      <span id="counterLabel">Card 1 of 17</span>
+      <span id="cardName">Mission Briefing</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- ══════════════════════════════ CARD 1 ══════════════════════════════ -->
+    <section class="card" data-name="Mission Briefing">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg> Mission Briefing</div>
+      <h2 class="card-title">Detective, here's today's case.</h2>
+      <p class="card-sub">The subtraction team has hit a bridge made of empty towers — every place reads zero. Tap each clue below once you understand it:</p>
+      <ul class="goal-list" id="goalList">
+        <li><span class="chk" data-goal="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>exchange</strong> a larger unit for 10 smaller units.</li>
+        <li><span class="chk" data-goal="2"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can regroup across <strong>one zero</strong> or <strong>many zeros</strong> in a row.</li>
+        <li><span class="chk" data-goal="3"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>estimate first</strong>, then check my exact answer.</li>
+        <li><span class="chk" data-goal="4"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can explain why <strong>zeros don't stop</strong> subtraction.</li>
+      </ul>
+      <div class="callout">🔑 <strong>Big Question:</strong> How can we subtract when a place has zero?</div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 2 ══════════════════════════════ -->
+    <section class="card" data-name="Key Vocabulary">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg> Evidence Log</div>
+      <h2 class="card-title">Vocabulary flashcards</h2>
+      <p class="card-sub">Tap a card to flip it and reveal the meaning.</p>
+      <div class="vocab-grid" id="vocabGrid">
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Regroup<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Exchange units for equivalent units in another place.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Exchange<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Trade 1 larger unit for 10 smaller units.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Rename<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Represent the exact same quantity in another place-value form.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Zero<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Shows there are no units in that place right now — the place still exists!</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Estimate<span>tap to flip</span></div>
+          <div class="flip-face flip-back">A close answer used to check whether your exact answer is reasonable.</div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 3 ══════════════════════════════ -->
+    <section class="card" data-name="The Exchange Chain">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21V12h6v9"/></svg> The Secret Rule</div>
+      <h2 class="card-title">1 larger unit = 10 smaller units</h2>
+      <p class="card-sub">If a place has zero, we don't stop — we exchange from the next larger place:</p>
+      <div class="exchange-chain">
+        <div class="exc-box filled">1 thousand</div>
+        <div class="exc-arrow">&darr; exchange for &darr;</div>
+        <div class="exc-box filled">10 hundreds</div>
+        <div class="exc-arrow">&darr; exchange for &darr;</div>
+        <div class="exc-box filled">10 tens</div>
+        <div class="exc-arrow">&darr; exchange for &darr;</div>
+        <div class="exc-box filled">10 ones</div>
+      </div>
+      <p class="table-note">Every exchange keeps the <strong>exact same value</strong> — only the place-value form changes.</p>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 4 ══════════════════════════════ -->
+    <section class="card" data-name="The Empty Towers">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Clue #1</div>
+      <h2 class="card-title">50,000 &minus; 27,846</h2>
+      <p class="card-sub">Every tower except the ten-thousands is empty. We can't subtract 6 ones from 0 ones — so the exchange cascades all the way down:</p>
+      <div class="decomp-list">
+        <div class="decomp-row"><div class="dnum">1</div><div class="dtext">Exchange 1 ten-thousand &rarr; 10 thousands (5 becomes 4)</div></div>
+        <div class="decomp-row"><div class="dnum">2</div><div class="dtext">Exchange 1 of those thousands &rarr; 10 hundreds</div></div>
+        <div class="decomp-row"><div class="dnum">3</div><div class="dtext">Exchange 1 of those hundreds &rarr; 10 tens</div></div>
+        <div class="decomp-row"><div class="dnum">4</div><div class="dtext">Exchange 1 of those tens &rarr; 10 ones</div></div>
+      </div>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:22px repeat(5,1fr);">
+          <div class="opcell"></div>
+          <div class="digit">4</div><div class="digit">9</div><div class="digit">9</div><div class="digit">9</div><div class="digit">10</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">Same value as 50,000 — just renamed!</p>
+      <div class="eq-block" style="margin-top:10px;">50,000 &minus; 27,846 = <strong>22,154</strong></div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 5 ══════════════════════════════ -->
+    <section class="card" data-name="Why It Works">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Clue #2 &middot; The Why</div>
+      <h2 class="card-title">Zeros don't block subtraction</h2>
+      <p class="card-sub">Instead of "borrowing," use the correct language:</p>
+      <div class="align-compare">
+        <div class="align-box bad">
+          <div class="albl">&#10007; "BORROW FROM THE NEXT COLUMN"</div>
+        </div>
+        <div class="align-box good">
+          <div class="albl">&check; "EXCHANGE 1 LARGER UNIT FOR 10 SMALLER UNITS"</div>
+        </div>
+      </div>
+      <button class="btn secondary" id="whyBtn">Does the total value ever change?</button>
+      <div class="reveal-box" id="whyReveal">
+        <p style="margin:0;">No! Zero just means <strong>no units are available yet</strong> in that place — the place still exists. We simply continue the exchange through the next larger place until we reach the place we need.</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 6 ══════════════════════════════ -->
+    <section class="card" data-name="One Zero">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Field Test #1</div>
+      <h2 class="card-title">Crossing one zero</h2>
+      <p class="card-sub">Tap each card to check your answer.</p>
+      <div class="qa-list" id="qaList1">
+        <div class="qa-item"><div class="qrow"><div class="q">50 &minus; 26 = ?</div><div class="peek">tap</div></div>
+          <div class="a">24 — exchange 1 ten for 10 ones: 10 &minus; 6 = 4, then 4 &minus; 2 = 2 tens.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">120 &minus; 56 = ?</div><div class="peek">tap</div></div>
+          <div class="a">64 — the ones place is 0, so exchange a ten first.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">240 &minus; 78 = ?</div><div class="peek">tap</div></div>
+          <div class="a">162 — one exchange needed, in the ones column.</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 7 ══════════════════════════════ -->
+    <section class="card" data-name="Two Zeros">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg> Field Test #2</div>
+      <h2 class="card-title">Crossing two zeros</h2>
+      <p class="card-sub">Tap each card to check your answer.</p>
+      <div class="qa-list" id="qaList2">
+        <div class="qa-item"><div class="qrow"><div class="q">500 &minus; 236 = ?</div><div class="peek">tap</div></div>
+          <div class="a">264 — exchange hundreds &rarr; tens &rarr; ones, two exchanges in a row.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">900 &minus; 374 = ?</div><div class="peek">tap</div></div>
+          <div class="a">526 — same two-step exchange chain.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">2,000 &minus; 638 = ?</div><div class="peek">tap</div></div>
+          <div class="a">1,362 — exchange thousands &rarr; hundreds &rarr; tens &rarr; ones.</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 8 ══════════════════════════════ -->
+    <section class="card" data-name="Zero Cascade Spotlight">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5v6c0 5-4 8.5-9 9.5-5-1-9-4.5-9-9.5v-6L12 2z"/></svg> Consecutive Zeros</div>
+      <h2 class="card-title">20,000 &minus; 7,845</h2>
+      <p class="card-sub">Four zeros in a row — watch the exchange cascade all the way down:</p>
+      <div class="decomp-list">
+        <div class="decomp-row"><div class="dnum">1</div><div class="dtext">2 ten-thousands &rarr; 1 stays, 1 exchanges for 10 thousands</div></div>
+        <div class="decomp-row"><div class="dnum">2</div><div class="dtext">1 of those thousands &rarr; 10 hundreds</div></div>
+        <div class="decomp-row"><div class="dnum">3</div><div class="dtext">1 of those hundreds &rarr; 10 tens</div></div>
+        <div class="decomp-row"><div class="dnum">4</div><div class="dtext">1 of those tens &rarr; 10 ones</div></div>
+      </div>
+      <div class="eq-block">20,000 &minus; 7,845 = <strong>12,155</strong></div>
+      <p class="table-note">Every zero became a 9 (after lending 1 away) except the very last place, which received the full 10. The value never changed — only its shape.</p>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 9 ══════════════════════════════ -->
+    <section class="card" data-name="Bigger Numbers">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Level Ladder</div>
+      <h2 class="card-title">Same rule, bigger numbers</h2>
+      <table class="rep-table">
+        <tr><td>5-digit</td><td>60,000 &minus; 38,475 = 21,525</td></tr>
+        <tr><td>5-digit</td><td>75,000 &minus; 38,759 = 36,241</td></tr>
+        <tr><td>6-digit</td><td>200,000 &minus; 86,475 = 113,525</td></tr>
+      </table>
+      <p class="table-note">The exchange chain works exactly the same way no matter how many zeros or how many digits.</p>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 10 ══════════════════════════════ -->
+    <section class="card" data-name="Mystery Statement 1">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Misconception Lab</div>
+      <h2 class="card-title">Agree or disagree?</h2>
+      <div class="callout">"Zeros make subtraction impossible."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="mis1Feedback"></div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 11 ══════════════════════════════ -->
+    <section class="card" data-name="Mystery Statement 2">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Misconception Lab</div>
+      <h2 class="card-title">Agree or disagree?</h2>
+      <div class="callout">"Borrowing means taking a number away from the next column."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="mis2Feedback"></div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 12 ══════════════════════════════ -->
+    <section class="card" data-name="Mystery Statement 3">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Misconception Lab</div>
+      <h2 class="card-title">Agree or disagree?</h2>
+      <div class="callout">"After regrouping, the original number becomes smaller."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="mis3Feedback"></div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 13 ══════════════════════════════ -->
+    <section class="card" data-name="Estimation Check">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Estimate First</div>
+      <h2 class="card-title">Estimate, then check</h2>
+      <p class="card-sub">Tap each card to compare the estimate with the exact answer.</p>
+      <div class="qa-list" id="qaList3">
+        <div class="qa-item"><div class="qrow"><div class="q">80,000 &minus; 36,725</div><div class="peek">tap</div></div>
+          <div class="a">Estimate: 80,000 &minus; 37,000 &asymp; 43,000. Exact: 43,275. Close!</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">70,000 &minus; 28,486</div><div class="peek">tap</div></div>
+          <div class="a">Estimate: 70,000 &minus; 28,000 &asymp; 42,000. Exact: 41,514. Close!</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">100,000 &minus; 47,895</div><div class="peek">tap</div></div>
+          <div class="a">Estimate: 100,000 &minus; 48,000 &asymp; 52,000. Exact: 52,105. Very close!</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 14 ══════════════════════════════ -->
+    <section class="card" data-name="Treasury Case">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V4h8v3"/></svg> Real-World Case</div>
+      <h2 class="card-title">🏦 The Kingdom Treasury</h2>
+      <div class="eq-block"><span class="tag">Gold in the treasury</span>80,000 coins</div>
+      <div class="eq-block"><span class="tag">Spent</span>36,725 coins</div>
+      <div class="qa-list" id="qaList4" style="margin-top:10px;">
+        <div class="qa-item"><div class="qrow"><div class="q">How many gold coins remain?</div><div class="peek">tap</div></div>
+          <div class="a">80,000 &minus; 36,725 = 43,275 coins.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Which columns needed exchanges?</div><div class="peek">tap</div></div>
+          <div class="a">Thousands, hundreds, tens, and ones were all zero — the exchange cascades through all four.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Check with addition.</div><div class="peek">tap</div></div>
+          <div class="a">43,275 + 36,725 = 80,000 ✓</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 15 ══════════════════════════════ -->
+    <section class="card" data-name="Final Report 1">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg> Final Report</div>
+      <h2 class="card-title">Calculate &amp; estimate</h2>
+      <p class="card-sub">80,000 &minus; 36,725</p>
+      <div class="vadd-wrap">
+        <div class="vadd" style="grid-template-columns:22px repeat(5,1fr);">
+          <div class="opcell"></div>
+          <div class="digit">8</div><div class="digit">0</div><div class="digit">0</div><div class="digit">0</div><div class="digit">0</div>
+          <div class="opcell">&minus;</div>
+          <div class="digit">3</div><div class="digit">6</div><div class="digit">7</div><div class="digit">2</div><div class="digit">5</div>
+          <div class="rule"></div>
+          <div class="opcell"></div>
+          <div class="sumdigit">4</div><div class="sumdigit">3</div><div class="sumdigit">2</div><div class="sumdigit">7</div><div class="sumdigit">5</div>
+        </div>
+      </div>
+      <p class="table-note" style="text-align:center;">80,000 &minus; 36,725 = <strong>43,275</strong></p>
+      <div class="qa-list" id="qaList5" style="margin-top:12px;">
+        <div class="qa-item"><div class="qrow"><div class="q">Estimate to the nearest thousand.</div><div class="peek">tap</div></div>
+          <div class="a">80,000 &minus; 37,000 &asymp; 43,000</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 16 ══════════════════════════════ -->
+    <section class="card" data-name="Final Report 2">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg> Final Report</div>
+      <h2 class="card-title">Explain &amp; reason</h2>
+      <p class="card-sub" style="margin-bottom:6px;">What happened to the zeros when you regrouped?</p>
+      <textarea id="exitExplain" rows="2" style="width:100%; border:2px solid var(--teal-100); border-radius:10px; padding:8px 10px; font-family:inherit; font-size:14px; resize:vertical;" placeholder="Type your answer here..."></textarea>
+      <div style="margin-top:10px;"><button class="btn ghost" id="exitExplainBtn">Compare with a model answer</button></div>
+      <div class="reveal-box" id="exitExplainReveal">
+        <p style="margin:0;">Model answer: each zero exchanged 1 unit away and became a <strong>9</strong> — except the very last place, which received the full <strong>10</strong>. The total value never changed, only how it was represented.</p>
+      </div>
+      <hr class="divider">
+      <p class="card-sub" style="margin-bottom:6px;">A learner says: "Zeros make subtraction harder because zero has no value." Do you agree?</p>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="zeroValueFeedback"></div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 17 ══════════════════════════════ -->
+    <section class="card" data-name="Case Closed">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Mastery Check</div>
+      <div class="badge-wrap">
+        <div class="badge-circle"><div class="inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2"><circle cx="12" cy="12" r="7"/><line x1="16.65" y1="16.65" x2="21" y2="21"/></svg>
+        </div></div>
+        <h2 class="card-title" style="text-align:center;">Case Closed, Detective!</h2>
+        <p class="card-sub" style="text-align:center;">You've crossed <strong>the Zero Bridge</strong>.</p>
+      </div>
+      <div class="callout" style="text-align:center;">
+        Zeros don't stop subtraction. 1 larger unit always exchanges for 10 smaller units — the exchange just keeps going until it reaches the place you need.
+      </div>
+      <div style="text-align:center; margin-top:14px;">
+        <div class="final-xp"><span id="finalXp">0</span> <span>XP earned this session</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost" id="prevBtn">◀ Back</button>
+    <span class="counter" id="counterMini"></span>
+    <button class="btn" id="nextBtn">Next ▶</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const total = cards.length;
+  let current = 0;
+  let xp = 0;
+
+  const progressTrack = document.getElementById('progressTrack');
+  const counterLabel  = document.getElementById('counterLabel');
+  const cardName      = document.getElementById('cardName');
+  const counterMini   = document.getElementById('counterMini');
+  const xpCount       = document.getElementById('xpCount');
+  const finalXp       = document.getElementById('finalXp');
+  const prevBtn       = document.getElementById('prevBtn');
+  const nextBtn       = document.getElementById('nextBtn');
+
+  for(let i=0;i<total;i++){
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    seg.appendChild(document.createElement('i'));
+    progressTrack.appendChild(seg);
+  }
+  const segs = Array.from(progressTrack.querySelectorAll('.seg > i'));
+
+  function addXp(n){ xp+=n; xpCount.textContent=xp; finalXp.textContent=xp; }
+
+  function render(){
+    cards.forEach((c,i)=> c.classList.toggle('active', i===current));
+    counterLabel.textContent = 'Card '+(current+1)+' of '+total;
+    counterMini.textContent  = (current+1)+' / '+total;
+    cardName.textContent     = cards[current].dataset.name || '';
+    segs.forEach((b,i)=> b.style.width = i<=current ? '100%' : '0%');
+    prevBtn.disabled  = current===0;
+    nextBtn.textContent = current===total-1 ? 'Restart ↺' : 'Next ▶';
+  }
+
+  prevBtn.addEventListener('click', ()=>{ if(current>0){current--; render();} });
+  nextBtn.addEventListener('click', ()=>{ current = current===total-1 ? 0 : current+1; render(); });
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight') nextBtn.click();
+    if(e.key==='ArrowLeft')  prevBtn.click();
+  });
+  render();
+
+  /* ── CARD 1: goals ── */
+  const goalsCompleted = new Set();
+  document.querySelectorAll('#goalList .chk').forEach(chk=>{
+    chk.addEventListener('click', ()=>{
+      const g = chk.dataset.goal;
+      chk.classList.toggle('done');
+      if(chk.classList.contains('done') && !goalsCompleted.has(g)){ goalsCompleted.add(g); addXp(5); }
+    });
+  });
+
+  /* ── CARD 2: vocab flip ── */
+  const flippedSet = new Set();
+  document.querySelectorAll('#vocabGrid .flip-card').forEach((card,idx)=>{
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(card.classList.contains('flipped') && !flippedSet.has(idx)){ flippedSet.add(idx); addXp(5); }
+    });
+  });
+
+  /* ── CARD 5: why reveal ── */
+  let whyDone = false;
+  document.getElementById('whyBtn').addEventListener('click', ()=>{
+    document.getElementById('whyReveal').classList.add('show');
+    if(!whyDone){ whyDone=true; addXp(10); }
+  });
+
+  /* ── generic qa-list toggler ── */
+  const qaXpGiven = new Set();
+  document.querySelectorAll('.qa-item').forEach((item,idx)=>{
+    item.addEventListener('click', ()=>{
+      item.classList.toggle('open');
+      const key = item.closest('.qa-list').id+'-'+idx;
+      if(item.classList.contains('open') && !qaXpGiven.has(key)){ qaXpGiven.add(key); addXp(5); }
+    });
+  });
+
+  /* ── CARD 10: misconception 1 ── */
+  let mis1Done = false;
+  document.querySelectorAll('.card[data-name="Mystery Statement 1"] .choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      document.querySelectorAll('.card[data-name="Mystery Statement 1"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('mis1Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = '\u2705 Correct! 50,000 \u2212 27,846 = 22,154 proves it. Zero just means there are no units yet \u2014 we exchange from a larger place instead.';
+        if(!mis1Done){ mis1Done=true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = 'Look at 50,000 \u2212 27,846 = 22,154 \u2014 it works! Zero just means no units are available yet in that place; we can always exchange from a larger place.';
+      }
+    });
+  });
+
+  /* ── CARD 11: misconception 2 ── */
+  let mis2Done = false;
+  document.querySelectorAll('.card[data-name="Mystery Statement 2"] .choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      document.querySelectorAll('.card[data-name="Mystery Statement 2"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('mis2Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = '\u2705 Correct! Nothing is "taken away" \u2014 1 larger unit is exchanged for 10 smaller units. The total value stays exactly the same.';
+        if(!mis2Done){ mis2Done=true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = 'Nothing disappears \u2014 1 larger unit is exchanged for 10 smaller units. It\u2019s a trade, not a removal.';
+      }
+    });
+  });
+
+  /* ── CARD 12: misconception 3 ── */
+  let mis3Done = false;
+  document.querySelectorAll('.card[data-name="Mystery Statement 3"] .choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      document.querySelectorAll('.card[data-name="Mystery Statement 3"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('mis3Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = '\u2705 Correct! The quantity never changes during regrouping \u2014 only its place-value representation does. 50,000 and "4 ten-thousands, 9 thousands, 9 hundreds, 9 tens, 10 ones" are the exact same amount.';
+        if(!mis3Done){ mis3Done=true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = 'The amount stays identical \u2014 regrouping only renames it using different place-value units. Nothing is lost or gained.';
+      }
+    });
+  });
+
+  /* ── CARD 16: exit explain ── */
+  let exitDone = false;
+  document.getElementById('exitExplainBtn').addEventListener('click', ()=>{
+    document.getElementById('exitExplainReveal').classList.add('show');
+    if(!exitDone){ exitDone=true; addXp(10); }
+  });
+
+  /* ── CARD 16: zero value reasoning ── */
+  let zeroValueDone = false;
+  document.querySelectorAll('.card[data-name="Final Report 2"] .choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      document.querySelectorAll('.card[data-name="Final Report 2"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('zeroValueFeedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = '\u2705 Correct! Zero just means no units are there right now \u2014 the place itself still exists and can always receive an exchange from a larger place. It doesn\u2019t make subtraction impossible, just one extra step.';
+        if(!zeroValueDone){ zeroValueDone=true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = 'Zero still marks a real place in the number \u2014 it just means no units are there yet. We can always exchange from a larger place, so zeros add a step, not a wall.';
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
