@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMasteryLab | Case File: The Master Chef Check</title>
+<style>
+  :root{
+    --teal-900:#0B4F4A;
+    --teal-700:#0F766E;
+    --teal-600:#128077;
+    --teal-500:#1AA79B;
+    --teal-100:#E3F3F1;
+    --teal-050:#F1FAF9;
+    --orange-700:#C2410C;
+    --orange-600:#D9520F;
+    --orange-500:#EA580C;
+    --orange-300:#FB923C;
+    --orange-100:#FEECDC;
+    --cream:#FFFBF4;
+    --paper:#FFF7EA;
+    --paper-line:#EADFC8;
+    --ink:#20302F;
+    --ink-soft:#5B6B69;
+    --success:#1E8F63;
+    --success-bg:#E4F5EC;
+    --danger:#C2483C;
+    --danger-bg:#FBEAE7;
+    --shadow: 0 10px 30px rgba(11,79,74,0.14);
+    --radius: 18px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: "Trebuchet MS", "Segoe UI Rounded", "Segoe UI", Verdana, sans-serif;
+    background:
+      radial-gradient(circle at 8% 8%, rgba(26,167,155,0.10), transparent 40%),
+      radial-gradient(circle at 95% 12%, rgba(234,88,12,0.10), transparent 38%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    padding: 18px 14px 40px;
+  }
+
+  .app{ max-width: 760px; margin: 0 auto; }
+
+  /* ---------- HEADER ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-badge{
+    width:44px; height:44px; border-radius:50%;
+    background: conic-gradient(from 220deg, var(--teal-700), var(--orange-500), var(--teal-500));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+    flex-shrink:0;
+  }
+  .brand-badge svg{ width:24px; height:24px; }
+  .brand-text .kicker{
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--orange-600); font-weight:700;
+  }
+  .brand-text .name{ font-size:15px; font-weight:800; color:var(--teal-900); line-height:1.1; }
+
+  .xp-pill{
+    display:flex; align-items:center; gap:6px;
+    background: var(--teal-900); color:#fff;
+    padding: 8px 14px; border-radius: 999px;
+    font-size:13px; font-weight:700;
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+  }
+  .xp-pill svg{ width:16px; height:16px; }
+
+  .case-title{
+    background: var(--teal-900);
+    color:#fff;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+  .case-title::before{
+    content:"";
+    position:absolute; right:-30px; top:-30px;
+    width:140px; height:140px; border-radius:50%;
+    background: rgba(251,146,60,0.18);
+  }
+  .case-title h1{
+    margin:0 0 4px; font-size: 21px; letter-spacing:0.3px; position:relative;
+  }
+  .case-title p{ margin:0; font-size:13px; color:#BFE6E1; position:relative; }
+  .case-title .stamp{
+    position:absolute; top:14px; right:16px;
+    border:2px solid var(--orange-300); color:var(--orange-300);
+    padding:3px 9px; border-radius:6px; font-size:10px; font-weight:800;
+    letter-spacing:1.5px; transform: rotate(6deg); opacity:0.9;
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-wrap{ margin-bottom: 14px; }
+  .progress-track{
+    display:flex; gap:5px; margin-bottom:6px;
+  }
+  .progress-track .seg{
+    flex:1; height:6px; border-radius:4px; background: var(--teal-100);
+    overflow:hidden;
+  }
+  .progress-track .seg > i{
+    display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--orange-500), var(--teal-500));
+    transition: width .3s ease;
+  }
+  .progress-label{
+    display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-weight:600;
+  }
+
+  /* ---------- STAGE / CARDS ---------- */
+  .stage{ position:relative; min-height: 430px; }
+  .card{
+    display:none;
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: var(--radius);
+    padding: 22px 20px 24px;
+    box-shadow: var(--shadow);
+    animation: rise .35s ease;
+  }
+  .card.active{ display:block; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .tab{
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--orange-100); color:var(--orange-700);
+    font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+    padding:5px 10px; border-radius: 999px; margin-bottom:12px;
+  }
+  .tab svg{ width:13px; height:13px; }
+
+  h2.card-title{
+    margin: 0 0 6px; font-size:19px; color:var(--teal-900); line-height:1.25;
+  }
+  .card-sub{ margin:0 0 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
+
+  .divider{ border:none; border-top:1.5px dashed var(--paper-line); margin: 16px 0; }
+
+  /* ---------- GENERIC UI PIECES ---------- */
+  .goal-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+  .goal-list li{
+    display:flex; align-items:flex-start; gap:10px;
+    background: var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.4;
+  }
+  .goal-list li .chk{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--teal-500);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; margin-top:1px; background:#fff; transition: background .15s, border-color .15s;
+  }
+  .goal-list li .chk.done{ background: var(--teal-500); border-color:var(--teal-500); }
+  .goal-list li .chk svg{ width:12px; height:12px; opacity:0; transition:opacity .15s; }
+  .goal-list li .chk.done svg{ opacity:1; }
+
+  .btn{
+    border:none; cursor:pointer; font-weight:800; font-size:13.5px;
+    border-radius: 999px; padding: 10px 18px;
+    background: var(--teal-700); color:#fff;
+    display:inline-flex; align-items:center; gap:6px;
+    transition: transform .12s ease, background .15s ease;
+  }
+  .btn:hover{ background: var(--teal-600); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn.secondary{ background: var(--orange-500); }
+  .btn.secondary:hover{ background: var(--orange-600); }
+  .btn.ghost{ background: transparent; color:var(--teal-700); border:2px solid var(--teal-100); }
+  .btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .btn svg{ width:14px; height:14px; }
+
+  .reveal-box{
+    margin-top:12px; border-radius:12px; padding:14px 14px;
+    background: var(--success-bg); border:1.5px solid #BFE3CE;
+    font-size:14px; line-height:1.55; display:none;
+  }
+  .reveal-box.show{ display:block; animation: rise .3s ease; }
+  .reveal-box strong{ color:var(--success); }
+
+  /* Vocabulary flip cards */
+  .vocab-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  @media (max-width:480px){ .vocab-grid{ grid-template-columns: 1fr; } }
+  .flip-card{ perspective: 1000px; height: 108px; cursor:pointer; }
+  .flip-inner{
+    position:relative; width:100%; height:100%; text-align:center;
+    transition: transform .5s; transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform: rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:10px; font-size:13px;
+  }
+  .flip-front{ background: var(--teal-700); color:#fff; font-weight:800; font-size:15px; }
+  .flip-front span{ font-size:10px; font-weight:600; opacity:0.75; margin-top:4px; }
+  .flip-back{ background:#fff; border:2px solid var(--teal-100); color:var(--ink); transform: rotateY(180deg); line-height:1.35; }
+
+  /* SVG viz container */
+  .viz{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding: 10px 6px 4px; margin: 6px 0 4px; overflow:hidden;
+  }
+  .viz svg{ width:100%; height:auto; display:block; }
+  .viz-caption{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin: 2px 0 8px; font-weight:600; }
+
+  /* Table */
+  table.pv-table{ width:100%; border-collapse:collapse; margin-top:6px; font-size:14px; }
+  table.pv-table th{
+    background: var(--teal-700); color:#fff; padding:9px 8px; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:0.4px;
+  }
+  table.pv-table th:first-child{ border-radius:8px 0 0 0; }
+  table.pv-table th:last-child{ border-radius:0 8px 0 0; }
+  table.pv-table td{ padding:9px 8px; border-bottom:1px solid var(--paper-line); text-align:center; }
+  table.pv-table tr:nth-child(even) td{ background: var(--teal-050); }
+  table.pv-table input{
+    width: 78px; padding:6px 4px; text-align:center; font-size:14px;
+    border:2px solid var(--teal-100); border-radius:8px; font-family:inherit;
+  }
+  table.pv-table input:focus{ outline:none; border-color:var(--teal-500); }
+  .cell-status{ display:inline-block; margin-left:4px; }
+
+  /* quick problem chain */
+  .chain{ display:flex; flex-direction:column; gap:8px; margin: 4px 0 6px; }
+  .chain .step{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:10px; padding:10px 12px;
+  }
+  .chain .step .q{ font-size:15px; font-weight:700; color:var(--teal-900); }
+  .chain .step .a{
+    font-size:15px; font-weight:800; color: var(--orange-700);
+    min-width:50px; text-align:right;
+  }
+
+  /* choice buttons */
+  .choice-row{ display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0; }
+  .choice{
+    flex:1; min-width:90px; text-align:center;
+    padding:10px 8px; border-radius:10px; border:2px solid var(--teal-100);
+    background:#fff; font-weight:800; font-size:13.5px; cursor:pointer; color:var(--teal-900);
+    transition: all .15s ease;
+  }
+  .choice:hover{ border-color: var(--teal-500); }
+  .choice.selected{ background: var(--teal-700); color:#fff; border-color:var(--teal-700); }
+
+  .input-line{ display:flex; align-items:center; gap:10px; margin: 10px 0; flex-wrap:wrap; }
+  .input-line input[type="text"], .input-line input[type="number"]{
+    width: 110px; padding:9px 10px; font-size:15px; text-align:center;
+    border:2px solid var(--teal-100); border-radius:10px; font-family:inherit; font-weight:700;
+  }
+  .input-line input:focus{ outline:none; border-color:var(--teal-500); }
+
+  .callout{
+    background: var(--orange-100); border-left:4px solid var(--orange-500);
+    border-radius:10px; padding:10px 12px; font-size:13.5px; line-height:1.5; margin: 12px 0;
+  }
+  .callout strong{ color:var(--orange-700); }
+
+  .mini-label{ font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; color:var(--teal-700); margin: 14px 0 6px; }
+
+  /* Badge / final card */
+  .badge-wrap{ text-align:center; padding: 6px 0 4px; }
+  .badge-circle{
+    width:110px; height:110px; border-radius:50%; margin: 4px auto 12px;
+    background: conic-gradient(from 200deg, var(--teal-700), var(--orange-500), var(--teal-500), var(--teal-700));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+  }
+  .badge-circle .inner{
+    width:86px; height:86px; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .badge-circle svg{ width:44px; height:44px; }
+  .final-xp{ font-size:26px; font-weight:900; color:var(--teal-900); }
+  .final-xp span{ font-size:14px; color:var(--ink-soft); font-weight:700; }
+
+  /* nav controls */
+  .controls{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:16px; gap:10px;
+  }
+  .controls .btn{ padding:10px 16px; }
+  .counter{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+
+  .feedback-text{ font-size:13.5px; margin-top:8px; line-height:1.5; display:none; padding:10px 12px; border-radius:10px; }
+  .feedback-text.show{ display:block; animation: rise .25s ease; }
+  .feedback-text.correct{ background: var(--success-bg); color:var(--success); border:1.5px solid #BFE3CE; }
+  .feedback-text.wrong{ background: var(--danger-bg); color:var(--danger); border:1.5px solid #F1C6BE; }
+  .feedback-text.info{ background: var(--teal-050); color:var(--teal-900); border:1.5px solid var(--teal-100); }
+
+  /* ---------- extra: Q&A reveal cards (session 3) ---------- */
+  .qa-list{ display:flex; flex-direction:column; gap:10px; margin:10px 0 4px; }
+  .qa-item{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; transition:border-color .15s ease;
+  }
+  .qa-item:hover{ border-color:var(--teal-500); }
+  .qa-item .qrow{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .qa-item .q{ font-size:14.5px; font-weight:700; color:var(--teal-900); line-height:1.45; }
+  .qa-item .peek{
+    font-size:9.5px; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink-soft);
+    font-weight:800; white-space:nowrap; margin-top:2px; flex-shrink:0;
+  }
+  .qa-item .a{
+    margin-top:12px; padding-top:12px; border-top:1.5px dashed var(--paper-line);
+    font-size:14px; font-weight:700; color:var(--orange-700); line-height:1.6; display:none;
+  }
+  .qa-item.open .a{ display:block; }
+
+  /* place-value table with placeholder zeros */
+  table.pv-table td.zero-cell{ background:var(--teal-050); color:var(--ink-soft); font-style:italic; }
+  .table-note{ font-size:12px; color:var(--ink-soft); font-weight:600; margin-top:8px; line-height:1.5; }
+
+  /* decomposition breakdown rows (spaced) */
+  .decomp-list{ display:flex; flex-direction:column; gap:10px; margin:12px 0 4px; }
+  .decomp-row{
+    display:flex; align-items:center; gap:12px;
+    background:var(--teal-050); border:1px solid var(--teal-100);
+    border-radius:10px; padding:10px 13px;
+  }
+  .decomp-row .dnum{
+    width:26px; height:26px; border-radius:7px; flex-shrink:0;
+    background:var(--teal-700); color:#fff; font-weight:800; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .decomp-row .dtext{ flex:1; font-size:13.5px; font-weight:700; color:var(--teal-900); line-height:1.4; }
+
+  /* representation table (standard / expanded / word) */
+  table.rep-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; }
+  table.rep-table td{
+    padding:12px 14px; border-bottom:1px solid var(--paper-line); font-size:14px;
+  }
+  table.rep-table td:first-child{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); width:92px; vertical-align:top; padding-top:14px;
+  }
+  table.rep-table td:last-child{ font-weight:700; color:var(--teal-900); line-height:1.5; }
+  table.rep-table tr:last-child td{ border-bottom:none; }
+
+  /* ---------- extra: compare table (session 4) ---------- */
+  table.cmp-table{ width:100%; border-collapse:collapse; margin:10px 0 4px; font-family:'Trebuchet MS',sans-serif; }
+  table.cmp-table th{
+    background:var(--teal-900); color:#fff; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.4px; padding:8px 2px; font-weight:700;
+  }
+  table.cmp-table td{
+    text-align:center; font-size:19px; font-weight:800; padding:10px 2px;
+    background:#fff; border:1px solid var(--paper-line); color:var(--teal-900);
+  }
+  table.cmp-table td.diff-col{ background:var(--orange-100); color:var(--orange-700); }
+  table.cmp-table tr:first-child td{ border-bottom:2px solid var(--paper-line); }
+
+  .cmp-verdict{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--teal-050); border:1.5px solid var(--teal-100); border-radius:12px;
+    padding:12px; margin-top:12px; font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-verdict .sym{ font-size:22px; color:var(--orange-700); }
+
+  /* quick compare pairs (field test) */
+  .cmp-pair{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:13px 14px; cursor:pointer; margin-bottom:10px;
+  }
+  .cmp-pair .nums{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    font-size:16px; font-weight:800; color:var(--teal-900);
+  }
+  .cmp-pair .nums .blank{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:26px; border:2px dashed var(--paper-line); border-radius:6px;
+    font-size:14px; color:var(--ink-soft); font-weight:800;
+  }
+  .cmp-pair.open .nums .blank{ border-style:solid; border-color:var(--orange-500); color:var(--orange-700); background:var(--orange-100); }
+  .cmp-pair .why{
+    margin-top:10px; padding-top:10px; border-top:1.5px dashed var(--paper-line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); line-height:1.5; display:none; text-align:center;
+  }
+  .cmp-pair.open .why{ display:block; }
+  .cmp-pair .peek{
+    text-align:center; font-size:9.5px; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-soft); font-weight:800; margin-top:8px;
+  }
+
+  /* ---------- extra: number line components (session 5) ---------- */
+  .numline-wrap{ margin:14px 0 6px; }
+  .numline-title{ font-size:11.5px; font-weight:800; color:var(--ink-soft); margin-bottom:6px; }
+  .numline{ position:relative; height:78px; }
+  .numline .track{
+    position:absolute; left:6px; right:6px; top:36px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .numline .tick{ position:absolute; top:26px; width:2px; height:24px; background:var(--ink-soft); transform:translateX(-50%); }
+  .numline .tick.mid{ background:var(--orange-300); width:2px; height:24px; }
+  .numline .ticklabel{
+    position:absolute; top:52px; font-size:11px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline .ticklabel.mid{ color:var(--orange-600); }
+  .numline .dot{
+    position:absolute; top:38px; width:15px; height:15px; border-radius:50%;
+    background:var(--orange-500); border:2.5px solid #fff; box-shadow:0 0 0 2px var(--orange-500);
+    transform:translate(-50%,-50%); z-index:2;
+  }
+  .numline .dotlabel{
+    position:absolute; top:0px; font-size:12px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap; background:#fff; padding:0 3px; border-radius:4px;
+  }
+  .numline .dist{
+    position:absolute; top:14px; font-size:9.5px; font-weight:700; color:var(--ink-soft);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .numline-verdict{
+    margin-top:10px; text-align:center; font-size:13px; font-weight:800;
+    color:var(--teal-900); background:var(--teal-050); border:1.5px solid var(--teal-100);
+    border-radius:10px; padding:9px 10px;
+  }
+
+  /* halfway zone diagram (deep learning why) */
+  .zone-line{ position:relative; height:100px; margin:14px 0 6px; }
+  .zone-line .half{
+    position:absolute; top:30px; height:34px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11.5px; font-weight:800; color:#fff;
+  }
+  .zone-line .half.down{ left:0; width:calc(50% - 3px); background:var(--teal-600); }
+  .zone-line .half.up{ right:0; width:calc(50% - 3px); background:var(--orange-500); }
+  .zone-line .mid-marker{
+    position:absolute; left:50%; top:20px; width:2px; height:54px; background:var(--ink-soft);
+    transform:translateX(-50%);
+  }
+  .zone-line .mid-label{
+    position:absolute; left:50%; top:76px; transform:translateX(-50%);
+    font-size:10.5px; font-weight:800; color:var(--ink-soft); text-align:center; width:120px;
+  }
+  .zone-line .end-label{
+    position:absolute; top:0px; font-size:10.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .zone-line .end-label.left{ left:0; }
+  .zone-line .end-label.right{ right:0; text-align:right; }
+
+  /* range band (fast learner extension) */
+  .band-line{ position:relative; height:88px; margin:14px 0 6px; }
+  .band-line .track{
+    position:absolute; left:6px; right:6px; top:38px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .band-line .band{
+    position:absolute; top:32px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .band-line .tick{ position:absolute; top:30px; width:2px; height:20px; background:var(--ink-soft); transform:translateX(-50%); }
+  .band-line .ticklabel{
+    position:absolute; top:56px; font-size:10.5px; font-weight:800; color:var(--teal-900);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+  .band-line .endmark{
+    position:absolute; top:6px; font-size:10px; font-weight:800; color:var(--orange-700);
+    transform:translateX(-50%); white-space:nowrap;
+  }
+
+  /* ---------- extra: reasonableness check-line (session 6) ---------- */
+  .check-line{ position:relative; height:112px; margin:14px 0 6px; }
+  .check-line .track{
+    position:absolute; left:6px; right:6px; top:52px; height:4px;
+    background:var(--paper-line); border-radius:2px;
+  }
+  .check-line .zone{
+    position:absolute; top:46px; height:16px; background:var(--teal-100);
+    border:1.5px solid var(--teal-500); border-radius:8px;
+  }
+  .check-line .marker{
+    position:absolute; top:40px; width:15px; height:15px; border-radius:50%;
+    transform:translate(-50%,-50%); border:2.5px solid #fff; z-index:2;
+    box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  }
+  .check-line .marker.estimate{ background:var(--teal-700); }
+  .check-line .marker.exact{ background:var(--success); }
+  .check-line .marker.given{ background:var(--danger); }
+  .check-line .mlabel{
+    position:absolute; font-size:10.5px; font-weight:800; white-space:nowrap;
+    transform:translateX(-50%);
+  }
+  .check-line .mlabel.top{ top:6px; }
+  .check-line .mlabel.bottom{ top:72px; }
+  .check-line .mlabel.estimate-c{ color:var(--teal-700); }
+  .check-line .mlabel.exact-c{ color:var(--success); }
+  .check-line .mlabel.given-c{ color:var(--danger); }
+  .check-line-legend{
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    margin-top:10px; font-size:11px; font-weight:700; color:var(--ink-soft);
+  }
+  .check-line-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .check-line-legend .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; flex-shrink:0; }
+
+  /* equation display for concept entry */
+  .eq-block{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:12px;
+    padding:12px 14px; margin:8px 0; font-size:15px; font-weight:800;
+    color:var(--teal-900); text-align:center;
+  }
+  .eq-block .tag{
+    display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--orange-700); font-weight:800; margin-bottom:4px;
+  }
+
+  /* ---------- extra: vertical addition (Lesson 10) ---------- */
+  .vadd-wrap{ margin:14px 0 6px; display:flex; justify-content:center; }
+  .vadd{ display:grid; row-gap:5px; column-gap:6px; align-items:center; }
+  .vadd .opcell{ font-size:19px; font-weight:800; color:var(--ink-soft); text-align:left; }
+  .vadd .digit{
+    text-align:center; font-size:20px; font-weight:800; color:var(--teal-900);
+    min-width:30px;
+  }
+  .vadd .digit.blank{ color:transparent; }
+  .vadd .carry{
+    text-align:center; font-size:12px; font-weight:800; color:var(--orange-600);
+    min-height:16px;
+  }
+  .vadd .rule{ grid-column:1/-1; border-top:3px solid var(--teal-900); margin:2px 0 3px; }
+  .vadd .sumdigit{ text-align:center; font-size:21px; font-weight:900; color:var(--teal-900); }
+
+  /* correct vs incorrect alignment compare */
+  .align-compare{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin:12px 0 4px; }
+  .align-box{
+    flex:1; min-width:135px; border-radius:12px; padding:12px 10px; text-align:center;
+  }
+  .align-box.good{ background:var(--teal-050); border:2px solid var(--teal-500); }
+  .align-box.bad{ background:#FEECEC; border:2px solid var(--danger); }
+  .align-box .albl{ font-size:11.5px; font-weight:800; margin-bottom:8px; }
+  .align-box.good .albl{ color:var(--teal-700); }
+  .align-box.bad .albl{ color:var(--danger); }
+
+  .quest-tag{
+    display:inline-flex; align-items:center; gap:6px; font-family:'Special Elite',monospace;
+    font-size:11px; letter-spacing:0.5px; text-transform:uppercase;
+  }
+
+  /* ---------- extra: kingdom room tower (Session 11) ---------- */
+  .room-tower{ display:flex; flex-direction:column; align-items:center; margin:14px 0 6px; }
+  .room-box{
+    width:100%; max-width:290px; background:var(--teal-050); border:2px solid var(--teal-500);
+    border-radius:12px; padding:11px 14px; text-align:center; font-weight:800;
+    color:var(--teal-900); font-size:14.5px;
+  }
+  .room-box .sub{ display:block; font-size:10.5px; font-weight:700; color:var(--ink-soft); margin-top:2px; }
+  .room-arrow{
+    display:flex; flex-direction:column; align-items:center; padding:6px 0; color:var(--orange-600);
+  }
+  .room-arrow svg{ width:16px; height:16px; }
+  .room-arrow span{ font-size:10.5px; font-weight:800; margin-top:2px; text-align:center; }
+
+  /* ---------- extra: bar model (Session 12) ---------- */
+  .bar-model{ margin:14px 0 8px; }
+  .bar-model .bm-label{ font-size:11px; font-weight:800; color:var(--ink-soft); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.4px; }
+  .bar-model .bm-whole{
+    height:36px; background:var(--teal-600); border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:900; color:#fff; margin-bottom:6px;
+  }
+  .bar-model .bm-parts{ display:flex; gap:4px; }
+  .bar-model .bm-part{
+    height:36px; border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-size:13px; font-weight:800;
+  }
+  .bar-model .bm-part.known{ background:var(--teal-100); border:2px solid var(--teal-500); color:var(--teal-900); }
+  .bar-model .bm-part.unknown{ background:#FEF3C7; border:2px dashed var(--orange-500); color:var(--orange-700); }
+
+  /* fact family triangle */
+  .fact-triangle{ margin:14px auto; width:100%; max-width:280px; }
+  .fact-triangle svg{ width:100%; }
+
+  /* meaning badge row */
+  .meaning-row{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 4px; }
+  .mbadge{
+    flex:1; min-width:80px; border-radius:10px; padding:10px 8px; text-align:center;
+    font-size:12px; font-weight:800; cursor:default;
+  }
+  .mbadge.ta{ background:#E0F2FE; border:2px solid #38BDF8; color:#0369A1; }
+  .mbadge.df{ background:var(--teal-050); border:2px solid var(--teal-500); color:var(--teal-700); }
+  .mbadge.ma{ background:#FEF3C7; border:2px solid var(--orange-400); color:var(--orange-700); }
+  .mbadge span{ display:block; font-size:10px; font-weight:700; margin-top:3px; opacity:0.8; }
+
+  /* ---------- extra: exchange chain tower (Session 13) ---------- */
+  .exchange-chain{ display:flex; flex-direction:column; align-items:center; gap:0; margin:14px 0 6px; }
+  .exc-box{
+    width:100%; max-width:280px; border-radius:10px; padding:10px 14px;
+    text-align:center; font-size:14px; font-weight:800;
+  }
+  .exc-box.empty{ background:#FEF3C7; border:2px dashed var(--orange-400); color:var(--orange-700); }
+  .exc-box.filled{ background:var(--teal-050); border:2px solid var(--teal-500); color:var(--teal-900); }
+  .exc-arrow{ padding:4px 0; font-size:11px; font-weight:800; color:var(--orange-600); text-align:center; }
+
+  /* subtraction vertical layout (reuse .vadd but with subtraction sign) */
+  .vsub-wrap{ margin:14px 0 6px; display:flex; justify-content:center; }
+  .vsub{ display:grid; row-gap:5px; column-gap:6px; align-items:center; }
+  .vsub .opcell{ font-size:19px; font-weight:800; color:var(--ink-soft); text-align:left; }
+  .vsub .digit{ text-align:center; font-size:20px; font-weight:800; color:var(--teal-900); min-width:30px; }
+  .vsub .digit.zero{ color:var(--orange-500); }
+  .vsub .digit.xd{ text-decoration:line-through; color:var(--ink-soft); font-size:16px; }
+  .vsub .above{ text-align:center; font-size:12px; font-weight:800; color:var(--orange-600); min-height:16px; }
+  .vsub .rule{ grid-column:1/-1; border-top:3px solid var(--teal-900); margin:2px 0 3px; }
+  .vsub .diffdigit{ text-align:center; font-size:21px; font-weight:900; color:var(--teal-900); }
+
+  /* ---------- extra: strategy chips (Session 15) ---------- */
+  .chip-list{ display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px; }
+  .chip{
+    background:var(--teal-050); border:1.5px solid var(--teal-500); color:var(--teal-700);
+    border-radius:999px; padding:6px 13px; font-size:12px; font-weight:800;
+  }
+  /* 3-step check flow (reuses mbadge-style but 3 wide, stacked on mobile) */
+  .check-row{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 4px; }
+  .cbadge{
+    flex:1; min-width:90px; border-radius:10px; padding:12px 8px; text-align:center;
+  }
+  .cbadge .num{
+    display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+    border-radius:50%; background:#fff; font-size:11px; font-weight:900; margin-bottom:6px;
+  }
+  .cbadge .title{ font-size:12.5px; font-weight:900; display:block; }
+  .cbadge .sub{ font-size:10px; font-weight:700; opacity:0.85; display:block; margin-top:3px; }
+  .cbadge.c1{ background:#E0F2FE; border:2px solid #38BDF8; color:#0369A1; }
+  .cbadge.c1 .num{ color:#0369A1; }
+  .cbadge.c2{ background:var(--teal-050); border:2px solid var(--teal-500); color:var(--teal-700); }
+  .cbadge.c2 .num{ color:var(--teal-700); }
+  .cbadge.c3{ background:#FEF3C7; border:2px solid var(--orange-400); color:var(--orange-700); }
+  .cbadge.c3 .num{ color:var(--orange-700); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="6"></circle><line x1="15" y1="15" x2="21" y2="21"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="kicker">MyMasteryLab</div>
+        <div class="name">Building Confident Problem Solvers</div>
+      </div>
+    </div>
+    <div class="xp-pill">
+      <svg viewBox="0 0 24 24" fill="#FB923C" stroke="none"><path d="M12 2l2.9 6.26L21.8 9l-5 4.6L18.2 21 12 17.3 5.8 21l1.4-7.4-5-4.6 6.9-.74L12 2z"/></svg>
+      <span id="xpCount">0</span> XP
+    </div>
+  </div>
+
+  <div class="case-title">
+    <div class="stamp">RECAP</div>
+    <h1>👨‍🍳 Case File: The Master Chef Check</h1>
+    <p>Session 15 Recap &middot; Grade 4 &middot; How Do We Know Our Answer Is Right?</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track" id="progressTrack"></div>
+    <div class="progress-label">
+      <span id="counterLabel">Card 1 of 17</span>
+      <span id="cardName">Mission Briefing</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- ══════════════════════════════ CARD 1 ══════════════════════════════ -->
+    <section class="card" data-name="Mission Briefing">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg> Mission Briefing</div>
+      <h2 class="card-title">Welcome to the Kitchen, Assistant.</h2>
+      <p class="card-sub">The Master Chef needs every calculation checked before the Kingdom Feast. Tap each clue below once you understand it:</p>
+      <ul class="goal-list" id="goalList">
+        <li><span class="chk" data-goal="1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can <strong>estimate</strong> to judge if an answer is reasonable.</li>
+        <li><span class="chk" data-goal="2"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can use the <strong>inverse operation</strong> to check my work.</li>
+        <li><span class="chk" data-goal="3"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I can find and <strong>explain errors</strong> in a calculation.</li>
+        <li><span class="chk" data-goal="4"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> I know a correct answer doesn't always mean <strong>correct reasoning</strong>.</li>
+      </ul>
+      <div class="callout">🔑 <strong>Big Question:</strong> How do we know our answer is right?</div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 2 ══════════════════════════════ -->
+    <section class="card" data-name="Key Vocabulary">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg> Evidence Log</div>
+      <h2 class="card-title">Vocabulary flashcards</h2>
+      <p class="card-sub">Tap a card to flip it and reveal the meaning.</p>
+      <div class="vocab-grid" id="vocabGrid">
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Estimate<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Find an approximate answer.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Reasonable<span>tap to flip</span></div>
+          <div class="flip-face flip-back">An answer that makes sense.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Inverse Operation<span>tap to flip</span></div>
+          <div class="flip-face flip-back">An operation that reverses another operation.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Error<span>tap to flip</span></div>
+          <div class="flip-face flip-back">A mistake in calculation or reasoning.</div>
+        </div></div>
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face flip-front">Verify<span>tap to flip</span></div>
+          <div class="flip-face flip-back">Check that something is correct.</div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 3 ══════════════════════════════ -->
+    <section class="card" data-name="The 3-Check System">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Clue #1</div>
+      <h2 class="card-title">The MyMasteryLab 3-Check System</h2>
+      <p class="card-sub">Before serving any answer, run it through three checks:</p>
+      <div class="check-row">
+        <div class="cbadge c1"><span class="num">1</span><span class="title">Estimate</span><span class="sub">About how much should I have?</span></div>
+        <div class="cbadge c2"><span class="num">2</span><span class="title">Inverse</span><span class="sub">Does the opposite operation confirm it?</span></div>
+        <div class="cbadge c3"><span class="num">3</span><span class="title">Strategy</span><span class="sub">Can I prove it another way?</span></div>
+      </div>
+      <div class="callout">👨‍🍳 <strong>Chef's Motto:</strong> "I'm not finished when I get an answer. I'm finished when I can explain why it can be trusted."</div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 4 ══════════════════════════════ -->
+    <section class="card" data-name="Check 1 Estimate">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Check 1</div>
+      <h2 class="card-title">"About how much should I have?"</h2>
+      <p class="card-sub">48,725 g of flour + 21,389 g of rice</p>
+      <div class="eq-block"><span class="tag">Round each amount</span>49,000 + 21,000 &asymp; 70,000 g</div>
+      <p class="table-note">Now the chef knows: <strong>a reasonable answer should land near 70,000 g</strong>. Anything wildly different is a warning sign.</p>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 5 ══════════════════════════════ -->
+    <section class="card" data-name="Check 2 Inverse">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> Check 2</div>
+      <h2 class="card-title">"Does the opposite confirm it?"</h2>
+      <div class="decomp-list">
+        <div class="decomp-row"><div class="dnum">+</div><div class="dtext">27,458 g + 15,736 g = 43,194 g<br><span style="font-size:12px; font-weight:700; color:var(--teal-700);">Check: 43,194 &minus; 15,736 = 27,458 ✓</span></div></div>
+        <div class="decomp-row"><div class="dnum">&minus;</div><div class="dtext">64,325 g &minus; 27,846 g = 36,479 g<br><span style="font-size:12px; font-weight:700; color:var(--teal-700);">Check: 36,479 + 27,846 = 64,325 ✓</span></div></div>
+      </div>
+      <p class="table-note">Addition checks subtraction. Subtraction checks addition. They always undo each other.</p>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 6 ══════════════════════════════ -->
+    <section class="card" data-name="Check 3 Strategy">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Check 3</div>
+      <h2 class="card-title">"Can I prove it another way?"</h2>
+      <p class="card-sub">A correct answer should hold up no matter which strategy you use:</p>
+      <div class="chip-list">
+        <span class="chip">Standard algorithm</span>
+        <span class="chip">Decomposition</span>
+        <span class="chip">Compensation</span>
+        <span class="chip">Friendly numbers</span>
+        <span class="chip">Number line</span>
+        <span class="chip">Missing addend</span>
+        <span class="chip">Mental calculation</span>
+        <span class="chip">Estimation</span>
+      </div>
+      <div class="callout" style="margin-top:12px;">Then ask: "Can I explain why my answer makes sense?"</div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 7 ══════════════════════════════ -->
+    <section class="card" data-name="Kitchen Case 1">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> 🚨 Kitchen Case #1</div>
+      <h2 class="card-title">"I subtracted each digit..."</h2>
+      <div class="callout">70,000 g &minus; 28,456 g = 51,544 g</div>
+      <button class="btn secondary" id="case1Btn">Run the 3-Check System</button>
+      <div class="reveal-box" id="case1Reveal">
+        <div class="decomp-list">
+          <div class="decomp-row"><div class="dnum">1</div><div class="dtext"><strong>Estimate:</strong> 70,000 &minus; 28,000 &asymp; 42,000. But 51,544 is nowhere close &mdash; suspicious!</div></div>
+          <div class="decomp-row"><div class="dnum">2</div><div class="dtext"><strong>Inverse:</strong> 28,456 + 51,544 = 80,000, not 70,000. The check fails.</div></div>
+          <div class="decomp-row"><div class="dnum">3</div><div class="dtext"><strong>Missing addend:</strong> 28,456 + ? = 70,000 &nbsp;&rArr;&nbsp; ? = 41,544</div></div>
+        </div>
+        <div class="eq-block" style="margin-top:6px;">Correct answer: 70,000 &minus; 28,456 = <strong>41,544</strong></div>
+        <p class="table-note">The chef likely forgot to reduce a digit after exchanging it away during regrouping &mdash; a classic place-value slip, caught only by checking.</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 8 ══════════════════════════════ -->
+    <section class="card" data-name="Kitchen Case 2">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> 🍲 Kitchen Case #2</div>
+      <h2 class="card-title">Is this recipe correct?</h2>
+      <div class="callout">34,500 g + 7,200 g = 41,700 g</div>
+      <div class="choice-row">
+        <div class="choice" data-val="yes">Correct</div>
+        <div class="choice" data-val="no">Incorrect</div>
+      </div>
+      <div class="feedback-text" id="case2Feedback"></div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 9 ══════════════════════════════ -->
+    <section class="card" data-name="Kitchen Case 3">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> 🍞 Kitchen Case #3</div>
+      <h2 class="card-title">Estimate first, then judge</h2>
+      <div class="callout">52,000 g &minus; 18,750 g = 44,250 g</div>
+      <button class="btn secondary" id="case3Btn">Estimate &amp; investigate</button>
+      <div class="reveal-box" id="case3Reveal">
+        <p style="margin:0 0 10px;">Estimate: 52,000 &minus; 19,000 &asymp; <strong>33,000 g</strong>. But 44,250 is over 11,000 away &mdash; not reasonable!</p>
+        <div class="eq-block" style="margin:0;">Correct answer: 52,000 &minus; 18,750 = <strong>33,250</strong></div>
+        <p class="table-note">Check: 33,250 + 18,750 = 52,000 ✓</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 10 ══════════════════════════════ -->
+    <section class="card" data-name="Kitchen Case 4">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> 🥕 Kitchen Case #4</div>
+      <h2 class="card-title">"I got an answer, so it's correct"</h2>
+      <p class="card-sub">A chef says:</p>
+      <div class="callout">"I got 36,500, so my answer must be correct."</div>
+      <div class="choice-row">
+        <div class="choice" data-val="no">Disagree</div>
+        <div class="choice" data-val="yes">Agree</div>
+      </div>
+      <div class="feedback-text" id="case4Feedback"></div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 11 ══════════════════════════════ -->
+    <section class="card" data-name="Kingdom Feast">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5v6c0 5-4 8.5-9 9.5-5-1-9-4.5-9-9.5v-6L12 2z"/></svg> Multi-Step Mission</div>
+      <h2 class="card-title">👨‍🍳 The Kingdom Feast</h2>
+      <table class="rep-table">
+        <tr><td>Flour</td><td>48,750 g</td></tr>
+        <tr><td>Rice</td><td>27,625 g</td></tr>
+        <tr><td>Used by chef</td><td>18,500 g</td></tr>
+      </table>
+      <div class="qa-list" id="qaList1" style="margin-top:10px;">
+        <div class="qa-item"><div class="qrow"><div class="q">Flour + rice altogether?</div><div class="peek">tap</div></div>
+          <div class="a">48,750 + 27,625 = 76,375 g</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">How much remains after using 18,500 g?</div><div class="peek">tap</div></div>
+          <div class="a">76,375 &minus; 18,500 = 57,875 g</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Estimate, then check with the inverse.</div><div class="peek">tap</div></div>
+          <div class="a">Estimate: 77,000 &minus; 19,000 &asymp; 58,000 g (close to 57,875). Check: 57,875 + 18,500 = 76,375 ✓</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 12 ══════════════════════════════ -->
+    <section class="card" data-name="Recipe Situations">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> What's Happening?</div>
+      <h2 class="card-title">Identify the situation first</h2>
+      <p class="card-sub">Tap each mission to reveal what's really going on.</p>
+      <div class="qa-list" id="qaList2">
+        <div class="qa-item"><div class="qrow"><div class="q">Chef has 24,500 g flour, receives 13,750 g more.</div><div class="peek">tap</div></div>
+          <div class="a">🥣 <strong>Combine</strong> — addition: 24,500 + 13,750 = 38,250 g</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Bakery has 56,000 g; kitchen has 38,500 g. How many more does the bakery have?</div><div class="peek">tap</div></div>
+          <div class="a">🧺 <strong>Compare</strong> — subtraction: 56,000 &minus; 38,500 = 17,500 g</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Kitchen has 72,000 g rice, chef uses 25,750 g. How much remains?</div><div class="peek">tap</div></div>
+          <div class="a">🍽️ <strong>Change</strong> — subtraction: 72,000 &minus; 25,750 = 46,250 g</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">Chef has 28,500 g vegetables; recipe needs 50,000 g. How many more needed?</div><div class="peek">tap</div></div>
+          <div class="a">🥕 <strong>Missing Amount</strong> — 28,500 + ? = 50,000 &nbsp;&rArr;&nbsp; ? = 21,500 g</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 13 ══════════════════════════════ -->
+    <section class="card" data-name="Chefs Claims">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5v6c0 5-4 8.5-9 9.5-5-1-9-4.5-9-9.5v-6L12 2z"/></svg> Critical Thinking Lab</div>
+      <h2 class="card-title">True, false, or sometimes?</h2>
+      <p class="card-sub">Tap each claim to reveal the verdict.</p>
+      <div class="qa-list" id="qaList3">
+        <div class="qa-item"><div class="qrow"><div class="q">"If my answer is close to my estimate, it must be correct."</div><div class="peek">tap</div></div>
+          <div class="a">❌ <strong>False</strong> — being close is a good sign, but never proof. Two mistakes could still land near the estimate by chance.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">"A correct answer proves that the method was correct."</div><div class="peek">tap</div></div>
+          <div class="a">❌ <strong>False</strong> — a correct answer can sometimes come from faulty reasoning that just happened to work out.</div></div>
+        <div class="qa-item"><div class="qrow"><div class="q">"Every recipe problem tells you which operation to use."</div><div class="peek">tap</div></div>
+          <div class="a">❌ <strong>False</strong> — you must read the situation and identify the relationship, not just spot the biggest number.</div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 14 ══════════════════════════════ -->
+    <section class="card" data-name="Two Ways to Check">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 9 12 2"/></svg> Chef Challenge</div>
+      <h2 class="card-title">72,000 g &minus; 38,500 g</h2>
+      <p class="card-sub">Three different strategies, one answer:</p>
+      <div class="decomp-list">
+        <div class="decomp-row"><div class="dnum">1</div><div class="dtext"><strong>Standard algorithm:</strong> 72,000 &minus; 38,500 = 33,500</div></div>
+        <div class="decomp-row"><div class="dnum">2</div><div class="dtext"><strong>Missing addend:</strong> 38,500 + ? = 72,000 &nbsp;&rArr;&nbsp; ? = 33,500</div></div>
+        <div class="decomp-row"><div class="dnum">3</div><div class="dtext"><strong>Counting up:</strong> from 38,500 to 72,000 is 33,500</div></div>
+      </div>
+      <div class="callout">All three strategies agree: <strong>33,500 g</strong>. Different correct strategies must always land on the same answer.</div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 15 ══════════════════════════════ -->
+    <section class="card" data-name="Model Recipe">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg> Junior Chef Model</div>
+      <h2 class="card-title">🍕 The Pizza Kitchen</h2>
+      <p class="card-sub">A chef has 24,500 g of flour, receives 13,750 g more, then uses 8,500 g to make pizzas. How much flour is left?</p>
+      <div class="decomp-list">
+        <div class="decomp-row"><div class="dnum">1</div><div class="dtext">Add the new flour: 24,500 + 13,750 = 38,250 g</div></div>
+        <div class="decomp-row"><div class="dnum">2</div><div class="dtext">Subtract what was used: 38,250 &minus; 8,500 = 29,750 g</div></div>
+      </div>
+      <div class="eq-block">✅ Answer: <strong>29,750 g</strong> of flour left</div>
+      <p class="table-note">Estimate: 25,000 + 14,000 = 39,000, then 39,000 &minus; 9,000 &asymp; 30,000 — very close! Check: 29,750 + 8,500 = 38,250, then 38,250 &minus; 13,750 = 24,500 — back to the start ✓</p>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 16 ══════════════════════════════ -->
+    <section class="card" data-name="Final Takeaway">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg> Final Report</div>
+      <h2 class="card-title">The Master Chef Mindset</h2>
+      <div class="check-row">
+        <div class="cbadge c1"><span class="num">1</span><span class="title">Calculate</span></div>
+        <div class="cbadge c2"><span class="num">2</span><span class="title">Check</span></div>
+        <div class="cbadge c3"><span class="num">3</span><span class="title">Explain</span></div>
+      </div>
+      <div class="callout" style="margin-top:12px;">"I am not finished when I get an answer. I am finished when I can explain why my answer can be trusted."</div>
+    </section>
+
+    <!-- ══════════════════════════════ CARD 17 ══════════════════════════════ -->
+    <section class="card" data-name="Kitchen Approved">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Mastery Check</div>
+      <div class="badge-wrap">
+        <div class="badge-circle"><div class="inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2"><circle cx="12" cy="12" r="7"/><line x1="16.65" y1="16.65" x2="21" y2="21"/></svg>
+        </div></div>
+        <h2 class="card-title" style="text-align:center;">👨‍🍳 Kitchen Approved!</h2>
+        <p class="card-sub" style="text-align:center;">You've mastered <strong>The Master Chef Check</strong>.</p>
+      </div>
+      <div class="callout" style="text-align:center;">
+        Great chefs check their recipes. Great mathematicians check their answers. Estimate, use the inverse, try another strategy — then explain.
+      </div>
+      <div style="text-align:center; margin-top:14px;">
+        <div class="final-xp"><span id="finalXp">0</span> <span>XP earned this session</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost" id="prevBtn">◀ Back</button>
+    <span class="counter" id="counterMini"></span>
+    <button class="btn" id="nextBtn">Next ▶</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  const total = cards.length;
+  let current = 0;
+  let xp = 0;
+
+  const progressTrack = document.getElementById('progressTrack');
+  const counterLabel  = document.getElementById('counterLabel');
+  const cardName      = document.getElementById('cardName');
+  const counterMini   = document.getElementById('counterMini');
+  const xpCount       = document.getElementById('xpCount');
+  const finalXp       = document.getElementById('finalXp');
+  const prevBtn       = document.getElementById('prevBtn');
+  const nextBtn       = document.getElementById('nextBtn');
+
+  for(let i=0;i<total;i++){
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    seg.appendChild(document.createElement('i'));
+    progressTrack.appendChild(seg);
+  }
+  const segs = Array.from(progressTrack.querySelectorAll('.seg > i'));
+
+  function addXp(n){ xp+=n; xpCount.textContent=xp; finalXp.textContent=xp; }
+
+  function render(){
+    cards.forEach((c,i)=> c.classList.toggle('active', i===current));
+    counterLabel.textContent = 'Card '+(current+1)+' of '+total;
+    counterMini.textContent  = (current+1)+' / '+total;
+    cardName.textContent     = cards[current].dataset.name || '';
+    segs.forEach((b,i)=> b.style.width = i<=current ? '100%' : '0%');
+    prevBtn.disabled  = current===0;
+    nextBtn.textContent = current===total-1 ? 'Restart ↺' : 'Next ▶';
+  }
+
+  prevBtn.addEventListener('click', ()=>{ if(current>0){current--; render();} });
+  nextBtn.addEventListener('click', ()=>{ current = current===total-1 ? 0 : current+1; render(); });
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight') nextBtn.click();
+    if(e.key==='ArrowLeft')  prevBtn.click();
+  });
+  render();
+
+  /* ── CARD 1: goals ── */
+  const goalsCompleted = new Set();
+  document.querySelectorAll('#goalList .chk').forEach(chk=>{
+    chk.addEventListener('click', ()=>{
+      const g = chk.dataset.goal;
+      chk.classList.toggle('done');
+      if(chk.classList.contains('done') && !goalsCompleted.has(g)){ goalsCompleted.add(g); addXp(5); }
+    });
+  });
+
+  /* ── CARD 2: vocab flip ── */
+  const flippedSet = new Set();
+  document.querySelectorAll('#vocabGrid .flip-card').forEach((card,idx)=>{
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(card.classList.contains('flipped') && !flippedSet.has(idx)){ flippedSet.add(idx); addXp(5); }
+    });
+  });
+
+  /* ── CARD 7: kitchen case 1 reveal ── */
+  let case1Done = false;
+  document.getElementById('case1Btn').addEventListener('click', ()=>{
+    document.getElementById('case1Reveal').classList.add('show');
+    if(!case1Done){ case1Done=true; addXp(10); }
+  });
+
+  /* ── generic qa-list toggler ── */
+  const qaXpGiven = new Set();
+  document.querySelectorAll('.qa-item').forEach((item,idx)=>{
+    item.addEventListener('click', ()=>{
+      item.classList.toggle('open');
+      const key = item.closest('.qa-list').id+'-'+idx;
+      if(item.classList.contains('open') && !qaXpGiven.has(key)){ qaXpGiven.add(key); addXp(5); }
+    });
+  });
+
+  /* ── CARD 8: kitchen case 2 ── */
+  let case2Done = false;
+  document.querySelectorAll('.card[data-name="Kitchen Case 2"] .choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      document.querySelectorAll('.card[data-name="Kitchen Case 2"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('case2Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'yes'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = '\u2705 Correct! 34,500 + 7,200 really does equal 41,700. Not every kitchen record hides a mistake \u2014 good assistants verify instead of assuming.';
+        if(!case2Done){ case2Done=true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = 'Check it: 34,500 + 7,200 = 41,700. This one is actually correct!';
+      }
+    });
+  });
+
+  /* ── CARD 9: kitchen case 3 reveal ── */
+  let case3Done = false;
+  document.getElementById('case3Btn').addEventListener('click', ()=>{
+    document.getElementById('case3Reveal').classList.add('show');
+    if(!case3Done){ case3Done=true; addXp(10); }
+  });
+
+  /* ── CARD 10: kitchen case 4 ── */
+  let case4Done = false;
+  document.querySelectorAll('.card[data-name="Kitchen Case 4"] .choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      document.querySelectorAll('.card[data-name="Kitchen Case 4"] .choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      const fb = document.getElementById('case4Feedback');
+      fb.classList.add('show');
+      if(ch.dataset.val === 'no'){
+        fb.className = 'feedback-text show correct';
+        fb.innerHTML = '\u2705 Correct! Getting an answer doesn\u2019t prove it\u2019s right. Estimating shows if it\u2019s in the right range, and explaining the strategy shows the reasoning actually makes sense.';
+        if(!case4Done){ case4Done=true; addXp(10); }
+      } else {
+        fb.className = 'feedback-text show wrong';
+        fb.innerHTML = 'Be careful \u2014 having an answer isn\u2019t proof it\u2019s correct. Estimating and explaining the strategy are what actually confirm it.';
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
