@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Number Kingdom Chronicles | MyMasteryLab</title>
+<style>
+:root{
+  --teal:#0d9488;
+  --teal-dark:#0f766e;
+  --teal-light:#5eead4;
+  --burnt:#c2410c;
+  --orange:#f97316;
+  --gold:#fbbf24;
+  --cream:#fff8ef;
+  --ink:#2b2320;
+  --card:#ffffff;
+  --shadow:0 10px 30px rgba(43,35,32,0.18);
+  --radius:22px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:'Baloo 2','Trebuchet MS','Segoe UI',sans-serif;
+  background:linear-gradient(180deg,#0b2a4a 0%,#134e4a 45%,#0b3230 80%,#08211f 100%);
+  color:var(--ink);
+  overflow-x:hidden;
+  min-height:100vh;
+  position:relative;
+}
+#app{position:relative;width:100%;min-height:100vh;z-index:2;}
+
+/* ---------- Persistent Kingdom Backdrop ---------- */
+#kingdomBackdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.moon{position:absolute;top:6%;right:10%;width:70px;height:70px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff9e0,#ffe9a8 60%,#f5d477 100%);
+  box-shadow:0 0 40px 14px rgba(255,236,168,0.35);animation:moonGlow 4s ease-in-out infinite;}
+@keyframes moonGlow{0%,100%{opacity:.9;}50%{opacity:1;}}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 2.6s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.25;}50%{opacity:1;}}
+.cloud{position:absolute;opacity:.16;font-size:52px;filter:blur(.3px);animation:driftCloud linear infinite;}
+@keyframes driftCloud{from{transform:translateX(-10vw);}to{transform:translateX(110vw);}}
+.skyline{position:absolute;bottom:0;left:0;right:0;height:120px;
+  background:linear-gradient(180deg,transparent,rgba(4,20,18,0.55) 40%,rgba(4,16,14,0.85));
+}
+.skyline svg{position:absolute;bottom:0;width:100%;height:100%;opacity:.55;}
+.firefly{position:absolute;width:5px;height:5px;border-radius:50%;background:#a7f3d0;
+  box-shadow:0 0 8px 3px rgba(167,243,208,0.7);animation:fireflyFloat 6s ease-in-out infinite;}
+@keyframes fireflyFloat{0%,100%{transform:translate(0,0);opacity:.3;}50%{transform:translate(14px,-24px);opacity:1;}}
+.screen{display:none;min-height:100vh;width:100%;position:relative;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px 40px;}
+.screen.active{display:flex;}
+
+/* ---------- Top bar / sound controls ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;pointer-events:none;
+}
+.brand-pill{
+  pointer-events:auto;
+  background:rgba(255,255,255,0.92);
+  border-radius:999px;padding:6px 16px 6px 10px;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:var(--shadow);
+  font-weight:800;color:var(--teal-dark);font-size:14px;
+}
+.brand-pill .dot{width:10px;height:10px;border-radius:50%;background:var(--orange);}
+.sound-wrap{pointer-events:auto;position:relative;}
+.sound-btn{
+  width:44px;height:44px;border-radius:50%;border:none;
+  background:rgba(255,255,255,0.92);box-shadow:var(--shadow);
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.sound-panel{
+  position:absolute;top:52px;right:0;background:#fff;border-radius:16px;
+  box-shadow:var(--shadow);padding:14px 16px;width:210px;display:none;
+  flex-direction:column;gap:10px;
+}
+.sound-panel.open{display:flex;}
+.sound-panel label{font-size:13px;font-weight:700;color:#555;display:flex;justify-content:space-between;align-items:center;}
+.toggle{
+  width:46px;height:26px;border-radius:20px;background:#d1d5db;position:relative;cursor:pointer;transition:.2s;border:none;
+}
+.toggle.on{background:var(--teal);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle.on::after{left:23px;}
+input[type=range]{width:100%;accent-color:var(--teal);}
+
+/* ---------- Buttons ---------- */
+.btn{
+  border:none;border-radius:16px;padding:14px 28px;font-size:17px;font-weight:800;
+  cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,0.15);transition:transform .08s;
+  font-family:inherit;
+}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,0.15);}
+.btn-primary{background:var(--orange);color:#fff;}
+.btn-secondary{background:#fff;color:var(--teal-dark);border:2px solid var(--teal);}
+.btn-small{padding:9px 18px;font-size:14px;border-radius:12px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+
+/* ---------- Start Screen ---------- */
+#screen-start{justify-content:center;text-align:center;padding-top:70px;}
+.logo-badge{
+  background:#fff;border-radius:20px;padding:10px 22px;display:inline-flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow);margin-bottom:18px;
+}
+.logo-badge b{color:var(--teal-dark);font-size:15px;}
+.logo-badge span{color:var(--burnt);font-size:12px;font-weight:700;}
+.title-hero{color:#fff;}
+.title-hero h1{
+  font-size:clamp(30px,7vw,52px);margin:6px 0 4px;
+  text-shadow:0 4px 0 rgba(0,0,0,0.25);
+  background:linear-gradient(180deg,#fff,var(--teal-light));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.title-hero p{font-size:clamp(14px,2.6vw,18px);color:#d1fae5;max-width:520px;margin:0 auto 26px;line-height:1.5;}
+.floaty{display:inline-block;animation:float 3s ease-in-out infinite;}
+.floaty2{display:inline-block;animation:float 3.4s ease-in-out infinite .4s;}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-14px) rotate(3deg);}}
+.hero-chars{font-size:54px;margin-bottom:10px;}
+.story-card{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:22px 24px;max-width:560px;margin:0 auto 24px;text-align:center;
+}
+.story-card h3{margin:0 0 8px;color:var(--burnt);font-size:18px;text-align:center;}
+.story-card p{margin:0;color:#4b4038;line-height:1.55;font-size:15px;text-align:center;}
+
+/* ---------- Map Screen ---------- */
+.map-wrap{width:100%;max-width:640px;margin-top:64px;}
+.map-header{text-align:center;color:#fff;margin-bottom:18px;}
+.map-header h2{margin:0 0 4px;font-size:26px;}
+.map-header p{margin:0;color:#d1fae5;font-size:14px;}
+.stage-path{display:flex;flex-direction:column;gap:14px;position:relative;}
+.stage-node{
+  background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;
+  border:3px solid transparent;transition:transform .12s;
+}
+.stage-node:hover{transform:translateY(-3px);}
+.stage-node .char{
+  width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:30px;flex-shrink:0;
+}
+.stage-node .info{flex:1;}
+.stage-node .info h4{margin:0 0 3px;font-size:16px;color:var(--ink);}
+.stage-node .info p{margin:0;font-size:12.5px;color:#7a7069;}
+.stage-stars{font-size:15px;color:#d1d5db;letter-spacing:1px;}
+.stage-stars .filled{color:var(--gold);}
+.overall-progress{
+  background:rgba(255,255,255,.15);border-radius:14px;padding:12px 16px;margin-top:20px;
+  color:#fff;text-align:center;font-size:14px;font-weight:700;
+}
+
+/* ---------- Stage intro ---------- */
+.stage-intro-card{position:relative;overflow:hidden;
+  max-width:560px;width:100%;background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:26px;text-align:center;margin-top:70px;
+}
+.stage-intro-char{font-size:80px;margin-bottom:6px;}
+.stage-intro-card h2{margin:4px 0 12px;color:var(--teal-dark);}
+.stage-intro-card p{color:#4b4038;line-height:1.6;font-size:15px;text-align:center;background:#fdf4e9;border-radius:14px;padding:14px 16px;}
+
+/* ---------- Question Screen ---------- */
+.game-frame{
+  width:100%;max-width:620px;margin-top:64px;background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px;position:relative;overflow:hidden;
+  border:4px solid rgba(255,255,255,0.5);
+}
+.game-frame .bg-decor{position:absolute;inset:0;opacity:.08;pointer-events:none;font-size:120px;display:flex;align-items:center;justify-content:center;}
+
+/* ---------- Themed stage scenery (BOLD, layered, animated backgrounds) ---------- */
+.scene-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;}
+.scene-icon{position:absolute;font-size:44px;opacity:.4;filter:drop-shadow(0 4px 6px rgba(0,0,0,.15));}
+.game-frame .q-prompt, .game-frame .q-sub, .game-frame .visual-box, .game-frame .hud,
+.game-frame .progress-bar, .game-frame #qAnswerArea, .game-frame .feedback-box, .game-frame .q-actions{position:relative;z-index:3;}
+
+/* Gate scene: torches + banners + gate arch glow */
+.scene-gate .arch{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:260px;height:190px;
+  border:18px solid rgba(255,255,255,.28);border-bottom:none;border-radius:130px 130px 0 0;
+  box-shadow:0 0 30px rgba(255,255,255,.15) inset;}
+.scene-gate .torch{position:absolute;bottom:10px;font-size:52px;animation:flicker 1.1s ease-in-out infinite;
+  filter:drop-shadow(0 0 14px rgba(255,150,0,.7));}
+.scene-gate .torch.l{left:6%;} .scene-gate .torch.r{right:6%;animation-delay:.3s;}
+@keyframes flicker{0%,100%{opacity:.85;transform:scale(1) rotate(-4deg);}50%{opacity:1;transform:scale(1.22) rotate(4deg);}}
+.scene-gate .banner{position:absolute;top:4px;font-size:38px;opacity:.75;animation:swing 2.4s ease-in-out infinite;}
+.scene-gate .banner.l{left:14%;} .scene-gate .banner.r{right:14%;animation-delay:.6s;}
+@keyframes swing{0%,100%{transform:rotate(-10deg);}50%{transform:rotate(10deg);}}
+
+/* Workshop scene: rotating gears + sparks */
+.scene-workshop .gear{position:absolute;font-size:70px;opacity:.4;animation:spin 5s linear infinite;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));}
+.scene-workshop .gear.g1{top:4%;left:2%;} .scene-workshop .gear.g2{bottom:4%;right:2%;animation-direction:reverse;animation-duration:7s;}
+.scene-workshop .gear.g3{top:44%;right:0%;font-size:50px;animation-duration:4s;opacity:.32;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.scene-workshop .spark{position:absolute;font-size:30px;animation:sparkPop 1.4s ease-in-out infinite;}
+@keyframes sparkPop{0%,100%{opacity:0;transform:scale(.3);}50%{opacity:1;transform:scale(1.3);}}
+
+/* Detective scene: drifting fog + glowing lamp + sliding magnifier */
+.scene-detective .fog{position:absolute;bottom:0;width:160%;height:110px;left:-30%;
+  background:linear-gradient(180deg,transparent,rgba(200,210,220,.28));animation:fogDrift 8s linear infinite;}
+@keyframes fogDrift{from{transform:translateX(-8%);}to{transform:translateX(8%);}}
+.scene-detective .lamp{position:absolute;top:6%;right:8%;font-size:60px;opacity:.75;animation:lampGlow 1.8s ease-in-out infinite;
+  filter:drop-shadow(0 0 18px rgba(255,200,80,.8));}
+@keyframes lampGlow{0%,100%{opacity:.55;transform:scale(1);}50%{opacity:1;transform:scale(1.08);}}
+.scene-detective .magnifier{position:absolute;font-size:46px;opacity:.6;animation:magnifierSlide 4s ease-in-out infinite;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));}
+@keyframes magnifierSlide{0%{left:5%;top:75%;transform:rotate(-10deg);}50%{left:78%;top:15%;transform:rotate(10deg);}100%{left:5%;top:75%;transform:rotate(-10deg);}}
+
+/* Vault scene: rotating dial + falling gold coins */
+.scene-vault .dial{position:absolute;top:4%;left:50%;transform:translateX(-50%);font-size:84px;opacity:.32;animation:spin 10s linear infinite;}
+.scene-vault .coin{position:absolute;top:-20px;font-size:34px;opacity:.8;animation:coinFall linear infinite;
+  filter:drop-shadow(0 0 8px rgba(255,215,0,.6));}
+@keyframes coinFall{from{transform:translateY(-20px) rotate(0deg) scale(1);opacity:0;}10%{opacity:1;}90%{opacity:1;}to{transform:translateY(360px) rotate(360deg) scale(.8);opacity:0;}}
+
+/* Treasury scene: raining coins + glowing crown */
+.scene-treasury .crownglow{position:absolute;top:3%;left:50%;transform:translateX(-50%);font-size:80px;opacity:.4;animation:pulseS 1.8s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(255,215,0,.6));}
+.scene-treasury .coin2{position:absolute;top:-20px;font-size:30px;opacity:.8;animation:coinFall linear infinite;
+  filter:drop-shadow(0 0 8px rgba(255,215,0,.6));}
+
+/* ---------- Walker character: BIG animated entrance between questions ---------- */
+.walker-wrap{position:relative;height:96px;margin:-4px 0 10px;z-index:3;overflow:visible;}
+.walker{position:absolute;left:0;bottom:0;font-size:72px;display:inline-block;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.3));}
+.walker.walk-in{animation:walkIn .75s cubic-bezier(.34,1.56,.64,1) forwards;}
+.walker.walk-out{animation:walkOut .5s ease-in forwards;}
+@keyframes walkIn{0%{transform:translateX(-140px) translateY(10px) scale(.55) rotate(-8deg);opacity:0;}
+  55%{transform:translateX(10px) translateY(-14px) scale(1.25) rotate(6deg);opacity:1;}
+  75%{transform:translateX(-4px) translateY(2px) scale(1.05) rotate(-2deg);}
+  100%{transform:translateX(0) translateY(0) scale(1) rotate(0);opacity:1;}}
+@keyframes walkOut{0%{transform:translateX(0) scale(1);opacity:1;}100%{transform:translateX(320px) translateY(-20px) scale(.5) rotate(20deg);opacity:0;}}
+.walker .speech{position:absolute;top:-38px;left:78px;background:#fff;border-radius:12px;padding:6px 12px;
+  font-size:13px;font-weight:900;color:var(--ink);white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.25);
+  opacity:0;animation:bubbleIn .4s ease forwards .4s;border:2px solid var(--gold);}
+@keyframes bubbleIn{to{opacity:1;transform:translateY(-6px);}}
+.walker.reacting.good{animation:reactGood .65s ease;}
+.walker.reacting.bad{animation:reactBad .55s ease;}
+@keyframes reactGood{0%{transform:scale(1);}25%{transform:scale(1.6) rotate(-14deg) translateY(-30px);}50%{transform:scale(1.35) rotate(14deg) translateY(-18px);}75%{transform:scale(1.15) rotate(-6deg) translateY(-6px);}100%{transform:scale(1);}}
+@keyframes reactBad{0%{transform:translateX(0) rotate(0);}20%{transform:translateX(-14px) rotate(-12deg);}40%{transform:translateX(14px) rotate(12deg);}60%{transform:translateX(-10px) rotate(-8deg);}80%{transform:translateX(6px) rotate(4deg);}100%{transform:translateX(0) rotate(0);}}
+.walker .burst{position:absolute;left:50%;top:50%;font-size:24px;opacity:0;pointer-events:none;}
+.walker.reacting.good .burst{animation:burstOut .7s ease forwards;}
+@keyframes burstOut{0%{opacity:1;transform:translate(-50%,-50%) scale(.3);}100%{opacity:0;transform:translate(-50%,-140%) scale(1.6);}}
+
+/* level-up banner shown briefly when moving into a new question — BIG & punchy */
+.levelup-banner{position:fixed;top:36%;left:50%;transform:translate(-50%,-50%) scale(.6);
+  background:linear-gradient(135deg,var(--gold),var(--orange));color:#fff;font-weight:900;
+  padding:18px 40px;border-radius:20px;font-size:30px;box-shadow:0 16px 40px rgba(0,0,0,.45);
+  z-index:200;opacity:0;pointer-events:none;border:4px solid #fff;text-shadow:0 2px 4px rgba(0,0,0,.3);}
+.levelup-banner.show{animation:levelPop 1.1s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes levelPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-8deg);}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(4deg);}
+  35%{transform:translate(-50%,-50%) scale(1) rotate(0);}
+  80%{opacity:1;}100%{opacity:0;transform:translate(-50%,-70%) scale(.85);}}
+
+/* screen shake / gold flash for dramatic feedback */
+.shake{animation:shakeFrame .5s;}
+@keyframes shakeFrame{0%,100%{transform:translateX(0) rotate(0);}15%{transform:translateX(-14px) rotate(-1.5deg);}30%{transform:translateX(14px) rotate(1.5deg);}45%{transform:translateX(-10px) rotate(-1deg);}60%{transform:translateX(10px) rotate(1deg);}75%{transform:translateX(-6px);}90%{transform:translateX(6px);}}
+.flash-gold{animation:flashGold .8s;}
+@keyframes flashGold{0%{box-shadow:0 0 0 0 rgba(251,191,36,0);}25%{box-shadow:0 0 60px 20px rgba(251,191,36,.75);}100%{box-shadow:0 0 0 0 rgba(251,191,36,0);}}
+.flash-red{animation:flashRed .5s;}
+@keyframes flashRed{0%{box-shadow:0 0 0 0 rgba(239,68,68,0);}30%{box-shadow:0 0 40px 14px rgba(239,68,68,.5);}100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}}
+
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;position:relative;z-index:2;}
+.hud .stage-tag{font-size:12px;font-weight:800;color:var(--burnt);background:#fff1e6;padding:5px 10px;border-radius:999px;}
+.hud .xp{font-size:13px;font-weight:800;color:var(--teal-dark);}
+.progress-bar{height:10px;background:#eee;border-radius:6px;overflow:hidden;margin-bottom:18px;position:relative;z-index:2;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-light));border-radius:6px;transition:width .3s;}
+.q-prompt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;position:relative;z-index:2;line-height:1.4;text-align:center;}
+.q-sub{font-size:13.5px;color:#8a7f76;margin-bottom:14px;position:relative;z-index:2;text-align:center;}
+.visual-box{margin:12px 0 18px;position:relative;z-index:2;}
+.pv-chart{border-collapse:collapse;width:100%;font-size:14px;text-align:center;}
+.pv-chart th{background:var(--teal);color:#fff;padding:6px 4px;font-size:11px;border:1px solid #0f766e;}
+.pv-chart td{padding:8px 4px;border:1px solid #ddd;font-weight:800;font-size:16px;min-width:30px;}
+.pv-chart tr:nth-child(2) td{color:var(--teal-dark);background:#f0fdfa;}
+.pv-chart tr:nth-child(3) td{color:var(--burnt);background:#fff7ed;}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:2;}
+@media(max-width:420px){.options-grid{grid-template-columns:1fr;}}
+.opt-btn{
+  background:#fdf4e9;border:2px solid #f1e2cf;border-radius:14px;padding:13px 10px;
+  font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;transition:.15s;font-family:inherit;
+}
+.opt-btn:hover{border-color:var(--orange);}
+.opt-btn.correct{background:#dcfce7;border-color:#22c55e;color:#166534;}
+.opt-btn.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b;}
+.opt-btn.dim{opacity:.5;}
+.input-row{display:flex;gap:10px;position:relative;z-index:2;align-items:center;}
+.input-row input{
+  flex:1;font-size:20px;font-weight:800;padding:12px 14px;border-radius:14px;border:2px solid #f1e2cf;
+  font-family:inherit;background:#fdf4e9;color:var(--ink);
+}
+.input-row input:focus{outline:none;border-color:var(--teal);}
+.feedback-box{
+  margin-top:16px;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.5;position:relative;z-index:2;
+  display:none;text-align:center;
+}
+.feedback-box.show{display:block;}
+.feedback-box.ok{background:#dcfce7;color:#166534;}
+.feedback-box.no{background:#fee2e2;color:#991b1b;}
+.q-actions{display:flex;justify-content:center;gap:16px;margin-top:18px;position:relative;z-index:2;}
+
+/* backgrounds per stage */
+.bg-gate{background:linear-gradient(135deg,#0f766e,#134e4a);}
+.bg-workshop{background:linear-gradient(135deg,#f97316,#c2410c);}
+.bg-detective{background:linear-gradient(135deg,#334155,#1e293b);}
+.bg-vault{background:linear-gradient(135deg,#7c3aed,#4c1d95);}
+.bg-treasury{background:linear-gradient(135deg,#c2410c,#7c2d12);}
+
+/* Light, HIGH-CONTRAST frame themes for the question screen — keeps dark text
+   easily readable while still giving each land a distinct, colorful identity
+   via a strong top accent bar + tinted card + bold decorative scenery icons. */
+.frametheme-gate{background:linear-gradient(170deg,#e6fffa 0%,#ffffff 60%);border-color:var(--teal) !important;}
+.frametheme-gate .hud .stage-tag{background:#ccfbf1;color:var(--teal-dark);}
+.frametheme-workshop{background:linear-gradient(170deg,#fff2e0 0%,#ffffff 60%);border-color:var(--orange) !important;}
+.frametheme-workshop .hud .stage-tag{background:#ffedd5;color:var(--burnt);}
+.frametheme-detective{background:linear-gradient(170deg,#eef2f7 0%,#ffffff 60%);border-color:#475569 !important;}
+.frametheme-detective .hud .stage-tag{background:#e2e8f0;color:#1e293b;}
+.frametheme-vault{background:linear-gradient(170deg,#f3ecff 0%,#ffffff 60%);border-color:#7c3aed !important;}
+.frametheme-vault .hud .stage-tag{background:#ede9fe;color:#5b21b6;}
+.frametheme-treasury{background:linear-gradient(170deg,#ffece0 0%,#ffffff 60%);border-color:var(--burnt) !important;}
+.frametheme-treasury .hud .stage-tag{background:#ffe4d1;color:var(--burnt);}
+.frametheme-gate,.frametheme-workshop,.frametheme-detective,.frametheme-vault,.frametheme-treasury{border-width:5px !important;}
+.stage-intro-card.themed{color:#fff;}
+.stage-intro-card.themed p{background:rgba(255,255,255,0.12);color:#fff;}
+.stage-intro-card.themed h2{color:#fff;}
+
+/* ---------- Stage result ---------- */
+.result-card{max-width:520px;width:100%;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px;text-align:center;margin-top:80px;}
+.big-stars{font-size:44px;letter-spacing:8px;margin:10px 0;}
+.big-stars .filled{color:var(--gold);animation:pop .5s ease;}
+@keyframes pop{0%{transform:scale(0);}60%{transform:scale(1.3);}100%{transform:scale(1);}}
+.stat-row{display:flex;justify-content:space-around;margin:18px 0;}
+.stat-row div{text-align:center;}
+.stat-row .num{font-size:24px;font-weight:900;color:var(--teal-dark);}
+.stat-row .lbl{font-size:11px;color:#8a7f76;text-transform:uppercase;letter-spacing:.5px;}
+
+/* ---------- Final screen ---------- */
+#screen-final{justify-content:center;}
+.final-card{max-width:600px;width:100%;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px;text-align:center;margin-top:60px;position:relative;overflow:hidden;}
+.final-card h1{color:var(--burnt);margin:6px 0;}
+.rubric{margin:20px 0;text-align:left;}
+.rubric-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #eee;}
+.rubric-row .char{font-size:24px;}
+.rubric-row .name{flex:1;font-weight:700;font-size:14px;}
+.rubric-row .bar-outer{width:100px;height:9px;background:#eee;border-radius:6px;overflow:hidden;}
+.rubric-row .bar-inner{height:100%;background:var(--teal);}
+.rubric-row .pct{font-size:13px;font-weight:800;color:var(--teal-dark);width:40px;text-align:right;}
+.badge{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--orange));color:#fff;font-weight:900;padding:10px 22px;border-radius:999px;font-size:15px;margin:8px 0;box-shadow:0 6px 14px rgba(249,115,22,.4);}
+.confetti{position:absolute;top:-10px;font-size:20px;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(650px) rotate(360deg);opacity:0;}}
+
+/* character animations */
+.anim-bounce{animation:bounce 1.8s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.anim-wiggle{animation:wiggle 2.2s ease-in-out infinite;}
+@keyframes wiggle{0%,100%{transform:rotate(-4deg);}50%{transform:rotate(4deg);}}
+.anim-pulse{animation:pulseS 2s ease-in-out infinite;}
+@keyframes pulseS{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+
+footer.brandfoot{color:rgba(255,255,255,.55);font-size:11px;margin-top:28px;text-align:center;}
+</style>
+</head>
+<body>
+<div id="kingdomBackdrop">
+  <div class="moon"></div>
+  <div class="skyline">
+    <svg viewBox="0 0 800 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="40" width="40" height="80" fill="#04302b"/>
+      <polygon points="30,10 10,40 50,40" fill="#04302b"/>
+      <rect x="90" y="60" width="30" height="60" fill="#04302b"/>
+      <rect x="140" y="30" width="46" height="90" fill="#04302b"/>
+      <polygon points="163,4 140,30 186,30" fill="#04302b"/>
+      <rect x="620" y="55" width="34" height="65" fill="#04302b"/>
+      <rect x="670" y="20" width="48" height="100" fill="#04302b"/>
+      <polygon points="694,-6 670,20 718,20" fill="#04302b"/>
+      <rect x="740" y="65" width="28" height="55" fill="#04302b"/>
+    </svg>
+  </div>
+  <div id="starField"></div>
+  <div id="fireflyField"></div>
+</div>
+<div class="levelup-banner" id="levelupBanner">✨ New Level! ✨</div>
+<div id="app">
+
+  <div class="topbar">
+    <div class="brand-pill"><span class="dot"></span><b>MyMasteryLab</b> <span>Building Confident Problem Solvers</span></div>
+    <div class="sound-wrap">
+      <button class="sound-btn" id="soundToggleBtn" onclick="toggleSoundPanel()">🔊</button>
+      <div class="sound-panel" id="soundPanel">
+        <label>Sound <button class="toggle on" id="soundToggle" onclick="toggleSound()"></button></label>
+        <label>Volume
+          <input type="range" id="volumeSlider" min="0" max="100" value="60" oninput="setVolume(this.value)">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <section class="screen active" id="screen-start">
+    <div class="logo-badge"><b>MyMasteryLab</b><span>GRADE 4 · PLACE VALUE & ADDITION</span></div>
+    <div class="title-hero">
+      <div class="hero-chars"><span class="floaty">🧙</span> <span class="floaty2">🐉</span> <span class="floaty">👑</span></div>
+      <h1>Number Kingdom Chronicles</h1>
+      <p>The Great Addition Quest — journey through five lands, master multi-digit addition and the mystery of regrouping, and save the Kingdom's Treasury!</p>
+    </div>
+    <div class="story-card">
+      <h3>📜 Your Mission</h3>
+      <p>Long ago, the Number Kingdom kept perfect order through place value. But lately, careless mistakes have crept into the ledgers! Travel through the Gateway, the Workshop, the Detective Bureau, the Regrouping Vault, and finally the Treasury — proving your mastery of addition at every stop.</p>
+    </div>
+    <button class="btn btn-primary" onclick="beginJourney()">▶ Begin the Quest</button>
+    <footer class="brandfoot">MyMasteryLab · Grade 4 Place Value & Number Sense Unit · Sessions 10–11 Revision</footer>
+  </section>
+
+  <!-- MAP SCREEN -->
+  <section class="screen" id="screen-map">
+    <div class="map-wrap">
+      <div class="map-header">
+        <h2>🗺️ Choose Your Land</h2>
+        <p>Tap a land to begin its challenge. Earn stars for accuracy!</p>
+      </div>
+      <div class="stage-path" id="stagePath"></div>
+      <div class="overall-progress" id="overallProgress">0 / 30 questions completed · 0 ⭐ earned</div>
+    </div>
+    <footer class="brandfoot">MyMasteryLab</footer>
+  </section>
+
+  <!-- STAGE INTRO SCREEN -->
+  <section class="screen" id="screen-stage-intro">
+    <div class="stage-intro-card themed" id="stageIntroCard">
+      <div class="scene-layer" id="stageIntroScene"></div>
+      <div class="stage-intro-char" id="stageIntroChar" style="position:relative;z-index:3;">🧙</div>
+      <h2 id="stageIntroTitle" style="position:relative;z-index:3;">Stage</h2>
+      <p id="stageIntroStory" style="position:relative;z-index:3;">Story...</p>
+      <div style="margin-top:18px;display:flex;gap:10px;justify-content:center;position:relative;z-index:3;">
+        <button class="btn btn-secondary" onclick="goToMap()" style="background:rgba(255,255,255,.9);">← Back</button>
+        <button class="btn btn-primary" onclick="startStageQuestions()">Start Challenge ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUESTION SCREEN -->
+  <section class="screen" id="screen-question">
+    <div class="game-frame" id="gameFrame">
+      <div class="scene-layer" id="sceneLayer"></div>
+      <div class="hud">
+        <div class="stage-tag" id="hudStageName">Stage</div>
+        <div class="xp" id="hudXp">⭐ 0 XP</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="walker-wrap" id="walkerWrap"></div>
+      <div class="q-prompt" id="qPrompt">Question</div>
+      <div class="q-sub" id="qSub"></div>
+      <div class="visual-box" id="qVisual"></div>
+      <div id="qAnswerArea"></div>
+      <div class="feedback-box" id="feedbackBox"></div>
+      <div class="q-actions">
+        <button class="btn btn-secondary btn-small" onclick="goToMap()">✕ Exit</button>
+        <button class="btn btn-primary btn-small" id="nextBtn" style="display:none" onclick="nextQuestion()">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAGE RESULT SCREEN -->
+  <section class="screen" id="screen-stage-result">
+    <div class="result-card">
+      <div id="resultChar" style="font-size:56px;">🎉</div>
+      <h2 id="resultTitle">Land Cleared!</h2>
+      <div class="big-stars" id="resultStars">☆☆☆</div>
+      <p id="resultMsg" style="color:#4b4038;"></p>
+      <div class="stat-row">
+        <div><div class="num" id="resultCorrect">0</div><div class="lbl">Correct</div></div>
+        <div><div class="num" id="resultXp">0</div><div class="lbl">XP Earned</div></div>
+        <div><div class="num" id="resultAcc">0%</div><div class="lbl">Accuracy</div></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn btn-secondary" onclick="retryStage()">↻ Play Again</button>
+        <button class="btn btn-primary" onclick="goToMap()">Map ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL SCREEN -->
+  <section class="screen" id="screen-final">
+    <div class="final-card" id="finalCard">
+      <div style="font-size:60px;">👑✨</div>
+      <h1>Kingdom Saved!</h1>
+      <div class="badge" id="finalBadge">Number Kingdom Master</div>
+      <p style="color:#4b4038;">You've completed every land of the Number Kingdom Chronicles. Here is your Mastery Report:</p>
+      <div class="rubric" id="finalRubric"></div>
+      <div class="stat-row">
+        <div><div class="num" id="finalTotalXp">0</div><div class="lbl">Total XP</div></div>
+        <div><div class="num" id="finalStars">0</div><div class="lbl">Stars</div></div>
+        <div><div class="num" id="finalAcc">0%</div><div class="lbl">Overall Accuracy</div></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
+        <button class="btn btn-secondary" onclick="goToMap()">↻ Revisit Lands</button>
+        <button class="btn btn-primary" onclick="restartAll()">🔄 New Quest</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   MyMasteryLab — Number Kingdom Chronicles
+   Grade 4 · Place Value & Number Sense · Sessions 10-11 Revision
+   All arithmetic is computed live in JavaScript (never hard-coded
+   as text) so every answer key is verified at run time.
+========================================================= */
+
+/* ---------------- SOUND ENGINE (Web Audio API) ---------------- */
+let soundOn = true;
+let volume = 0.6;
+let audioCtx = null, masterGain = null;
+let ambientNodes = null, ambientRunning = false;
+
+function initAudio(){
+  if(audioCtx) return;
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = volume;
+    masterGain.connect(audioCtx.destination);
+  }catch(e){ soundOn = false; }
+}
+function playTone(freq, dur, type, vol){
+  if(!soundOn || !audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type || 'sine';
+  o.frequency.value = freq;
+  g.gain.value = (vol===undefined?0.2:vol);
+  o.connect(g); g.connect(masterGain);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+  o.stop(audioCtx.currentTime + dur);
+}
+function sfxClick(){ playTone(500,0.06,'square',0.12); }
+
+// VICTORY fanfare for a correct answer — bright rising triad + royal trumpet-like flourish + sparkle
+function sfxCorrect(){
+  playTone(523.25,0.13,'triangle',0.28);            // C5
+  setTimeout(()=>playTone(659.25,0.13,'triangle',0.28),85);   // E5
+  setTimeout(()=>playTone(783.99,0.15,'square',0.22),170);    // G5 (brassy)
+  setTimeout(()=>playTone(1046.50,0.28,'triangle',0.30),255); // C6 — victory landing note
+  setTimeout(()=>playTone(1318.51,0.35,'sine',0.20),300);     // E6 sparkle
+  setTimeout(()=>playTone(1567.98,0.4,'sine',0.15),340);      // G6 shimmer tail
+}
+// PUNISHMENT buzzer for a wrong answer — classic game-show "wrong answer" buzz + low thud
+function sfxWrong(){
+  playTone(150,0.09,'square',0.24);
+  setTimeout(()=>playTone(130,0.09,'square',0.24),110);
+  setTimeout(()=>playTone(150,0.09,'square',0.24),220);
+  setTimeout(()=>playTone(120,0.09,'square',0.22),330);
+  setTimeout(()=>playTone(90,0.45,'sawtooth',0.22),430); // low descending thud — the "punishment"
+}
+// Big victory fanfare for clearing a whole land (stage complete)
+function sfxFanfare(){
+  const notes=[523.25,659.25,783.99,1046.50,1318.51];
+  notes.forEach((f,i)=> setTimeout(()=>playTone(f, i===notes.length-1?0.5:0.2,'triangle',0.28), i*120));
+  setTimeout(()=>playTone(1567.98,0.4,'sine',0.22), notes.length*120+40);
+}
+function sfxStar(){ playTone(1046,0.12,'sine',0.2); setTimeout(()=>playTone(1318,0.16,'sine',0.2),90); setTimeout(()=>playTone(1568,0.22,'sine',0.2),180); }
+function sfxWhoosh(){ playTone(300,0.2,'triangle',0.1); }
+function sfxLevelUp(){ playTone(392,0.1,'square',0.15); setTimeout(()=>playTone(523.25,0.1,'square',0.15),80); setTimeout(()=>playTone(659.25,0.22,'square',0.18),160); }
+function sfxStepIn(){ playTone(220,0.06,'square',0.08); setTimeout(()=>playTone(277,0.06,'square',0.08),70); }
+
+/* ---- Fun kid-friendly background music loop (xylophone-style pentatonic melody) ---- */
+const MUSIC_SCALE = [392.00,440.00,523.25,587.33,659.25,783.99,880.00]; // G pentatonic-ish, bright & playful
+const MUSIC_PATTERN = [0,2,4,2,1,3,5,3,0,2,4,6,4,2,1,0]; // melodic step indices into scale
+let musicStep = 0, musicTimerId = null;
+function playMusicStep(){
+  if(!soundOn) return;
+  const idx = MUSIC_PATTERN[musicStep % MUSIC_PATTERN.length];
+  const freq = MUSIC_SCALE[idx % MUSIC_SCALE.length];
+  playTone(freq, 0.32, 'triangle', 0.055);
+  if(musicStep % 4 === 0) playTone(freq/2, 0.4, 'sine', 0.035); // gentle bass pulse
+  musicStep++;
+}
+function startAmbient(){
+  if(!soundOn || ambientRunning) return;
+  initAudio();
+  musicStep = 0;
+  playMusicStep();
+  musicTimerId = setInterval(playMusicStep, 260);
+  ambientRunning = true;
+}
+function stopAmbient(){
+  if(!ambientRunning) return;
+  if(musicTimerId){ clearInterval(musicTimerId); musicTimerId = null; }
+  ambientRunning = false;
+}
+function toggleSoundPanel(){
+  document.getElementById('soundPanel').classList.toggle('open');
+}
+function toggleSound(){
+  soundOn = !soundOn;
+  const btn = document.getElementById('soundToggle');
+  btn.classList.toggle('on', soundOn);
+  document.getElementById('soundToggleBtn').textContent = soundOn ? '🔊' : '🔇';
+  if(soundOn){ initAudio(); if(masterGain) masterGain.gain.value = volume; startAmbient(); }
+  else { stopAmbient(); if(masterGain) masterGain.gain.value = 0; }
+}
+function setVolume(v){
+  volume = v/100;
+  if(masterGain) masterGain.gain.value = soundOn ? volume : 0;
+}
+
+/* ---------------- MATH HELPERS (single source of truth) ---------------- */
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function randDigitsNum(d){
+  if(d<=1) return randInt(1,9);
+  const min = Math.pow(10,d-1), max = Math.pow(10,d)-1;
+  return randInt(min,max);
+}
+function fmt(n){ return n.toLocaleString('en-US'); }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function pick(arr){ return arr[randInt(0,arr.length-1)]; }
+
+// Does adding a+b require at least one regrouping step?
+function hasAnyCarry(a,b){
+  const as=String(a), bs=String(b);
+  const len=Math.max(as.length,bs.length);
+  const ap=as.padStart(len,'0'), bp=bs.padStart(len,'0');
+  let carry=0, any=false;
+  for(let i=len-1;i>=0;i--){
+    const s = parseInt(ap[i]) + parseInt(bp[i]) + carry;
+    if(s>=10){ carry=1; any=true; } else carry=0;
+  }
+  return any;
+}
+// Generate two numbers with `digits` digits where addition forces regrouping
+function genRegroupPair(digits){
+  let a,b,tries=0;
+  do{
+    a = randDigitsNum(digits);
+    b = randDigitsNum(digits);
+    tries++;
+  } while(!hasAnyCarry(a,b) && tries<50);
+  return [a,b];
+}
+// Generate two numbers with `digits` digits where addition needs NO regrouping (for gentle warm-ups)
+function genNoCarryPair(digits){
+  let a,b,tries=0;
+  do{
+    a = randDigitsNum(digits);
+    b = randDigitsNum(digits);
+    tries++;
+  } while(hasAnyCarry(a,b) && tries<50);
+  if(hasAnyCarry(a,b)){ a = randDigitsNum(digits); b = 1; } // fallback safety
+  return [a,b];
+}
+// Classic "forgot to regroup" wrong answer: adds each column but keeps only the units digit (no carry)
+function noCarrySum(a,b){
+  const as=String(a), bs=String(b);
+  const len=Math.max(as.length,bs.length);
+  const ap=as.padStart(len,'0'), bp=bs.padStart(len,'0');
+  let digits=[];
+  for(let i=0;i<len;i++){ digits.push((parseInt(ap[i])+parseInt(bp[i]))%10); }
+  return parseInt(digits.join(''),10);
+}
+// Expanded form string built strictly from the number's own digits (skips zero place values)
+function expandedForm(num){
+  const s=String(num);
+  const len=s.length;
+  const terms=[];
+  for(let i=0;i<len;i++){
+    const d=parseInt(s[i]);
+    if(d===0) continue;
+    const placeVal = d*Math.pow(10,len-1-i);
+    terms.push(fmt(placeVal));
+  }
+  return terms.join(' + ');
+}
+// Build a small place-value chart (HTML) for two numbers stacked by place
+function placeValueChart(a,b){
+  const allLabels=['HTh','TTh','Th','H','T','O'];
+  const fullLabels=['Hundred-Th.','Ten-Th.','Thousands','Hundreds','Tens','Ones'];
+  const len = Math.max(String(a).length, String(b).length);
+  const labels = allLabels.slice(allLabels.length-len);
+  const flabels = fullLabels.slice(fullLabels.length-len);
+  const as = String(a).padStart(len,' ');
+  const bs = String(b).padStart(len,' ');
+  let html = '<table class="pv-chart"><tr>';
+  for(let i=0;i<len;i++) html += `<th title="${flabels[i]}">${labels[i]}</th>`;
+  html += '</tr><tr>';
+  for(let i=0;i<len;i++) html += `<td>${as[i]===' '?'':as[i]}</td>`;
+  html += '</tr><tr>';
+  for(let i=0;i<len;i++) html += `<td>${bs[i]===' '?'':bs[i]}</td>`;
+  html += '</tr></table>';
+  return html;
+}
+// Build 4 unique, plausible MCQ options around a correct sum
+function buildSumOptions(correct, a, b){
+  const set = new Set([correct]);
+  const opts = [correct];
+  const digits = String(correct).length;
+  // distractor 1: forgot-to-regroup (only if a real carry exists)
+  const nc = noCarrySum(a,b);
+  if(nc !== correct && !set.has(nc)){ opts.push(nc); set.add(nc); }
+  // distractor 2 & 3: off by a place value (simulates regrouping placed in wrong column)
+  let guard=0;
+  while(opts.length<4 && guard<30){
+    guard++;
+    const k = Math.pow(10, randInt(0, Math.max(0,digits-2)));
+    const sign = Math.random()<0.5 ? 1 : -1;
+    let cand = correct + sign*k*randInt(1,3);
+    if(cand>0 && !set.has(cand)){ opts.push(cand); set.add(cand); }
+  }
+  while(opts.length<4){ // ultra-safety fallback
+    const cand = correct + randInt(1,9)*(opts.length+2);
+    if(!set.has(cand)){ opts.push(cand); set.add(cand); }
+  }
+  return shuffle(opts);
+}
+
+/* ---------------- QUESTION GENERATORS (per land) ---------------- */
+
+// Generates `n` questions from a factory function, guaranteeing no two questions
+// in the set have identical prompt text (prevents repeats within a stage round).
+function buildUniqueSet(n, factoryFn){
+  const seen = new Set();
+  const out = [];
+  let tries = 0;
+  const cap = Math.max(300, n*50);
+  while(out.length < n && tries < cap){
+    tries++;
+    const q = factoryFn();
+    const sig = (q.prompt||'') + '|' + (q.visual||'') + '|' + (q.correct);
+    if(!seen.has(sig)){
+      seen.add(sig);
+      out.push(q);
+    }
+  }
+  return out;
+}
+
+// LAND 1 — Gateway of Numbers (retrieval: mental round-number addition + operation ID)
+const GATE_WORD_TEMPLATES = [
+  {place:'A library', itemA:'fiction books', itemB:'nonfiction books', ask:'What operation finds the TOTAL number of books?'},
+  {place:'A school', itemA:'students', itemB:'new students who just joined', ask:'What operation finds the new total enrollment?'},
+  {place:'A bakery', itemA:'muffins sold on Monday', itemB:'muffins sold on Tuesday', ask:'What operation finds how many muffins were sold in total?'},
+  {place:'A stadium', itemA:'seats in the lower deck', itemB:'seats in the upper deck', ask:'What operation finds the total seating?'},
+  {place:'A farm', itemA:'apples picked in the morning', itemB:'apples picked in the afternoon', ask:'What operation finds the total apples picked?'},
+  {place:'A toy store', itemA:'toy cars already in stock', itemB:'toy cars just delivered', ask:'What operation finds the total toy cars now in stock?'}
+];
+function makeGateQuestion(){
+  if(Math.random() < 0.55){
+    // mental round-number addition (digit sum stays under 10 so no regrouping needed)
+    const k = randInt(1,4); // tens/hundreds/thousands/ten-thousands place
+    const d1 = randInt(1,8);
+    const d2 = randInt(1, 9-d1);
+    const a = d1*Math.pow(10,k), b = d2*Math.pow(10,k);
+    const correct = a+b;
+    const opts = buildSumOptions(correct,a,b);
+    return {
+      type:'mcq',
+      prompt:`Mental Math: ${fmt(a)} + ${fmt(b)} = ?`,
+      sub:'No regrouping needed — think in whole groups!',
+      options: opts.map(String),
+      correct: String(correct)
+    };
+  } else {
+    const c = pick(GATE_WORD_TEMPLATES);
+    const digits = pick([3,4]);
+    const a = randDigitsNum(digits), b = randDigitsNum(digits);
+    return {
+      type:'mcq',
+      prompt: `${c.place} has ${fmt(a)} ${c.itemA} and ${fmt(b)} ${c.itemB}. ${c.ask}`,
+      sub:'Think about whether the groups are being combined.',
+      options: shuffle(['Addition','Subtraction','Multiplication','Division']),
+      correct: 'Addition'
+    };
+  }
+}
+function genGateQuestions(n){ return buildUniqueSet(n, makeGateQuestion); }
+
+// LAND 2 — Build-the-Sum Workshop (standard algorithm + expanded form, with place value chart)
+const WORKSHOP_CONCEPTS = [
+  {q:'When adding 36,241 + 12,315, why must each digit line up under the digit with the same place value?',
+   opts:['So digits with the same place value (like thousands with thousands) are combined together','So the biggest digit is always on the left','So the addition uses fewer digits','So the problem looks neater'],
+   correct:'So digits with the same place value (like thousands with thousands) are combined together'},
+  {q:'Why does a place-value chart help when adding large numbers?',
+   opts:['It keeps ones under ones, tens under tens, and so on, so nothing gets mixed up','It makes the numbers smaller','It changes addition into subtraction','It removes the need for regrouping'],
+   correct:'It keeps ones under ones, tens under tens, and so on, so nothing gets mixed up'},
+  {q:'In 4,000 + 300, why can we NOT simply add the digits 4 and 3 to get 7?',
+   opts:['Because 4 represents 4,000 (thousands) and 3 represents 300 (hundreds) — different place values','Because 4 is an even number','Because addition only works with two-digit numbers','Because 4,000 is a decimal'],
+   correct:'Because 4 represents 4,000 (thousands) and 3 represents 300 (hundreds) — different place values'}
+];
+function makeWorkshopQuestion(){
+  const r = Math.random();
+  if(r < 0.45){
+    const digits = pick([3,4,5]);
+    const a = randDigitsNum(digits), b = randDigitsNum(digits);
+    const correct = a+b;
+    return {
+      type:'input',
+      prompt:`Build the sum: ${fmt(a)} + ${fmt(b)} = ?`,
+      sub:'Use the place value chart to help you align each column.',
+      visual: placeValueChart(a,b),
+      correct: correct
+    };
+  } else if(r < 0.8){
+    const digits = pick([4,5]);
+    const num = randDigitsNum(digits);
+    const correctForm = expandedForm(num);
+    const s=String(num); let wrongTerms=[]; let shifted=false;
+    for(let idx=0;idx<s.length;idx++){
+      const d=parseInt(s[idx]); if(d===0) continue;
+      let placeVal=d*Math.pow(10,s.length-1-idx);
+      if(!shifted && Math.random()<0.5){ placeVal*=10; shifted=true; }
+      wrongTerms.push(fmt(placeVal));
+    }
+    if(!shifted && wrongTerms.length>0){ wrongTerms[0]=fmt(parseInt(wrongTerms[0].replace(/,/g,''))*10); }
+    const wrongForm = wrongTerms.join(' + ');
+    let opts=[correctForm];
+    if(wrongForm!==correctForm) opts.push(wrongForm);
+    if(opts.length<3){ const parts=correctForm.split(' + '); if(parts.length>1) opts.push(parts.slice(0,-1).join(' + ')); }
+    while(opts.length<3){ opts.push(correctForm+' + 0'); }
+    return {
+      type:'mcq',
+      prompt:`Which expanded form correctly represents ${fmt(num)}?`,
+      sub:'Check that every digit is placed in its true place value.',
+      options: shuffle(Array.from(new Set(opts))),
+      correct: correctForm
+    };
+  } else {
+    const c = pick(WORKSHOP_CONCEPTS);
+    return { type:'mcq', prompt:c.q, sub:'Think about what each digit represents.', options: shuffle(c.opts), correct:c.correct };
+  }
+}
+function genWorkshopQuestions(n){ return buildUniqueSet(n, makeWorkshopQuestion); }
+
+// LAND 3 — Addition Detective Bureau (find the error)
+// Every "wrong" worked example shown is a GENUINE, explainable mistake: the numbers
+// are chosen so a real regrouping step is required, and the shown wrong answer is
+// exactly what you'd get if that regrouping step were skipped (never an arbitrary offset).
+function buildDetectiveOptions(correct, shown){
+  const set = new Set([correct, shown]);
+  let guard = 0;
+  const digits = String(correct).length;
+  while(set.size < 4 && guard < 60){
+    guard++;
+    const k = Math.pow(10, randInt(0, Math.max(0,digits-2)));
+    const sign = Math.random()<0.5 ? 1 : -1;
+    const cand = correct + sign*k*randInt(1,3);
+    if(cand > 0) set.add(cand);
+  }
+  return shuffle(Array.from(set).slice(0,4).map(String));
+}
+function makeDetectiveQuestion(){
+  const digits = pick([3,4,5]);
+  const [a,b] = genRegroupPair(digits); // guarantees a genuine carry is required
+  const correct = a+b;
+  const shown = noCarrySum(a,b); // the exact result of forgetting to regroup — always differs from correct
+  const workedBlock = `<div style="font-family:monospace;font-size:18px;text-align:center;background:#f8fafc;color:#0f172a;border-radius:10px;padding:10px 16px;margin:10px auto;display:inline-block;box-shadow:inset 0 0 0 2px #e2e8f0;">&nbsp;&nbsp;${fmt(a)}<br>+ ${fmt(b)}<br>——————<br>&nbsp;&nbsp;${fmt(shown)}</div>`;
+  if(Math.random() < 0.6){
+    const finalOpts = buildDetectiveOptions(correct, shown);
+    return {
+      type:'mcq',
+      prompt:`A Number Builder wrote:<br>${workedBlock}<br>Detective, what is the CORRECT answer?`,
+      sub:'Check each place-value column carefully — did every regrouping step happen?',
+      options: finalOpts,
+      correct: String(correct)
+    };
+  } else {
+    return {
+      type:'mcq',
+      prompt:`A Number Builder wrote:<br>${workedBlock}<br>What mistake did the Number Builder make?`,
+      sub:'Compare the shown answer to what regrouping should have produced.',
+      options: shuffle(['Forgot to regroup (carry) into the next column','Used subtraction instead of addition','Added the wrong two numbers together','There is no mistake — the answer is correct']),
+      correct: 'Forgot to regroup (carry) into the next column'
+    };
+  }
+}
+function genDetectiveQuestions(n){ return buildUniqueSet(n, makeDetectiveQuestion); }
+
+// LAND 4 — The Regrouping Vault (place value conversions + regroup practice + misconceptions)
+const VAULT_FACTS = [
+  {q:'10 ones = ?', opts:['1 ten','1 hundred','10 tens','1 thousand'], correct:'1 ten'},
+  {q:'10 tens = ?', opts:['1 hundred','1 ten','10 hundreds','1 thousand'], correct:'1 hundred'},
+  {q:'10 hundreds = ?', opts:['1 thousand','1 hundred','10 thousand','100 tens'], correct:'1 thousand'},
+  {q:'10 thousands = ?', opts:['1 ten-thousand','1 hundred-thousand','10 hundred','1 thousand'], correct:'1 ten-thousand'},
+  {q:'1 hundred = how many tens?', opts:['10 tens','100 tens','1 ten','20 tens'], correct:'10 tens'},
+  {q:'1 thousand = how many hundreds?', opts:['10 hundreds','100 hundreds','1 hundred','5 hundreds'], correct:'10 hundreds'}
+];
+const VAULT_STATEMENTS = [
+  {s:'Regrouping renames a quantity — the total value does not change.', v:true},
+  {s:'Regrouping creates extra value that was not there before.', v:false},
+  {s:'The regrouped "1" always represents exactly one unit, no matter which column it moves to.', v:false},
+  {s:'10 ones can be renamed as 1 ten because they represent the same quantity.', v:true},
+  {s:'When a column adds up to 10 or more, we regroup 10 of that unit into 1 unit of the next place.', v:true},
+  {s:'You can put digits anywhere you like as long as every digit gets added once.', v:false}
+];
+function makeVaultQuestion(){
+  const r = Math.random();
+  if(r < 0.3){
+    const f = pick(VAULT_FACTS);
+    return { type:'mcq', prompt:f.q, sub:'Place-value fact check.', options: shuffle(f.opts), correct:f.correct };
+  } else if(r < 0.6){
+    const st = pick(VAULT_STATEMENTS);
+    return { type:'truefalse', prompt: st.s, sub:'True or False?', correct: st.v ? 'True' : 'False' };
+  } else {
+    const digits = pick([2,3,4]);
+    const [a,b] = genRegroupPair(digits);
+    const correct = a+b;
+    return {
+      type:'input',
+      prompt:`Regroup and solve: ${fmt(a)} + ${fmt(b)} = ?`,
+      sub:'This one needs at least one regrouping step!',
+      visual: placeValueChart(a,b),
+      correct: correct
+    };
+  }
+}
+function genVaultQuestions(n){ return buildUniqueSet(n, makeVaultQuestion); }
+
+// LAND 5 — Kingdom Treasury Challenge (word problems, estimation, mastery mixed)
+const TREASURY_CTX = [
+  {label:'boxes', place:'a warehouse', verb:'received'},
+  {label:'gold coins', place:"the kingdom's treasury", verb:'holds'},
+  {label:'silver coins', place:"the kingdom's treasury", verb:'holds'},
+  {label:'scrolls', place:'the royal library', verb:'stored'}
+];
+function makeTreasuryQuestion(){
+  const r = Math.random();
+  if(r < 0.4){
+    const c = pick(TREASURY_CTX);
+    const digits = pick([4,5]);
+    const a = randDigitsNum(digits), b = randDigitsNum(digits);
+    const correct = a+b;
+    return {
+      type:'input',
+      prompt:`🏰 ${c.place[0].toUpperCase()+c.place.slice(1)} ${c.verb} ${fmt(a)} ${c.label} on one day and ${fmt(b)} more ${c.label} the next day. How many ${c.label} in total?`,
+      sub:'Real-world addition — line up the place values!',
+      correct: correct
+    };
+  } else if(r < 0.7){
+    const digits = pick([4,5]);
+    const a = randDigitsNum(digits), b = randDigitsNum(digits);
+    const exact = a+b;
+    const correctEst = Math.round(exact/1000)*1000;
+    const distractors = new Set([correctEst]);
+    let opts=[correctEst];
+    const alt1 = Math.floor(exact/1000)*1000;
+    const alt2 = Math.ceil(exact/1000)*1000;
+    [alt1,alt2].forEach(v=>{ if(!distractors.has(v)){opts.push(v); distractors.add(v);} });
+    if(!distractors.has(exact)){ opts.push(exact); distractors.add(exact); }
+    while(opts.length<4){ const v=correctEst + 1000*randInt(1,3)*(Math.random()<0.5?1:-1); if(v>0 && !distractors.has(v)){opts.push(v);distractors.add(v);} }
+    return {
+      type:'mcq',
+      prompt:`Estimate ${fmt(a)} + ${fmt(b)} to the nearest thousand.`,
+      sub:'Round each addend, or round the exact sum — either way should land close!',
+      options: shuffle(opts.slice(0,4).map(fmt)),
+      correct: fmt(correctEst)
+    };
+  } else {
+    const digits = pick([5,6]);
+    const [a,b] = genRegroupPair(digits);
+    const correct = a+b;
+    return {
+      type:'input',
+      prompt:`Mastery Challenge: ${fmt(a)} + ${fmt(b)} = ?`,
+      sub:'The Kingdom is counting on your accuracy!',
+      correct: correct
+    };
+  }
+}
+function genTreasuryQuestions(n){ return buildUniqueSet(n, makeTreasuryQuestion); }
+
+/* ---------------- AMBIENT BACKDROP (stars + fireflies) ---------------- */
+function buildBackdrop(){
+  const starField = document.getElementById('starField');
+  const fireflyField = document.getElementById('fireflyField');
+  if(starField){
+    let html='';
+    for(let i=0;i<45;i++){
+      const size = (Math.random()*2+1).toFixed(1);
+      html += `<div class="star" style="left:${Math.random()*100}%;top:${Math.random()*70}%;width:${size}px;height:${size}px;animation-delay:${(Math.random()*2.6).toFixed(2)}s;"></div>`;
+    }
+    ['☁️','☁️','☁️'].forEach((c,i)=>{
+      html += `<div class="cloud" style="top:${8+i*9}%;animation-duration:${70+i*20}s;animation-delay:${i*8}s;">${c}</div>`;
+    });
+    starField.innerHTML = html;
+  }
+  if(fireflyField){
+    let html='';
+    for(let i=0;i<10;i++){
+      html += `<div class="firefly" style="left:${Math.random()*100}%;top:${55+Math.random()*35}%;animation-delay:${(Math.random()*4).toFixed(2)}s;animation-duration:${(4+Math.random()*3).toFixed(1)}s;"></div>`;
+    }
+    fireflyField.innerHTML = html;
+  }
+}
+
+/* ---------------- STAGE SCENERY (themed animated backgrounds, not plain) ---------------- */
+function sceneHTML(stageId){
+  if(stageId==='gate'){
+    return `<div class="scene-gate">
+      <div class="arch"></div>
+      <div class="torch l">🔥</div><div class="torch r">🔥</div>
+      <div class="banner l">🚩</div><div class="banner r">🚩</div>
+      <div class="scene-icon" style="top:14%;left:8%;">🏰</div>
+      <div class="scene-icon" style="top:70%;right:10%;">🛡️</div>
+    </div>`;
+  }
+  if(stageId==='workshop'){
+    return `<div class="scene-workshop">
+      <div class="gear g1">⚙️</div><div class="gear g2">⚙️</div><div class="gear g3">⚙️</div>
+      <div class="spark" style="top:20%;left:30%;animation-delay:.2s;">✨</div>
+      <div class="spark" style="top:60%;left:70%;animation-delay:.9s;">✨</div>
+      <div class="scene-icon" style="top:40%;left:12%;">🔧</div>
+    </div>`;
+  }
+  if(stageId==='detective'){
+    return `<div class="scene-detective">
+      <div class="fog"></div>
+      <div class="lamp">🏮</div>
+      <div class="magnifier">🔎</div>
+      <div class="scene-icon" style="top:12%;left:10%;">🌙</div>
+    </div>`;
+  }
+  if(stageId==='vault'){
+    return `<div class="scene-vault">
+      <div class="dial">🔐</div>
+      <div class="coin" style="left:15%;animation-duration:3.2s;animation-delay:.1s;">🪙</div>
+      <div class="coin" style="left:45%;animation-duration:2.6s;animation-delay:1s;">🪙</div>
+      <div class="coin" style="left:75%;animation-duration:3.6s;animation-delay:.5s;">🪙</div>
+      <div class="scene-icon" style="top:70%;left:8%;">💎</div>
+    </div>`;
+  }
+  if(stageId==='treasury'){
+    return `<div class="scene-treasury">
+      <div class="crownglow">👑</div>
+      <div class="coin2" style="left:10%;animation-duration:3s;animation-delay:0s;">🪙</div>
+      <div class="coin2" style="left:35%;animation-duration:3.6s;animation-delay:.7s;">🪙</div>
+      <div class="coin2" style="left:60%;animation-duration:2.8s;animation-delay:1.3s;">🪙</div>
+      <div class="coin2" style="left:85%;animation-duration:3.3s;animation-delay:.4s;">🪙</div>
+    </div>`;
+  }
+  return '';
+}
+
+/* ---------------- WALKER: animated character enters/exits with each question ---------------- */
+const WALKER_LINES = {
+  gate: ['On guard!','Answer swiftly!','The gate awaits...','Show your skill!'],
+  workshop: ['Let\u2019s build it!','Bolt it together!','Checking the blueprint...','Almost assembled!'],
+  detective: ['Case #{n} time!','Let\u2019s investigate...','Hmm, curious...','On the trail!'],
+  vault: ['The vault stirs...','Unlock the mystery!','Careful now...','Regroup wisely!'],
+  treasury: ['To the treasury!','Count it carefully!','The kingdom awaits!','Almost there!']
+};
+function spawnWalker(stageId, character, qNumber){
+  const wrap = document.getElementById('walkerWrap');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const w = document.createElement('div');
+  w.className = 'walker walk-in';
+  w.id = 'walkerChar';
+  const lines = WALKER_LINES[stageId] || ['Onward!'];
+  const line = lines[(qNumber-1) % lines.length].replace('{n}', qNumber);
+  w.innerHTML = `${character}<div class="speech">${line}</div>`;
+  wrap.appendChild(w);
+  sfxStepIn();
+}
+function reactWalker(isCorrect){
+  const w = document.getElementById('walkerChar');
+  if(!w) return;
+  w.classList.remove('reacting','good','bad');
+  void w.offsetWidth; // reflow to restart animation
+  w.classList.add('reacting', isCorrect?'good':'bad');
+}
+function walkOutThen(callback){
+  const w = document.getElementById('walkerChar');
+  if(!w){ callback(); return; }
+  w.classList.remove('walk-in');
+  w.classList.add('walk-out');
+  setTimeout(callback, 420);
+}
+function showLevelUpBanner(text){
+  const b = document.getElementById('levelupBanner');
+  if(!b) return;
+  b.textContent = text;
+  b.classList.remove('show');
+  void b.offsetWidth;
+  b.classList.add('show');
+  sfxLevelUp();
+}
+
+/* ---------------- STAGE CONFIG ---------------- */
+const QUESTIONS_PER_STAGE = 15;
+const STAGES = [
+  { id:'gate', name:'Gateway of Numbers', subtitle:'Warm up your addition powers', character:'🧙', bgClass:'bg-gate', animClass:'anim-bounce', decor:'🧮',
+    story:"Welcome, Number Builder! Before you may enter the Kingdom, the Gatekeeper must test your mental addition and your sense of what addition truly means. Answer swiftly and truly!",
+    gen: genGateQuestions },
+  { id:'workshop', name:'Build-the-Sum Workshop', subtitle:'Construct sums with place value', character:'🤖', bgClass:'bg-workshop', animClass:'anim-wiggle', decor:'⚙️',
+    story:"The Number Builder robot needs your help in the Workshop! Use the place-value chart to align digits correctly and construct perfect sums, one column at a time.",
+    gen: genWorkshopQuestions },
+  { id:'detective', name:'Addition Detective Bureau', subtitle:'Catch the sneaky mistakes', character:'🦊', bgClass:'bg-detective', animClass:'anim-pulse', decor:'🔍',
+    story:"Detective Fox needs a sharp-eyed partner. Somewhere in the Kingdom's ledgers, mistakes are hiding — misaligned digits and forgotten regroups. Find the truth!",
+    gen: genDetectiveQuestions },
+  { id:'vault', name:'The Regrouping Vault', subtitle:'Unlock the mystery of carrying', character:'🐉', bgClass:'bg-vault', animClass:'anim-float', decor:'🔐',
+    story:"Deep beneath the castle, the Vault Keeper dragon guards the secret of regrouping: 10 units of one place always become 1 unit of the next. Prove you understand — not just memorize — the mystery.",
+    gen: genVaultQuestions },
+  { id:'treasury', name:'Kingdom Treasury Challenge', subtitle:'Apply your skills to save the kingdom', character:'👑', bgClass:'bg-treasury', animClass:'anim-bounce', decor:'💰',
+    story:"The final trial! The Royal Treasurer needs your addition mastery to count coins, estimate totals, and balance the Kingdom's books once and for all.",
+    gen: genTreasuryQuestions }
+];
+
+/* ---------------- GAME STATE ---------------- */
+let state = {
+  currentStageIdx: 0,
+  currentQIdx: 0,
+  stageQuestions: [],
+  stageCorrect: 0,
+  totalXp: 0,
+  answered: false,
+  stageStars: {}, // id -> stars (0-3)
+  stageDone: {},  // id -> completed count
+  totalCorrectEver: 0,
+  totalAnsweredEver: 0
+};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function beginJourney(){
+  initAudio();
+  soundOn = true;
+  if(masterGain) masterGain.gain.value = volume;
+  startAmbient();
+  sfxWhoosh();
+  renderMap();
+  showScreen('screen-map');
+}
+
+function renderMap(){
+  const wrap = document.getElementById('stagePath');
+  wrap.innerHTML = '';
+  let totalDone=0, totalStars=0;
+  STAGES.forEach((st, idx)=>{
+    const stars = state.stageStars[st.id]||0;
+    totalStars += stars;
+    totalDone += state.stageDone[st.id]||0;
+    const node = document.createElement('div');
+    node.className = 'stage-node';
+    node.onclick = ()=>{ sfxClick(); openStageIntro(idx); };
+    node.innerHTML = `
+      <div class="char ${st.animClass}" style="background:${stageColor(st.id)}22;">${st.character}</div>
+      <div class="info">
+        <h4>${idx+1}. ${st.name}</h4>
+        <p>${st.subtitle}</p>
+      </div>
+      <div class="stage-stars">${starString(stars)}</div>
+    `;
+    wrap.appendChild(node);
+  });
+  document.getElementById('overallProgress').textContent = `${totalDone} / ${STAGES.length*QUESTIONS_PER_STAGE} questions completed · ${totalStars} ⭐ earned`;
+}
+function frameThemeClass(stageId){
+  return 'frametheme-' + stageId;
+}
+function stageColor(id){
+  const map={gate:'#0d9488',workshop:'#f97316',detective:'#334155',vault:'#7c3aed',treasury:'#c2410c'};
+  return map[id]||'#0d9488';
+}
+function starString(n){
+  let s='';
+  for(let i=0;i<3;i++) s += i<n ? '<span class="filled">★</span>' : '☆';
+  return s;
+}
+function goToMap(){ renderMap(); showScreen('screen-map'); }
+
+function openStageIntro(idx){
+  state.currentStageIdx = idx;
+  const st = STAGES[idx];
+  const card = document.getElementById('stageIntroCard');
+  card.className = 'stage-intro-card themed ' + st.bgClass;
+  document.getElementById('stageIntroScene').innerHTML = sceneHTML(st.id);
+  document.getElementById('stageIntroChar').textContent = st.character;
+  document.getElementById('stageIntroChar').className = 'stage-intro-char ' + st.animClass;
+  sfxWhoosh();
+  document.getElementById('stageIntroTitle').textContent = (idx+1) + '. ' + st.name;
+  document.getElementById('stageIntroStory').textContent = st.story;
+  showScreen('screen-stage-intro');
+}
+
+function startStageQuestions(){
+  const st = STAGES[state.currentStageIdx];
+  state.stageQuestions = st.gen(QUESTIONS_PER_STAGE);
+  state.currentQIdx = 0;
+  state.stageCorrect = 0;
+  state.answered = false;
+  showScreen('screen-question');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const st = STAGES[state.currentStageIdx];
+  const q = state.stageQuestions[state.currentQIdx];
+  state.answered = false;
+
+  const frame = document.getElementById('gameFrame');
+  frame.className = 'game-frame ' + frameThemeClass(st.id);
+  document.getElementById('sceneLayer').innerHTML = sceneHTML(st.id);
+  document.getElementById('hudStageName').textContent = `${st.character} ${st.name}`;
+  document.getElementById('hudXp').textContent = `⭐ ${state.totalXp} XP`;
+  const pct = Math.round((state.currentQIdx)/QUESTIONS_PER_STAGE*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  spawnWalker(st.id, st.character, state.currentQIdx+1);
+
+  document.getElementById('qPrompt').innerHTML = q.prompt;
+  document.getElementById('qSub').textContent = q.sub||'';
+  const visualBox = document.getElementById('qVisual');
+  visualBox.innerHTML = q.visual || '';
+
+  const answerArea = document.getElementById('qAnswerArea');
+  answerArea.innerHTML = '';
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box';
+  fb.textContent = '';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  if(q.type === 'mcq'){
+    const grid = document.createElement('div');
+    grid.className = 'options-grid';
+    q.options.forEach(opt=>{
+      const b = document.createElement('button');
+      b.className = 'opt-btn';
+      b.innerHTML = opt;
+      b.onclick = ()=> submitAnswer(opt, q, b, grid);
+      grid.appendChild(b);
+    });
+    answerArea.appendChild(grid);
+  } else if(q.type === 'truefalse'){
+    const grid = document.createElement('div');
+    grid.className = 'options-grid';
+    ['True','False'].forEach(opt=>{
+      const b = document.createElement('button');
+      b.className = 'opt-btn';
+      b.textContent = opt;
+      b.onclick = ()=> submitAnswer(opt, q, b, grid);
+      grid.appendChild(b);
+    });
+    answerArea.appendChild(grid);
+  } else if(q.type === 'input'){
+    const row = document.createElement('div');
+    row.className = 'input-row';
+    row.innerHTML = `<input type="number" id="numInput" placeholder="Type your answer" inputmode="numeric"/>`;
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary btn-small';
+    btn.textContent = 'Check';
+    btn.onclick = ()=>{
+      const val = document.getElementById('numInput').value;
+      if(val==='') return;
+      submitAnswer(Number(val), q, btn, row, true);
+    };
+    row.appendChild(btn);
+    answerArea.appendChild(row);
+    setTimeout(()=>{ const el=document.getElementById('numInput'); if(el) el.focus(); }, 100);
+  }
+}
+
+function submitAnswer(given, q, btnEl, containerEl, isInput){
+  if(state.answered) return;
+  state.answered = true;
+  sfxClick();
+  let isCorrect;
+  if(q.type==='input'){
+    isCorrect = Number(given) === Number(q.correct);
+  } else {
+    isCorrect = String(given) === String(q.correct);
+  }
+
+  const fb = document.getElementById('feedbackBox');
+  const frame = document.getElementById('gameFrame');
+  if(isCorrect){
+    state.stageCorrect++;
+    state.totalXp += 10;
+    state.totalCorrectEver++;
+    fb.className = 'feedback-box show ok';
+    fb.textContent = '✅ Correct! ' + (q.explanation||'Great place-value thinking!');
+    sfxCorrect();
+    if(btnEl && !isInput) btnEl.classList.add('correct');
+    reactWalker(true);
+    frame.classList.remove('flash-gold'); void frame.offsetWidth; frame.classList.add('flash-gold');
+  } else {
+    fb.className = 'feedback-box show no';
+    const correctDisplay = q.type==='input' ? fmt(q.correct) : q.correct;
+    fb.textContent = `❌ Not quite. The correct answer is ${correctDisplay}. ${q.explanation||''}`;
+    sfxWrong();
+    if(btnEl && !isInput) btnEl.classList.add('wrong');
+    reactWalker(false);
+    frame.classList.remove('shake','flash-red'); void frame.offsetWidth; frame.classList.add('shake','flash-red');
+  }
+  state.totalAnsweredEver++;
+
+  if(containerEl && !isInput){
+    Array.from(containerEl.children).forEach(c=>{
+      if(c.tagName==='BUTTON'){
+        c.disabled = true;
+        const txt = c.innerHTML;
+        if(txt === (q.type==='input'?String(q.correct):q.correct) && !c.classList.contains('correct') && !c.classList.contains('wrong')){
+          c.classList.add('correct');
+        }
+        if(!c.classList.contains('correct') && !c.classList.contains('wrong')) c.classList.add('dim');
+      }
+    });
+  } else if(isInput){
+    document.getElementById('numInput').disabled = true;
+    btnEl.disabled = true;
+  }
+
+  document.getElementById('hudXp').textContent = `⭐ ${state.totalXp} XP`;
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function nextQuestion(){
+  sfxClick();
+  walkOutThen(()=>{
+    state.currentQIdx++;
+    if(state.currentQIdx >= state.stageQuestions.length){
+      finishStage();
+    } else {
+      showLevelUpBanner('Level ' + (state.currentQIdx+1) + '!');
+      renderQuestion();
+    }
+  });
+}
+
+function finishStage(){
+  const st = STAGES[state.currentStageIdx];
+  const total = state.stageQuestions.length;
+  const acc = Math.round(state.stageCorrect/total*100);
+  let stars = 1;
+  if(acc>=90) stars=3; else if(acc>=70) stars=2; else stars=1;
+  if(acc===0) stars=0;
+
+  const prevStars = state.stageStars[st.id]||0;
+  state.stageStars[st.id] = Math.max(prevStars, stars);
+  state.stageDone[st.id] = total;
+
+  document.getElementById('resultChar').textContent = st.character;
+  document.getElementById('resultTitle').textContent = `${st.name} — Cleared!`;
+  document.getElementById('resultStars').innerHTML = starString(stars);
+  document.getElementById('resultCorrect').textContent = `${state.stageCorrect}/${total}`;
+  document.getElementById('resultXp').textContent = state.stageCorrect*10;
+  document.getElementById('resultAcc').textContent = acc+'%';
+
+  let msg;
+  if(acc>=90) msg = "Outstanding! You've truly mastered this land.";
+  else if(acc>=70) msg = "Well done! A little more practice and you'll shine even brighter.";
+  else msg = "Good try! Revisit this land to sharpen your skills.";
+  document.getElementById('resultMsg').textContent = msg;
+
+  sfxFanfare();
+  if(stars===3) setTimeout(sfxStar, 700);
+
+  showScreen('screen-stage-result');
+
+  // check if all stages have been attempted at least once
+  const allDone = STAGES.every(s => (state.stageDone[s.id]||0) >= QUESTIONS_PER_STAGE);
+  if(allDone){
+    setTimeout(()=>{ if(confirm('You have cleared every land! View your Mastery Report now?')) showFinal(); }, 400);
+  }
+}
+
+function retryStage(){
+  startStageQuestions();
+}
+
+function showFinal(){
+  const rubric = document.getElementById('finalRubric');
+  rubric.innerHTML = '';
+  let totalStars=0, totalPossible=0;
+  STAGES.forEach(st=>{
+    const stars = state.stageStars[st.id]||0;
+    totalStars += stars; totalPossible += 3;
+    const pct = Math.round(stars/3*100);
+    const row = document.createElement('div');
+    row.className = 'rubric-row';
+    row.innerHTML = `<div class="char">${st.character}</div><div class="name">${st.name}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${stageColor(st.id)};"></div></div>
+      <div class="pct">${starString(stars)}</div>`;
+    rubric.appendChild(row);
+  });
+  document.getElementById('finalTotalXp').textContent = state.totalXp;
+  document.getElementById('finalStars').textContent = totalStars + '/' + totalPossible;
+  const overallAcc = state.totalAnsweredEver ? Math.round(state.totalCorrectEver/state.totalAnsweredEver*100) : 0;
+  document.getElementById('finalAcc').textContent = overallAcc+'%';
+
+  let badgeText = 'Kingdom Apprentice';
+  if(totalStars>=13) badgeText = 'Grand Master of the Number Kingdom';
+  else if(totalStars>=9) badgeText = 'Royal Number Builder';
+  else if(totalStars>=5) badgeText = 'Trusted Kingdom Helper';
+  document.getElementById('finalBadge').textContent = badgeText;
+
+  spawnConfetti();
+  sfxStar();
+  showScreen('screen-final');
+}
+
+function spawnConfetti(){
+  const card = document.getElementById('finalCard');
+  const emojis = ['🎉','⭐','🪙','✨','👑'];
+  for(let i=0;i<24;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[randInt(0,emojis.length-1)];
+    c.style.left = randInt(0,100)+'%';
+    c.style.animationDuration = (1.5+Math.random()*1.5)+'s';
+    c.style.animationDelay = (Math.random()*0.6)+'s';
+    card.appendChild(c);
+    setTimeout(()=>c.remove(), 3500);
+  }
+}
+
+function restartAll(){
+  state = {
+    currentStageIdx:0, currentQIdx:0, stageQuestions:[], stageCorrect:0, totalXp:0,
+    answered:false, stageStars:{}, stageDone:{}, totalCorrectEver:0, totalAnsweredEver:0
+  };
+  showScreen('screen-start');
+}
+
+// close sound panel when clicking outside
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('soundPanel');
+  const btn = document.getElementById('soundToggleBtn');
+  if(panel.classList.contains('open') && !panel.contains(e.target) && e.target!==btn){
+    panel.classList.remove('open');
+  }
+});
+
+// add the float animation class used by the vault character (defined here to keep CSS block above tidy)
+const styleTag = document.createElement('style');
+styleTag.textContent = '.anim-float{animation:floatChar 2.4s ease-in-out infinite;} @keyframes floatChar{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-12px) rotate(3deg);}}';
+document.head.appendChild(styleTag);
+
+// Build the twinkling starfield / firefly backdrop once the DOM is ready
+buildBackdrop();
+</script>
+</body>
+</html>
