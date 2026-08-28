@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tidewater Trials | MyMasteryLab</title>
+<style>
+:root{
+  --teal:#0d9488;
+  --teal-dark:#0f766e;
+  --teal-light:#5eead4;
+  --burnt:#c2410c;
+  --orange:#f97316;
+  --gold:#fbbf24;
+  --coral:#fb7185;
+  --deep:#0c4a6e;
+  --cream:#fff8ef;
+  --ink:#1e293b;
+  --card:#ffffff;
+  --shadow:0 10px 30px rgba(15,23,42,0.18);
+  --radius:22px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:'Baloo 2','Trebuchet MS','Segoe UI',sans-serif;
+  background:linear-gradient(180deg,#e0f7fa 0%,#0891b2 35%,#075985 70%,#0c4a6e 100%);
+  color:var(--ink);
+  overflow-x:hidden;
+  min-height:100vh;
+  position:relative;
+  text-align:center;
+}
+#app{position:relative;width:100%;min-height:100vh;z-index:2;}
+.screen{display:none;min-height:100vh;width:100%;position:relative;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px 40px;}
+.screen.active{display:flex;}
+
+/* ---------- Persistent Ocean Backdrop ---------- */
+#oceanBackdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.sunburst{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.55),rgba(255,255,255,0.08) 60%,transparent 75%);
+  animation:sunPulse 5s ease-in-out infinite;}
+@keyframes sunPulse{0%,100%{opacity:.7;}50%{opacity:1;}}
+.ray{position:absolute;top:-40px;left:50%;width:6px;height:60vh;background:linear-gradient(180deg,rgba(255,255,255,.35),transparent);
+  transform-origin:top center;animation:raySway 6s ease-in-out infinite;}
+@keyframes raySway{0%,100%{opacity:.25;}50%{opacity:.55;}}
+.bubble{position:absolute;bottom:-30px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.85),rgba(255,255,255,0.15));
+  animation:bubbleRise linear infinite;}
+@keyframes bubbleRise{0%{transform:translateY(0) translateX(0);opacity:0;}10%{opacity:.85;}90%{opacity:.6;}100%{transform:translateY(-110vh) translateX(20px);opacity:0;}}
+.fish-drift{position:absolute;font-size:26px;opacity:.35;animation:fishSwim linear infinite;}
+@keyframes fishSwim{from{transform:translateX(-10vw) scaleX(1);}to{transform:translateX(110vw) scaleX(1);}}
+.seafloor{position:absolute;bottom:0;left:0;right:0;height:130px;
+  background:linear-gradient(180deg,transparent,rgba(6,40,55,0.55) 40%,rgba(4,28,38,0.9));}
+.seafloor svg{position:absolute;bottom:0;width:100%;height:100%;opacity:.6;}
+.seaweed{position:absolute;bottom:6px;font-size:34px;opacity:.5;animation:seaweedSway 3.4s ease-in-out infinite;transform-origin:bottom center;}
+@keyframes seaweedSway{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
+
+#kingdomBackdrop{display:none;} /* legacy safety, unused */
+</style>
+</head>
+<body>
+<div id="oceanBackdrop">
+  <div class="sunburst"></div>
+  <div id="rayField"></div>
+  <div id="bubbleField"></div>
+  <div id="fishField"></div>
+  <div class="seafloor">
+    <svg viewBox="0 0 800 130" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="60" cy="120" rx="70" ry="30" fill="#04222f"/>
+      <ellipse cx="180" cy="110" rx="50" ry="24" fill="#04222f"/>
+      <ellipse cx="330" cy="122" rx="90" ry="34" fill="#04222f"/>
+      <ellipse cx="500" cy="112" rx="60" ry="26" fill="#04222f"/>
+      <ellipse cx="640" cy="120" rx="80" ry="30" fill="#04222f"/>
+      <ellipse cx="760" cy="110" rx="55" ry="24" fill="#04222f"/>
+    </svg>
+  </div>
+  <div id="seaweedField"></div>
+</div>
+<div class="levelup-banner" id="levelupBanner">✨ New Level! ✨</div>
+
+<!-- Floating Workspace (whiteboard) launcher -->
+<div class="wb-fab-label" id="wbFabLabel">✏️ Workspace</div>
+<button class="wb-fab" id="wbFab" onclick="openWhiteboard()" title="Open scratch workspace">📝</button>
+
+<!-- Whiteboard / Workspace Modal -->
+<div class="whiteboard-modal" id="whiteboardModal">
+  <div class="whiteboard-panel">
+    <div class="wb-header">
+      <span>🖊️ Scratch Workspace</span>
+      <button class="wb-close-btn" onclick="closeWhiteboard()">✕</button>
+    </div>
+    <div class="wb-toolbar">
+      <div class="wb-colors" id="wbColors"></div>
+      <div class="wb-size-group" id="wbSizes"></div>
+      <button class="wb-tool-btn" id="wbEraserBtn" onclick="setWbTool('eraser')">🧹 Eraser</button>
+      <button class="wb-tool-btn" onclick="clearWhiteboard()">🗑️ Clear All</button>
+    </div>
+    <div class="wb-canvas-wrap">
+      <canvas id="wbCanvas"></canvas>
+    </div>
+    <div class="wb-footnote">Work out your calculation here, then go back and type your answer in the game.</div>
+  </div>
+</div>
+
+<div id="app">
+
+  <div class="topbar">
+    <div class="brand-pill"><span class="dot"></span><b>MyMasteryLab</b> <span>Building Confident Problem Solvers</span></div>
+    <div class="sound-wrap">
+      <button class="sound-btn" id="soundToggleBtn" onclick="toggleSoundPanel()">🔊</button>
+      <div class="sound-panel" id="soundPanel">
+        <label>Sound <button class="toggle on" id="soundToggle" onclick="toggleSound()"></button></label>
+        <label>Volume
+          <input type="range" id="volumeSlider" min="0" max="100" value="60" oninput="setVolume(this.value)">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <section class="screen active" id="screen-start">
+    <div class="logo-badge"><b>MyMasteryLab</b><span>SUBTRACTION & REGROUPING</span></div>
+    <div class="title-hero">
+      <div class="hero-chars"><span class="floaty">🦦</span> <span class="floaty2">🐬</span> <span class="floaty">🦀</span> <span class="floaty2">🐙</span> <span class="floaty">🦜</span></div>
+      <h1>Tidewater Trials</h1>
+      <p>The Great Subtraction Voyage — dive through five ocean worlds, master the three meanings of subtraction, and cross the mysterious Sunken Zero Reef to reach the Captain's Treasury!</p>
+    </div>
+    <div class="story-card">
+      <h3>🌊 Your Mission</h3>
+      <p>The tide has scattered the crew across the ocean! From the sunny shallows of the Tide Pools to the deep, glowing dark of the Sunken Zero Reef, you'll help each sea friend solve real subtraction mysteries — take away, compare, and missing-addend puzzles — before joining Captain Vera's ship for the final voyage.</p>
+    </div>
+    <button class="btn btn-primary" onclick="beginJourney()">▶ Set Sail</button>
+    <footer class="brandfoot">MyMasteryLab · Grade 4 Addition & Subtraction Unit · Sessions 12–13 Revision</footer>
+  </section>
+
+  <!-- MAP SCREEN -->
+  <section class="screen" id="screen-map">
+    <div class="map-wrap">
+      <div class="map-header">
+        <h2>🗺️ Choose Your Waters</h2>
+        <p>Tap a world to begin its trial. Earn stars for accuracy!</p>
+      </div>
+      <div class="stage-path" id="stagePath"></div>
+      <div class="overall-progress" id="overallProgress">0 / 75 questions completed · 0 ⭐ earned</div>
+    </div>
+    <footer class="brandfoot">MyMasteryLab</footer>
+  </section>
+
+  <!-- STAGE INTRO SCREEN -->
+  <section class="screen" id="screen-stage-intro">
+    <div class="stage-intro-card themed" id="stageIntroCard">
+      <div class="scene-layer" id="stageIntroScene"></div>
+      <div class="stage-intro-char" id="stageIntroChar" style="position:relative;z-index:3;">🦦</div>
+      <h2 id="stageIntroTitle" style="position:relative;z-index:3;">World</h2>
+      <p id="stageIntroStory" style="position:relative;z-index:3;">Story...</p>
+      <div style="margin-top:18px;display:flex;gap:10px;justify-content:center;position:relative;z-index:3;">
+        <button class="btn btn-secondary" onclick="goToMap()" style="background:rgba(255,255,255,.9);">← Back</button>
+        <button class="btn btn-primary" onclick="startStageQuestions()">Start Trial ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUESTION SCREEN -->
+  <section class="screen" id="screen-question">
+    <div class="game-frame" id="gameFrame">
+      <div class="scene-layer" id="sceneLayer"></div>
+      <div class="hud">
+        <div class="stage-tag" id="hudStageName">World</div>
+        <div class="xp" id="hudXp">⭐ 0 XP</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="walker-wrap" id="walkerWrap"></div>
+      <div class="q-prompt" id="qPrompt">Question</div>
+      <div class="q-sub" id="qSub"></div>
+      <div class="visual-box" id="qVisual"></div>
+      <div id="qAnswerArea"></div>
+      <div class="feedback-box" id="feedbackBox"></div>
+      <div class="q-actions">
+        <button class="btn btn-secondary btn-small" onclick="goToMap()">✕ Exit</button>
+        <button class="btn btn-primary btn-small" id="nextBtn" style="display:none" onclick="nextQuestion()">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAGE RESULT SCREEN -->
+  <section class="screen" id="screen-stage-result">
+    <div class="result-card">
+      <div id="resultChar" style="font-size:56px;">🎉</div>
+      <h2 id="resultTitle">World Cleared!</h2>
+      <div class="big-stars" id="resultStars">☆☆☆</div>
+      <p id="resultMsg" style="color:#4b4038;"></p>
+      <div class="stat-row">
+        <div><div class="num" id="resultCorrect">0</div><div class="lbl">Correct</div></div>
+        <div><div class="num" id="resultXp">0</div><div class="lbl">XP Earned</div></div>
+        <div><div class="num" id="resultAcc">0%</div><div class="lbl">Accuracy</div></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn btn-secondary" onclick="retryStage()">↻ Play Again</button>
+        <button class="btn btn-primary" onclick="goToMap()">Map ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL SCREEN -->
+  <section class="screen" id="screen-final">
+    <div class="final-card" id="finalCard">
+      <div style="font-size:60px;">⚓✨</div>
+      <h1>Voyage Complete!</h1>
+      <div class="badge" id="finalBadge">Tidewater Navigator</div>
+      <p style="color:#4b4038;">You've completed every world of the Tidewater Trials. Here is your Mastery Report:</p>
+      <div class="rubric" id="finalRubric"></div>
+      <div class="stat-row">
+        <div><div class="num" id="finalTotalXp">0</div><div class="lbl">Total XP</div></div>
+        <div><div class="num" id="finalStars">0</div><div class="lbl">Stars</div></div>
+        <div><div class="num" id="finalAcc">0%</div><div class="lbl">Overall Accuracy</div></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
+        <button class="btn btn-secondary" onclick="goToMap()">↻ Revisit Waters</button>
+        <button class="btn btn-primary" onclick="restartAll()">🔄 New Voyage</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<style>
+/* ---------- Top bar / sound controls ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;pointer-events:none;}
+.brand-pill{pointer-events:auto;background:rgba(255,255,255,0.92);border-radius:999px;padding:6px 16px 6px 10px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);font-weight:800;color:var(--teal-dark);font-size:14px;}
+.brand-pill .dot{width:10px;height:10px;border-radius:50%;background:var(--orange);}
+.sound-wrap{pointer-events:auto;position:relative;}
+.sound-btn{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.92);box-shadow:var(--shadow);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sound-panel{position:absolute;top:52px;right:0;background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:14px 16px;width:210px;display:none;flex-direction:column;gap:10px;}
+.sound-panel.open{display:flex;}
+.sound-panel label{font-size:13px;font-weight:700;color:#555;display:flex;justify-content:space-between;align-items:center;}
+.toggle{width:46px;height:26px;border-radius:20px;background:#d1d5db;position:relative;cursor:pointer;transition:.2s;border:none;}
+.toggle.on{background:var(--teal);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle.on::after{left:23px;}
+input[type=range]{width:100%;accent-color:var(--teal);}
+
+/* ---------- Buttons ---------- */
+.btn{border:none;border-radius:16px;padding:14px 28px;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,0.15);transition:transform .08s;font-family:inherit;}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,0.15);}
+.btn-primary{background:var(--orange);color:#fff;}
+.btn-secondary{background:#fff;color:var(--teal-dark);border:2px solid var(--teal);}
+.btn-small{padding:9px 18px;font-size:14px;border-radius:12px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+
+/* ---------- Start Screen ---------- */
+#screen-start{justify-content:center;text-align:center;padding-top:70px;}
+.logo-badge{background:#fff;border-radius:20px;padding:10px 22px;display:inline-flex;align-items:center;gap:10px;box-shadow:var(--shadow);margin-bottom:18px;}
+.logo-badge b{color:var(--teal-dark);font-size:15px;}
+.logo-badge span{color:var(--burnt);font-size:12px;font-weight:700;}
+.title-hero{color:#fff;}
+.title-hero h1{font-size:clamp(30px,7vw,52px);margin:6px 0 4px;text-shadow:0 4px 0 rgba(0,0,0,0.25);background:linear-gradient(180deg,#fff,var(--teal-light));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.title-hero p{font-size:clamp(14px,2.6vw,18px);color:#e0fbfc;max-width:540px;margin:0 auto 26px;line-height:1.5;}
+.floaty{display:inline-block;animation:float 3s ease-in-out infinite;}
+.floaty2{display:inline-block;animation:float 3.4s ease-in-out infinite .4s;}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-14px) rotate(3deg);}}
+.hero-chars{font-size:48px;margin-bottom:10px;}
+.story-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;max-width:560px;margin:0 auto 24px;text-align:center;}
+.story-card h3{margin:0 0 8px;color:var(--burnt);font-size:18px;text-align:center;}
+.story-card p{margin:0;color:#4b4038;line-height:1.55;font-size:15px;text-align:center;}
+
+/* ---------- Map Screen ---------- */
+.map-wrap{width:100%;max-width:640px;margin-top:64px;}
+.map-header{text-align:center;color:#fff;margin-bottom:18px;}
+.map-header h2{margin:0 0 4px;font-size:26px;}
+.map-header p{margin:0;color:#e0fbfc;font-size:14px;}
+.stage-path{display:flex;flex-direction:column;gap:14px;position:relative;}
+.stage-node{background:var(--card);border-radius:20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border:3px solid transparent;transition:transform .12s;}
+.stage-node:hover{transform:translateY(-3px);}
+.stage-node .char{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;}
+.stage-node .info{flex:1;text-align:left;}
+.stage-node .info h4{margin:0 0 3px;font-size:16px;color:var(--ink);}
+.stage-node .info p{margin:0;font-size:12.5px;color:#7a7069;}
+.stage-stars{font-size:15px;color:#d1d5db;letter-spacing:1px;}
+.stage-stars .filled{color:var(--gold);}
+.overall-progress{background:rgba(255,255,255,.18);border-radius:14px;padding:12px 16px;margin-top:20px;color:#fff;text-align:center;font-size:14px;font-weight:700;}
+
+/* ---------- Stage intro ---------- */
+.stage-intro-card{position:relative;overflow:hidden;max-width:560px;width:100%;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;text-align:center;margin-top:70px;}
+.stage-intro-char{font-size:80px;margin-bottom:6px;}
+.stage-intro-card h2{margin:4px 0 12px;color:var(--teal-dark);}
+.stage-intro-card p{color:#4b4038;line-height:1.6;font-size:15px;text-align:center;background:#eefaff;border-radius:14px;padding:14px 16px;}
+.stage-intro-card.themed{color:#fff;}
+.stage-intro-card.themed p{background:rgba(255,255,255,0.15);color:#fff;}
+.stage-intro-card.themed h2{color:#fff;}
+
+/* ---------- Question Screen ---------- */
+.game-frame{width:100%;max-width:620px;margin-top:64px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;position:relative;overflow:hidden;border:4px solid rgba(255,255,255,0.5);}
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;position:relative;z-index:3;}
+.hud .stage-tag{font-size:12px;font-weight:800;color:var(--burnt);background:#fff1e6;padding:5px 10px;border-radius:999px;}
+.hud .xp{font-size:13px;font-weight:800;color:var(--teal-dark);}
+.progress-bar{height:10px;background:#eee;border-radius:6px;overflow:hidden;margin-bottom:18px;position:relative;z-index:3;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-light));border-radius:6px;transition:width .3s;}
+.q-prompt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;position:relative;z-index:3;line-height:1.4;text-align:center;}
+.q-sub{font-size:13.5px;color:#8a7f76;margin-bottom:14px;position:relative;z-index:3;text-align:center;}
+.visual-box{margin:12px 0 18px;position:relative;z-index:3;}
+.pv-chart{border-collapse:collapse;width:100%;font-size:14px;text-align:center;}
+.pv-chart th{background:var(--teal);color:#fff;padding:6px 4px;font-size:11px;border:1px solid #0f766e;}
+.pv-chart td{padding:8px 4px;border:1px solid #ddd;font-weight:800;font-size:16px;min-width:30px;}
+.pv-chart tr:nth-child(2) td{color:var(--teal-dark);background:#f0fdfa;}
+.pv-chart tr:nth-child(3) td{color:var(--burnt);background:#fff7ed;}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:3;}
+@media(max-width:420px){.options-grid{grid-template-columns:1fr;}}
+.opt-btn{background:#fdf4e9;border:2px solid #f1e2cf;border-radius:14px;padding:13px 10px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;transition:.15s;font-family:inherit;text-align:center;}
+.opt-btn:hover{border-color:var(--orange);}
+.opt-btn.correct{background:#dcfce7;border-color:#22c55e;color:#166534;}
+.opt-btn.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b;}
+.opt-btn.dim{opacity:.5;}
+.input-row{display:flex;gap:10px;position:relative;z-index:3;align-items:center;justify-content:center;}
+.input-row input{flex:1;font-size:20px;font-weight:800;padding:12px 14px;border-radius:14px;border:2px solid #f1e2cf;font-family:inherit;background:#fdf4e9;color:var(--ink);text-align:center;max-width:220px;}
+.input-row input:focus{outline:none;border-color:var(--teal);}
+.feedback-box{margin-top:16px;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.5;position:relative;z-index:3;display:none;text-align:center;}
+.feedback-box.show{display:block;}
+.feedback-box.ok{background:#dcfce7;color:#166534;}
+.feedback-box.no{background:#fee2e2;color:#991b1b;}
+.q-actions{display:flex;justify-content:center;gap:16px;margin-top:18px;position:relative;z-index:3;}
+
+/* Light, HIGH-CONTRAST frame themes per world — keeps text readable while still colorful */
+.frametheme-tidepool{background:linear-gradient(170deg,#e6fffb 0%,#ffffff 60%);border-color:var(--teal) !important;}
+.frametheme-tidepool .hud .stage-tag{background:#ccfbf1;color:var(--teal-dark);}
+.frametheme-current{background:linear-gradient(170deg,#e0f2ff 0%,#ffffff 60%);border-color:#0284c7 !important;}
+.frametheme-current .hud .stage-tag{background:#dbeafe;color:#075985;}
+.frametheme-cove{background:linear-gradient(170deg,#ffe9ee 0%,#ffffff 60%);border-color:var(--coral) !important;}
+.frametheme-cove .hud .stage-tag{background:#ffe4e9;color:#be123c;}
+.frametheme-reef{background:linear-gradient(170deg,#e6f9f5 0%,#ffffff 60%);border-color:#0f766e !important;}
+.frametheme-reef .hud .stage-tag{background:#ccfbf1;color:#0f766e;}
+.frametheme-voyage{background:linear-gradient(170deg,#fff2df 0%,#ffffff 60%);border-color:var(--burnt) !important;}
+.frametheme-voyage .hud .stage-tag{background:#ffe4d1;color:var(--burnt);}
+.frametheme-tidepool,.frametheme-current,.frametheme-cove,.frametheme-reef,.frametheme-voyage{border-width:5px !important;}
+
+/* ---------- Themed world scenery (bold, animated, non-plain backgrounds) ---------- */
+.scene-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;}
+.scene-icon{position:absolute;font-size:44px;opacity:.4;filter:drop-shadow(0 4px 6px rgba(0,0,0,.15));}
+
+/* Tide Pool: sun sparkle, shells, gentle waves */
+.scene-tidepool .shell{position:absolute;font-size:40px;opacity:.4;animation:bobGentle 3s ease-in-out infinite;}
+@keyframes bobGentle{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-10px) rotate(4deg);}}
+.scene-tidepool .wave{position:absolute;bottom:0;width:100%;height:34px;opacity:.3;
+  background:repeating-linear-gradient(90deg,#5eead4 0 24px,transparent 24px 48px);animation:waveShift 3s linear infinite;}
+@keyframes waveShift{from{background-position-x:0;}to{background-position-x:48px;}}
+
+/* Compare Current: racing bubbles + current stripes */
+.scene-current .stripe{position:absolute;height:8px;width:120%;left:-10%;background:linear-gradient(90deg,transparent,#7dd3fc,transparent);opacity:.5;animation:stripeMove 2.4s linear infinite;}
+@keyframes stripeMove{from{transform:translateX(-30%);}to{transform:translateX(30%);}}
+.scene-current .racer{position:absolute;font-size:34px;opacity:.55;animation:racerGo 3.4s ease-in-out infinite;}
+@keyframes racerGo{0%{left:-10%;}50%{left:90%;}100%{left:-10%;}}
+
+/* Pearl Exchange Cove: treasure chest + falling pearls + coral */
+.scene-cove .chest{position:absolute;font-size:64px;opacity:.4;top:8%;left:50%;transform:translateX(-50%);animation:chestWiggle 2.6s ease-in-out infinite;}
+@keyframes chestWiggle{0%,100%{transform:translateX(-50%) rotate(-3deg);}50%{transform:translateX(-50%) rotate(3deg);}}
+.scene-cove .pearl{position:absolute;top:-20px;font-size:26px;opacity:.75;animation:pearlFall linear infinite;filter:drop-shadow(0 0 8px rgba(255,255,255,.6));}
+@keyframes pearlFall{from{transform:translateY(-20px) rotate(0deg);opacity:0;}10%{opacity:1;}90%{opacity:1;}to{transform:translateY(340px) rotate(300deg);opacity:0;}}
+.scene-cove .coral{position:absolute;bottom:0;font-size:46px;opacity:.35;}
+
+/* Sunken Zero Reef: dark glow, pulsing jellyfish, empty chest */
+.scene-reef .jelly{position:absolute;font-size:44px;opacity:.5;animation:jellyGlow 2.2s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(94,234,212,.7));}
+@keyframes jellyGlow{0%,100%{opacity:.35;transform:translateY(0);}50%{opacity:.8;transform:translateY(-10px);}}
+.scene-reef .emptychest{position:absolute;font-size:40px;opacity:.3;animation:driftSlow 5s ease-in-out infinite;}
+@keyframes driftSlow{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+.scene-reef .glowdot{position:absolute;width:8px;height:8px;border-radius:50%;background:#5eead4;box-shadow:0 0 10px 4px rgba(94,234,212,.7);animation:dotPulse 1.8s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+/* Captain's Treasury: ship wheel + raining coins + sunset glow */
+.scene-voyage .wheel{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:70px;opacity:.28;animation:spinWheel 8s linear infinite;}
+@keyframes spinWheel{from{transform:translateX(-50%) rotate(0deg);}to{transform:translateX(-50%) rotate(360deg);}}
+.scene-voyage .doubloon{position:absolute;top:-20px;font-size:26px;opacity:.75;animation:pearlFall linear infinite;filter:drop-shadow(0 0 8px rgba(255,215,0,.6));}
+
+/* ---------- Walker character: BIG animated entrance between questions ---------- */
+.walker-wrap{position:relative;height:96px;margin:-4px 0 10px;z-index:3;overflow:visible;}
+.walker{position:absolute;left:0;bottom:0;font-size:72px;display:inline-block;filter:drop-shadow(0 8px 10px rgba(0,0,0,.3));}
+.walker.walk-in{animation:walkIn .75s cubic-bezier(.34,1.56,.64,1) forwards;}
+.walker.walk-out{animation:walkOut .5s ease-in forwards;}
+@keyframes walkIn{0%{transform:translateX(-140px) translateY(10px) scale(.55) rotate(-8deg);opacity:0;}55%{transform:translateX(10px) translateY(-14px) scale(1.25) rotate(6deg);opacity:1;}75%{transform:translateX(-4px) translateY(2px) scale(1.05) rotate(-2deg);}100%{transform:translateX(0) translateY(0) scale(1) rotate(0);opacity:1;}}
+@keyframes walkOut{0%{transform:translateX(0) scale(1);opacity:1;}100%{transform:translateX(320px) translateY(-20px) scale(.5) rotate(20deg);opacity:0;}}
+.walker .speech{position:absolute;top:-38px;left:78px;background:#fff;border-radius:12px;padding:6px 12px;font-size:13px;font-weight:900;color:var(--ink);white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.25);opacity:0;animation:bubbleIn .4s ease forwards .4s;border:2px solid var(--gold);}
+@keyframes bubbleIn{to{opacity:1;transform:translateY(-6px);}}
+.walker.reacting.good{animation:splashJump .7s ease;}
+.walker.reacting.bad{animation:sinkWobble .6s ease;}
+@keyframes splashJump{0%{transform:translateY(0) scale(1);}30%{transform:translateY(-34px) scale(1.15,0.9);}55%{transform:translateY(-38px) scale(0.95,1.1);}75%{transform:translateY(0) scale(1.08,0.92);}100%{transform:translateY(0) scale(1);}}
+@keyframes sinkWobble{0%{transform:translateY(0) skewX(0) scale(1);opacity:1;}30%{transform:translateY(6px) skewX(-8deg) scale(.97,1.03);opacity:.85;}55%{transform:translateY(10px) skewX(8deg) scale(.95,1.05);opacity:.8;}80%{transform:translateY(4px) skewX(-3deg) scale(.99);opacity:.95;}100%{transform:translateY(0) skewX(0) scale(1);opacity:1;}}
+.splash-ring{position:absolute;left:50%;bottom:-6px;width:14px;height:6px;border-radius:50%;
+  border:3px solid rgba(94,234,212,.8);transform:translate(-50%,0) scale(0);pointer-events:none;
+  animation:ringExpand .6s ease-out forwards;}
+@keyframes ringExpand{0%{transform:translate(-50%,0) scale(0.3);opacity:.9;}100%{transform:translate(-50%,0) scale(5);opacity:0;}}
+
+/* Ocean-specific feedback: a spreading teal ripple for correct answers,
+   a murky-water wobble for wrong answers — replaces the shake/flash used elsewhere. */
+.ripple-good{animation:rippleGoodFrame .8s ease;}
+@keyframes rippleGoodFrame{0%{box-shadow:0 0 0 0 rgba(45,212,191,0);}30%{box-shadow:0 0 0 18px rgba(45,212,191,.35),0 0 50px 10px rgba(94,234,212,.5);}100%{box-shadow:0 0 0 0 rgba(45,212,191,0);}}
+.murk-bad{animation:murkBadFrame .6s ease;}
+@keyframes murkBadFrame{
+  0%{transform:skewX(0) translateX(0);filter:none;}
+  20%{transform:skewX(-2.2deg) translateX(-10px);filter:saturate(.7) brightness(.94);}
+  40%{transform:skewX(2.2deg) translateX(8px);filter:saturate(.6) brightness(.9);}
+  60%{transform:skewX(-1.4deg) translateX(-5px);filter:saturate(.75) brightness(.95);}
+  80%{transform:skewX(.8deg) translateX(3px);filter:saturate(.9) brightness(.98);}
+  100%{transform:skewX(0) translateX(0);filter:none;}
+}
+.murk-overlay{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(15,64,74,0) 0%,rgba(8,47,58,.28) 70%);
+  opacity:0;pointer-events:none;z-index:4;animation:murkFade .6s ease;}
+@keyframes murkFade{0%{opacity:0;}30%{opacity:1;}100%{opacity:0;}}
+
+/* ---------- WAVE-WASH TRANSITION: a fresh-water wave sweeps across the frame
+   between questions, replacing any character walk-in/out style transition ---------- */
+.wave-wash{position:absolute;inset:0;z-index:60;overflow:hidden;pointer-events:none;border-radius:18px;}
+.wave-shape{position:absolute;top:-15%;left:-55%;width:220%;height:130%;
+  background:linear-gradient(100deg,
+    rgba(6,182,212,0) 0%,
+    rgba(6,182,212,.55) 30%,
+    rgba(8,145,178,.92) 48%,
+    rgba(14,165,233,.95) 52%,
+    rgba(6,182,212,.55) 70%,
+    rgba(6,182,212,0) 100%);
+  border-radius:42% 58% 38% 62% / 55% 45% 55% 45%;
+  animation: waveSweep .95s cubic-bezier(.62,0,.35,1) forwards;
+}
+.wave-shape.foam::before{content:'';position:absolute;top:38%;left:0;right:0;height:12%;
+  background:repeating-radial-gradient(circle,#fff 0 5px,transparent 6px 14px);opacity:.75;}
+.wave-shape2{animation-delay:.06s;opacity:.55;filter:blur(3px);}
+@keyframes waveSweep{
+  0%{transform:translateX(-55%) scaleY(.9);}
+  45%{transform:translateX(6%) scaleY(1.25);}
+  55%{transform:translateX(18%) scaleY(1.2);}
+  100%{transform:translateX(95%) scaleY(.9);}
+}
+.wave-droplet{position:absolute;bottom:-10px;font-size:14px;opacity:0;animation:dropletPop .8s ease forwards;}
+@keyframes dropletPop{0%{opacity:0;transform:translateY(0) scale(.5);}30%{opacity:1;}100%{opacity:0;transform:translateY(-60px) scale(1.1);}}
+
+.levelup-banner{position:fixed;top:36%;left:50%;transform:translate(-50%,-50%) scale(.6);background:linear-gradient(135deg,var(--gold),var(--orange));color:#fff;font-weight:900;padding:18px 40px;border-radius:20px;font-size:30px;box-shadow:0 16px 40px rgba(0,0,0,.45);z-index:200;opacity:0;pointer-events:none;border:4px solid #fff;text-shadow:0 2px 4px rgba(0,0,0,.3);}
+.levelup-banner.show{animation:levelPop 1.1s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes levelPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-8deg);}20%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(4deg);}35%{transform:translate(-50%,-50%) scale(1) rotate(0);}80%{opacity:1;}100%{opacity:0;transform:translate(-50%,-70%) scale(.85);}}
+
+/* ---------- Stage result ---------- */
+.result-card{max-width:520px;width:100%;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px;text-align:center;margin-top:80px;}
+.big-stars{font-size:44px;letter-spacing:8px;margin:10px 0;}
+.big-stars .filled{color:var(--gold);animation:pop .5s ease;}
+@keyframes pop{0%{transform:scale(0);}60%{transform:scale(1.3);}100%{transform:scale(1);}}
+.stat-row{display:flex;justify-content:space-around;margin:18px 0;}
+.stat-row div{text-align:center;}
+.stat-row .num{font-size:24px;font-weight:900;color:var(--teal-dark);}
+.stat-row .lbl{font-size:11px;color:#8a7f76;text-transform:uppercase;letter-spacing:.5px;}
+
+/* ---------- Final screen ---------- */
+#screen-final{justify-content:center;}
+.final-card{max-width:600px;width:100%;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px;text-align:center;margin-top:60px;position:relative;overflow:hidden;}
+.final-card h1{color:var(--burnt);margin:6px 0;}
+.rubric{margin:20px 0;text-align:left;}
+.rubric-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #eee;}
+.rubric-row .char{font-size:24px;}
+.rubric-row .name{flex:1;font-weight:700;font-size:14px;}
+.rubric-row .bar-outer{width:100px;height:9px;background:#eee;border-radius:6px;overflow:hidden;}
+.rubric-row .bar-inner{height:100%;background:var(--teal);}
+.rubric-row .pct{font-size:13px;font-weight:800;color:var(--teal-dark);width:40px;text-align:right;}
+.badge{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--orange));color:#fff;font-weight:900;padding:10px 22px;border-radius:999px;font-size:15px;margin:8px 0;box-shadow:0 6px 14px rgba(249,115,22,.4);}
+.confetti{position:absolute;top:-10px;font-size:20px;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(650px) rotate(360deg);opacity:0;}}
+
+.anim-bounce{animation:bounce 1.8s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.anim-wiggle{animation:wiggle 2.2s ease-in-out infinite;}
+@keyframes wiggle{0%,100%{transform:rotate(-4deg);}50%{transform:rotate(4deg);}}
+.anim-pulse{animation:pulseS 2s ease-in-out infinite;}
+@keyframes pulseS{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+.anim-float{animation:floatChar 2.4s ease-in-out infinite;}
+@keyframes floatChar{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-12px) rotate(3deg);}}
+
+footer.brandfoot{color:rgba(255,255,255,.6);font-size:11px;margin-top:28px;text-align:center;}
+
+/* ---------- Workspace / Whiteboard ---------- */
+.wb-fab{
+  position:fixed;right:18px;bottom:22px;z-index:120;
+  width:60px;height:60px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--gold),var(--orange));color:#fff;font-size:26px;
+  box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;display:none;align-items:center;justify-content:center;
+  animation:fabPulse 2.6s ease-in-out infinite;
+}
+.wb-fab.show{display:flex;}
+@keyframes fabPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
+.wb-fab-label{position:fixed;right:22px;bottom:86px;z-index:120;background:#fff;color:var(--ink);
+  font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;box-shadow:var(--shadow);display:none;}
+.wb-fab-label.show{display:block;}
+
+.whiteboard-modal{position:fixed;inset:0;z-index:300;background:rgba(8,30,40,0.6);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.whiteboard-modal.open{display:flex;}
+.whiteboard-panel{
+  background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.4);
+  width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;
+}
+.wb-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;
+  background:linear-gradient(135deg,var(--teal),var(--teal-dark));color:#fff;}
+.wb-header span{font-weight:900;font-size:16px;}
+.wb-close-btn{background:rgba(255,255,255,.25);border:none;color:#fff;width:32px;height:32px;
+  border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.wb-toolbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#f8fafc;
+  border-bottom:2px solid #eef2f6;flex-wrap:wrap;justify-content:center;}
+.wb-colors{display:flex;gap:8px;align-items:center;}
+.wb-color{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #e2e8f0;
+  cursor:pointer;padding:0;transition:transform .12s;}
+.wb-color:hover{transform:scale(1.12);}
+.wb-color.active{box-shadow:0 0 0 3px var(--teal);transform:scale(1.15);}
+.wb-tool-btn{background:#fff;border:2px solid #e2e8f0;border-radius:12px;padding:8px 14px;
+  font-size:13px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
+.wb-tool-btn.active{background:#e0f2fe;border-color:#0284c7;color:#075985;}
+.wb-tool-btn:hover{border-color:var(--orange);}
+.wb-size-group{display:flex;gap:4px;align-items:center;}
+.wb-size-btn{width:30px;height:30px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+.wb-size-btn.active{border-color:var(--teal);background:#f0fdfa;}
+.wb-size-dot{border-radius:50%;background:var(--ink);}
+.wb-canvas-wrap{flex:1;position:relative;background:
+  repeating-linear-gradient(0deg,#fbfdff,#fbfdff 27px,#eaf1f8 28px),
+  repeating-linear-gradient(90deg,#fbfdff,#fbfdff 27px,#f3f7fb 28px);
+  min-height:320px;}
+#wbCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;}
+.wb-footnote{padding:8px 16px;font-size:11.5px;color:#8a7f76;text-align:center;background:#f8fafc;}
+
+</style>
+
+<script>
+/* Defensive safety net: if anything unexpected throws, surface a visible,
+   friendly message instead of leaving a blank or frozen page. */
+window.addEventListener('error', function(ev){
+  try{
+    if(document.getElementById('fallback-error-banner')) return;
+    const el = document.createElement('div');
+    el.id = 'fallback-error-banner';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#fee2e2;color:#991b1b;padding:12px 16px;font-family:sans-serif;font-size:13px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,.2);';
+    el.textContent = '⚠️ Something didn\u2019t load correctly. Please refresh the page. (' + (ev && ev.message ? ev.message : 'unknown error') + ')';
+    document.body.appendChild(el);
+  }catch(inner){}
+});
+
+/* =========================================================
+   MyMasteryLab — Tidewater Trials: The Great Subtraction Voyage
+   Grade 4 · Addition & Subtraction Unit · Sessions 12-13 Revision
+   All arithmetic is computed live in JavaScript (never hard-coded
+   as text) so every answer key is verified at run time.
+========================================================= */
+
+/* ---------------- SOUND ENGINE (Web Audio API) ---------------- */
+let soundOn = true;
+let volume = 0.6;
+let audioCtx = null, masterGain = null;
+let ambientRunning = false;
+
+function initAudio(){
+  if(audioCtx) return;
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = volume;
+    masterGain.connect(audioCtx.destination);
+  }catch(e){ soundOn = false; }
+}
+function playTone(freq, dur, type, vol){
+  if(!soundOn || !audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type || 'sine';
+  o.frequency.value = freq;
+  g.gain.value = (vol===undefined?0.2:vol);
+  o.connect(g); g.connect(masterGain);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+  o.stop(audioCtx.currentTime + dur);
+}
+function sfxClick(){ playTone(500,0.06,'square',0.12); }
+
+// VICTORY sound — a bright cascading "treasure chime": a fast ascending run
+// like coins tumbling into a chest, finished with a satisfying bell ring.
+function sfxCorrect(){
+  if(!soundOn) return;
+  initAudio();
+  const run=[698.46,783.99,880.00,987.77,1046.50,1174.66]; // fast coin cascade
+  run.forEach((f,i)=> setTimeout(()=>playTone(f,0.11,'square',0.20), i*55));
+  setTimeout(()=>playTone(1567.98,0.22,'sine',0.28), run.length*55+40);   // bell strike
+  setTimeout(()=>playTone(1567.98,0.5,'triangle',0.16), run.length*55+60); // bell resonance tail
+}
+// FAILURE sound — an underwater "gloop": one oscillator pitch-bends sharply
+// downward (like sinking through water) into a soft muffled thud.
+function sfxWrong(){
+  if(!soundOn){ return; }
+  initAudio();
+  try{
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    const t0 = audioCtx.currentTime;
+    o.frequency.setValueAtTime(420, t0);
+    o.frequency.exponentialRampToValueAtTime(80, t0+0.45);
+    g.gain.setValueAtTime(0.22, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+0.5);
+    o.connect(g); g.connect(masterGain);
+    o.start(t0); o.stop(t0+0.5);
+  }catch(e){}
+  setTimeout(()=>playTone(100,0.3,'sine',0.15), 380); // soft muffled thud landing
+}
+function sfxFanfare(){
+  const notes=[523.25,659.25,783.99,1046.50,1318.51];
+  notes.forEach((f,i)=> setTimeout(()=>playTone(f, i===notes.length-1?0.5:0.2,'triangle',0.28), i*120));
+  setTimeout(()=>playTone(1567.98,0.4,'sine',0.22), notes.length*120+40);
+}
+function sfxStar(){ playTone(1046,0.12,'sine',0.2); setTimeout(()=>playTone(1318,0.16,'sine',0.2),90); setTimeout(()=>playTone(1568,0.22,'sine',0.2),180); }
+function sfxWhoosh(){ playTone(300,0.2,'triangle',0.1); }
+function sfxLevelUp(){ playTone(392,0.1,'square',0.15); setTimeout(()=>playTone(523.25,0.1,'square',0.15),80); setTimeout(()=>playTone(659.25,0.22,'square',0.18),160); }
+function sfxStepIn(){ playTone(220,0.06,'square',0.08); setTimeout(()=>playTone(277,0.06,'square',0.08),70); }
+// A short rising "whoosh of water" for the wave-wash transition between questions
+function sfxWaveWhoosh(){
+  if(!soundOn){ return; }
+  initAudio();
+  try{
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    const t0 = audioCtx.currentTime;
+    o.frequency.setValueAtTime(180, t0);
+    o.frequency.exponentialRampToValueAtTime(900, t0+0.35);
+    o.frequency.exponentialRampToValueAtTime(260, t0+0.7);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(0.12, t0+0.15);
+    g.gain.linearRampToValueAtTime(0.0001, t0+0.7);
+    o.connect(g); g.connect(masterGain);
+    o.start(t0); o.stop(t0+0.75);
+  }catch(e){}
+}
+
+/* ---- Background music: a bouncy "sea shanty" loop — bass pulse + chord stabs +
+   melody, closer to a real game soundtrack than a single-note scale walk ---- */
+const SHANTY_BASS   = [130.81,130.81,164.81,146.83];              // C3-C3-E3-D3 rolling bass
+const SHANTY_CHORDS = [
+  [261.63,329.63,392.00],  // C major
+  [261.63,329.63,392.00],
+  [293.66,349.23,440.00],  // D minor-ish colour tone
+  [246.94,311.13,392.00]   // G7-ish colour tone
+];
+const SHANTY_MELODY = [523.25,587.33,659.25,587.33, 523.25,493.88,523.25,659.25,
+                        698.46,659.25,587.33,523.25, 493.88,523.25,587.33,392.00];
+let shantyStep = 0, musicTimerId = null;
+function playShantyStep(){
+  if(!soundOn) return;
+  const bar = Math.floor(shantyStep/4) % SHANTY_CHORDS.length;
+  const beat = shantyStep % 4;
+  // bass thump on every beat — the steady "sailing" pulse
+  playTone(SHANTY_BASS[bar], 0.28, 'triangle', 0.07);
+  // chord stab on beat 1 of each bar for harmonic body
+  if(beat===0){
+    SHANTY_CHORDS[bar].forEach(f=> playTone(f, 0.5, 'sine', 0.035));
+  }
+  // bright melody line on top, one note per beat — the memorable "tune"
+  const mNote = SHANTY_MELODY[shantyStep % SHANTY_MELODY.length];
+  playTone(mNote, 0.22, 'square', 0.045);
+  shantyStep++;
+}
+function startAmbient(){
+  if(!soundOn || ambientRunning) return;
+  initAudio();
+  shantyStep = 0;
+  playShantyStep();
+  musicTimerId = setInterval(playShantyStep, 300);
+  ambientRunning = true;
+}
+function stopAmbient(){
+  if(!ambientRunning) return;
+  if(musicTimerId){ clearInterval(musicTimerId); musicTimerId = null; }
+  ambientRunning = false;
+}
+function toggleSoundPanel(){ document.getElementById('soundPanel').classList.toggle('open'); }
+
+/* ---------------- WHITEBOARD / WORKSPACE (freehand scratchpad) ---------------- */
+const WB_COLORS = [
+  {name:'Black', value:'#1e293b'},
+  {name:'Teal', value:'#0d9488'},
+  {name:'Burnt Orange', value:'#c2410c'},
+  {name:'Red', value:'#ef4444'},
+  {name:'Blue', value:'#2563eb'},
+  {name:'Green', value:'#16a34a'}
+];
+const WB_SIZES = [
+  {name:'Thin', px:3},
+  {name:'Medium', px:6},
+  {name:'Thick', px:11}
+];
+let wbCtx = null;
+let wbDrawing = false;
+let wbLastX = 0, wbLastY = 0;
+let wbColor = WB_COLORS[0].value;
+let wbSize = WB_SIZES[1].px;
+let wbTool = 'pen'; // 'pen' | 'eraser'
+let wbInitialized = false;
+
+function buildWhiteboardToolbar(){
+  const colorsWrap = document.getElementById('wbColors');
+  colorsWrap.innerHTML = '';
+  WB_COLORS.forEach((c, i)=>{
+    const b = document.createElement('button');
+    b.className = 'wb-color' + (i===0 ? ' active' : '');
+    b.style.background = c.value;
+    b.title = c.name;
+    b.onclick = ()=> selectWbColor(c.value, b);
+    colorsWrap.appendChild(b);
+  });
+  const sizesWrap = document.getElementById('wbSizes');
+  sizesWrap.innerHTML = '';
+  WB_SIZES.forEach((s, i)=>{
+    const b = document.createElement('button');
+    b.className = 'wb-size-btn' + (i===1 ? ' active' : '');
+    b.title = s.name;
+    const dot = document.createElement('div');
+    dot.className = 'wb-size-dot';
+    const dim = Math.min(18, 4 + s.px);
+    dot.style.width = dim+'px';
+    dot.style.height = dim+'px';
+    b.appendChild(dot);
+    b.onclick = ()=> selectWbSize(s.px, b);
+    sizesWrap.appendChild(b);
+  });
+}
+function selectWbColor(value, btnEl){
+  wbColor = value;
+  wbTool = 'pen';
+  document.querySelectorAll('.wb-color').forEach(el=>el.classList.remove('active'));
+  btnEl.classList.add('active');
+  document.getElementById('wbEraserBtn').classList.remove('active');
+}
+function selectWbSize(px, btnEl){
+  wbSize = px;
+  document.querySelectorAll('.wb-size-btn').forEach(el=>el.classList.remove('active'));
+  btnEl.classList.add('active');
+}
+function setWbTool(tool){
+  wbTool = tool;
+  document.getElementById('wbEraserBtn').classList.toggle('active', tool==='eraser');
+}
+function sizeWbCanvas(){
+  const canvas = document.getElementById('wbCanvas');
+  const wrap = canvas.parentElement;
+  const rect = wrap.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  wbCtx = canvas.getContext('2d');
+  if(!wbCtx) return;
+  wbCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  wbCtx.lineCap = 'round';
+  wbCtx.lineJoin = 'round';
+}
+function wbPointerPos(e){
+  const canvas = document.getElementById('wbCanvas');
+  const rect = canvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+function wbPointerDown(e){
+  if(!wbCtx) return;
+  wbDrawing = true;
+  const p = wbPointerPos(e);
+  wbLastX = p.x; wbLastY = p.y;
+  // draw a dot immediately so single taps/clicks still show a mark
+  wbCtx.beginPath();
+  wbCtx.fillStyle = wbTool==='eraser' ? '#ffffff' : wbColor;
+  const r = (wbTool==='eraser' ? wbSize*2.6 : wbSize) / 2;
+  wbCtx.arc(p.x, p.y, r, 0, Math.PI*2);
+  wbCtx.fill();
+}
+function wbPointerMove(e){
+  if(!wbDrawing || !wbCtx) return;
+  const p = wbPointerPos(e);
+  wbCtx.strokeStyle = wbTool==='eraser' ? '#ffffff' : wbColor;
+  wbCtx.lineWidth = wbTool==='eraser' ? wbSize*2.6 : wbSize;
+  wbCtx.beginPath();
+  wbCtx.moveTo(wbLastX, wbLastY);
+  wbCtx.lineTo(p.x, p.y);
+  wbCtx.stroke();
+  wbLastX = p.x; wbLastY = p.y;
+}
+function wbPointerUp(){ wbDrawing = false; }
+
+function initWhiteboardEventsOnce(){
+  if(wbInitialized) return;
+  wbInitialized = true;
+  buildWhiteboardToolbar();
+  const canvas = document.getElementById('wbCanvas');
+  canvas.addEventListener('pointerdown', (e)=>{ canvas.setPointerCapture(e.pointerId); wbPointerDown(e); });
+  canvas.addEventListener('pointermove', wbPointerMove);
+  canvas.addEventListener('pointerup', wbPointerUp);
+  canvas.addEventListener('pointercancel', wbPointerUp);
+  canvas.addEventListener('pointerleave', wbPointerUp);
+  window.addEventListener('resize', ()=>{
+    if(document.getElementById('whiteboardModal').classList.contains('open')) sizeWbCanvas();
+  });
+}
+function openWhiteboard(){
+  initWhiteboardEventsOnce();
+  document.getElementById('whiteboardModal').classList.add('open');
+  sfxClick();
+  // size (and clear to a fresh page) each time it's opened for this question
+  requestAnimationFrame(()=> sizeWbCanvas());
+}
+function closeWhiteboard(){
+  const modal = document.getElementById('whiteboardModal');
+  if(modal) modal.classList.remove('open');
+}
+function clearWhiteboard(){
+  if(!wbCtx) return;
+  const canvas = document.getElementById('wbCanvas');
+  wbCtx.clearRect(0, 0, canvas.width, canvas.height);
+  sfxClick();
+}
+
+function toggleSound(){
+  soundOn = !soundOn;
+  const btn = document.getElementById('soundToggle');
+  btn.classList.toggle('on', soundOn);
+  document.getElementById('soundToggleBtn').textContent = soundOn ? '🔊' : '🔇';
+  if(soundOn){ initAudio(); if(masterGain) masterGain.gain.value = volume; startAmbient(); }
+  else { stopAmbient(); if(masterGain) masterGain.gain.value = 0; }
+}
+function setVolume(v){ volume = v/100; if(masterGain) masterGain.gain.value = soundOn ? volume : 0; }
+
+/* ---------------- MATH HELPERS (single source of truth) ---------------- */
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function randDigitsNum(d){
+  if(d<=1) return randInt(1,9);
+  const min = Math.pow(10,d-1), max = Math.pow(10,d)-1;
+  return randInt(min,max);
+}
+function fmt(n){ return n.toLocaleString('en-US'); }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function pick(arr){ return arr[randInt(0,arr.length-1)]; }
+
+// Build a small place-value chart (HTML) for two numbers stacked by place
+function placeValueChart(a,b){
+  const allLabels=['HTh','TTh','Th','H','T','O'];
+  const fullLabels=['Hundred-Th.','Ten-Th.','Thousands','Hundreds','Tens','Ones'];
+  const len = Math.max(String(a).length, String(b).length);
+  const labels = allLabels.slice(allLabels.length-len);
+  const flabels = fullLabels.slice(fullLabels.length-len);
+  const as = String(a).padStart(len,' ');
+  const bs = String(b).padStart(len,' ');
+  let html = '<table class="pv-chart"><tr>';
+  for(let i=0;i<len;i++) html += `<th title="${flabels[i]}">${labels[i]}</th>`;
+  html += '</tr><tr>';
+  for(let i=0;i<len;i++) html += `<td>${as[i]===' '?'':as[i]}</td>`;
+  html += '</tr><tr>';
+  for(let i=0;i<len;i++) html += `<td>${bs[i]===' '?'':bs[i]}</td>`;
+  html += '</tr></table>';
+  return html;
+}
+
+// Generates `n` questions from a factory function, guaranteeing no two questions
+// in the set have identical prompt text (prevents repeats within a stage round).
+function buildUniqueSet(n, factoryFn){
+  const seen = new Set();
+  const out = [];
+  let tries = 0;
+  const cap = Math.max(300, n*50);
+  while(out.length < n && tries < cap){
+    tries++;
+    const q = factoryFn();
+    const sig = (q.prompt||'') + '|' + (q.visual||'') + '|' + (q.correct);
+    if(!seen.has(sig)){
+      seen.add(sig);
+      out.push(q);
+    }
+  }
+  return out;
+}
+
+/* ---- Subtraction-specific correctness helpers ---- */
+// Analyzes a-b column by column: how many columns need a borrow, and the
+// longest run of CONSECUTIVE borrows (used to guarantee genuine zero-crossing regroups).
+function subtractionAnalysis(a,b){
+  const as = String(a);
+  const bp = String(b).padStart(as.length,'0');
+  let borrow=0, chain=0, maxChain=0, totalBorrows=0;
+  for(let i=as.length-1;i>=0;i--){
+    let top = parseInt(as[i]) - borrow;
+    const bot = parseInt(bp[i]);
+    if(top < bot){ borrow = 1; chain++; totalBorrows++; maxChain = Math.max(maxChain,chain); }
+    else { borrow = 0; chain = 0; }
+  }
+  return {maxChain, totalBorrows};
+}
+function hasAnyBorrow(a,b){ return subtractionAnalysis(a,b).totalBorrows > 0; }
+
+// Two numbers (a>b) with NO borrowing required at all (safe warm-up problems)
+function genNoRegroupSubPair(digits){
+  const aDigits = String(randDigitsNum(digits)).split('').map(Number);
+  let bDigits = aDigits.map(d => randInt(0, d));
+  let equal = aDigits.every((d,i)=> d===bDigits[i]);
+  if(equal){
+    let done=false;
+    for(let i=0;i<aDigits.length && !done;i++){
+      if(aDigits[i] > 0){ bDigits[i] = randInt(0, aDigits[i]-1); done=true; }
+    }
+  }
+  const a = parseInt(aDigits.join(''),10);
+  const b = parseInt(bDigits.join(''),10) || 0;
+  return [a,b];
+}
+// Two numbers (a>b) that GENUINELY require at least one regroup (borrow)
+function genRegroupSubPair(digits){
+  let a,b,tries=0;
+  do{
+    a = randDigitsNum(digits);
+    const lo = digits>=2 ? Math.pow(10,digits-2) : 1;
+    b = randInt(lo, a-1);
+    tries++;
+  } while(!hasAnyBorrow(a,b) && tries<80);
+  return [a,b];
+}
+// The classic "forgot to regroup" mistake: subtract the smaller digit from the
+// larger digit in EVERY column regardless of position (never borrows).
+function noBorrowDiff(a,b){
+  const as = String(a);
+  const bp = String(b).padStart(as.length,'0');
+  let digits=[];
+  for(let i=0;i<as.length;i++){ digits.push(Math.abs(parseInt(as[i]) - parseInt(bp[i]))); }
+  return parseInt(digits.join(''),10);
+}
+// Minuend is a round power-of-ten multiple (e.g. 50,000) so subtracting a genuine
+// number forces a cascading borrow chain through the trailing zero columns —
+// exactly the "Zero Bridge" scenario from the lesson. Verified via subtractionAnalysis.
+function genZeroChainPair(trailingZeros, totalDigits){
+  let a,b,analysis,tries=0;
+  const targetChain = Math.min(trailingZeros, totalDigits-1);
+  do{
+    const lead = randInt(2,9);
+    a = lead * Math.pow(10, totalDigits-1);
+    const bDigitsCount = totalDigits-1;
+    b = randDigitsNum(bDigitsCount);
+    if(b >= a) b = Math.floor(a*0.6);
+    if(b % 10 === 0) b += randInt(1,9); // force nonzero ones digit so the cascade is genuine
+    analysis = subtractionAnalysis(a,b);
+    tries++;
+  } while(analysis.maxChain < targetChain && tries<80);
+  return [a,b];
+}
+function buildDiffOptions(correct, shown){
+  const set = new Set([correct, shown]);
+  let guard = 0;
+  const digits = String(correct).length;
+  while(set.size < 4 && guard < 60){
+    guard++;
+    const k = Math.pow(10, randInt(0, Math.max(0,digits-2)));
+    const sign = Math.random()<0.5 ? 1 : -1;
+    const cand = correct + sign*k*randInt(1,3);
+    if(cand >= 0) set.add(cand);
+  }
+  return shuffle(Array.from(set).slice(0,4).map(String));
+}
+
+/* ---------------- QUESTION GENERATORS (per world) ---------------- */
+
+// WORLD 1 — Tide Pool Basics (three meanings of subtraction + vocabulary)
+const SUB_VOCAB = [
+  {q:'In 72 − 28 = 44, what is 72 called?', opts:['Minuend','Subtrahend','Difference','Quotient'], correct:'Minuend'},
+  {q:'In 72 − 28 = 44, what is 28 called?', opts:['Subtrahend','Minuend','Difference','Product'], correct:'Subtrahend'},
+  {q:'In 72 − 28 = 44, what is 44 called?', opts:['Difference','Minuend','Subtrahend','Sum'], correct:'Difference'},
+  {q:'What does "regroup" mean in subtraction?', opts:['Exchange a larger place-value unit for smaller units','Add two numbers together','Round a number to the nearest ten','Multiply by ten'], correct:'Exchange a larger place-value unit for smaller units'},
+  {q:'Addition and subtraction are called...', opts:['Inverse operations','Equal operations','Prime operations','Estimated operations'], correct:'Inverse operations'}
+];
+const MEANING_TEMPLATES = [
+  {kind:'takeaway', build:(a,b)=>`A young otter collected ${fmt(a)} clams and gave away ${fmt(b)} to friends. How many clams does the otter have left?`},
+  {kind:'compare', build:(a,b)=>`One tide pool has ${fmt(a)} starfish and another has ${fmt(b)} starfish. How many MORE starfish does the first pool have?`},
+  {kind:'missing', build:(a,b)=>`A hermit crab has ${fmt(b)} pearls and wants ${fmt(a)} pearls in total. How many MORE pearls does the crab need to find?`}
+];
+function makeMeaningQuestion(){
+  const t = pick(MEANING_TEMPLATES);
+  const digits = pick([2,3]);
+  const [a,b] = genNoRegroupSubPair(digits);
+  const labelMap = {takeaway:'Take Away', compare:'Compare (Difference)', missing:'Missing Addend'};
+  return {
+    type:'mcq',
+    prompt: t.build(a,b) + ' Which meaning of subtraction does this represent?',
+    sub:'Think about what the story is really asking.',
+    options: shuffle(['Take Away','Compare (Difference)','Missing Addend']),
+    correct: labelMap[t.kind]
+  };
+}
+function makeTidePoolQuestion(){
+  const r = Math.random();
+  if(r < 0.35){
+    return makeMeaningQuestion();
+  } else if(r < 0.65){
+    const v = pick(SUB_VOCAB);
+    return { type:'mcq', prompt:v.q, sub:'Subtraction vocabulary check.', options: shuffle(v.opts), correct:v.correct };
+  } else {
+    const digits = pick([2,3]);
+    const [a,b] = genNoRegroupSubPair(digits);
+    const correct = a-b;
+    return {
+      type:'input',
+      prompt:`Take Away: ${fmt(a)} − ${fmt(b)} = ?`,
+      sub:'No regrouping needed here — subtract each column directly.',
+      visual: placeValueChart(a,b),
+      correct: correct
+    };
+  }
+}
+function genTidePoolQuestions(n){ return buildUniqueSet(n, makeTidePoolQuestion); }
+
+// WORLD 2 — The Compare Current (missing addend, inverse-operation check, comparison)
+function makeMissingAddendQuestion(){
+  const digits = pick([2,3]);
+  const [minuend, subtrahend] = genRegroupSubPair(digits);
+  const diff = minuend - subtrahend;
+  return {
+    type:'input',
+    prompt:`Missing Addend: ${fmt(subtrahend)} + ? = ${fmt(minuend)}. What number completes the equation?`,
+    sub:'Think: what must be added to reach the total?',
+    correct: diff
+  };
+}
+function isEquationTrue(eqStr){
+  const m = eqStr.match(/^([\d,]+) ([+\-]) ([\d,]+) = ([\d,]+)$/);
+  if(!m) return false;
+  const x=parseInt(m[1].replace(/,/g,'')), op=m[2], y=parseInt(m[3].replace(/,/g,'')), z=parseInt(m[4].replace(/,/g,''));
+  return op==='+' ? (x+y===z) : (x-y===z);
+}
+function makeInverseCheckQuestion(){
+  const digits = pick([2,3]);
+  const [minuend, subtrahend] = genRegroupSubPair(digits+1 > 4 ? 4 : digits+1);
+  const diff = minuend - subtrahend;
+  const correctEq = `${fmt(diff)} + ${fmt(subtrahend)} = ${fmt(minuend)}`;
+  const candidatePool = [
+    `${fmt(subtrahend)} + ${fmt(minuend)} = ${fmt(diff)}`,
+    `${fmt(diff)} + ${fmt(minuend)} = ${fmt(subtrahend)}`,
+    `${fmt(minuend)} + ${fmt(subtrahend)} = ${fmt(diff)}`,
+    `${fmt(diff)} − ${fmt(subtrahend)} = ${fmt(minuend)}`.replace('−','-')
+  ];
+  let distractors = candidatePool.filter(c => !isEquationTrue(c) && c !== correctEq);
+  distractors = Array.from(new Set(distractors));
+  let guard=0;
+  while(distractors.length < 3 && guard < 20){
+    guard++;
+    const fakeDiff = diff + randInt(1,9)*(Math.random()<0.5?1:-1);
+    const fake = `${fmt(Math.max(fakeDiff,0))} + ${fmt(subtrahend)} = ${fmt(minuend)}`;
+    if(!isEquationTrue(fake) && fake!==correctEq && !distractors.includes(fake)) distractors.push(fake);
+  }
+  const options = shuffle([correctEq, ...distractors.slice(0,3)]);
+  return {
+    type:'mcq',
+    prompt:`If ${fmt(minuend)} − ${fmt(subtrahend)} = ${fmt(diff)}, which addition equation checks this subtraction?`,
+    sub:'Remember: Difference + Subtrahend = Minuend',
+    options,
+    correct: correctEq
+  };
+}
+const COMPARE_TEMPLATES = [
+  (a,b)=>`Dolphin A swam ${fmt(a)} meters and Dolphin B swam ${fmt(b)} meters. How much FARTHER did Dolphin A swim?`,
+  (a,b)=>`One current carried ${fmt(a)} bubbles and another carried ${fmt(b)} bubbles. What is the DIFFERENCE between the two currents?`,
+  (a,b)=>`A racing dolphin covered ${fmt(a)} meters while its rival covered ${fmt(b)} meters. By how many meters did it win?`
+];
+function makeCompareQuestion(){
+  const r = Math.random();
+  if(r < 0.34){
+    return makeMissingAddendQuestion();
+  } else if(r < 0.68){
+    return makeInverseCheckQuestion();
+  } else {
+    const digits = pick([3,4]);
+    const [a,b] = genRegroupSubPair(digits);
+    const correct = a-b;
+    const tmpl = pick(COMPARE_TEMPLATES);
+    return {
+      type:'input',
+      prompt: tmpl(a,b),
+      sub:'Comparing two amounts — find the difference.',
+      correct: correct
+    };
+  }
+}
+function genCompareQuestions(n){ return buildUniqueSet(n, makeCompareQuestion); }
+
+// WORLD 3 — Pearl Exchange Cove (regrouping basics + find-the-error)
+function makePearlQuestion(){
+  const r = Math.random();
+  if(r < 0.5){
+    const digits = pick([3,4,5]);
+    const [a,b] = genRegroupSubPair(digits);
+    const correct = a-b;
+    return {
+      type:'input',
+      prompt:`Exchange and solve: ${fmt(a)} − ${fmt(b)} = ?`,
+      sub:'Regroup (exchange) when a column does not have enough to subtract.',
+      visual: placeValueChart(a,b),
+      correct: correct
+    };
+  } else {
+    const digits = pick([3,4]);
+    const [a,b] = genRegroupSubPair(digits);
+    const correct = a-b;
+    const shown = noBorrowDiff(a,b);
+    const workedBlock = `<div style="font-family:monospace;font-size:18px;text-align:center;background:#f8fafc;color:#0f172a;border-radius:10px;padding:10px 16px;margin:10px auto;display:inline-block;box-shadow:inset 0 0 0 2px #e2e8f0;">&nbsp;&nbsp;${fmt(a)}<br>− ${fmt(b)}<br>——————<br>&nbsp;&nbsp;${fmt(shown)}</div>`;
+    if(Math.random() < 0.6){
+      const finalOpts = buildDiffOptions(correct, shown);
+      return {
+        type:'mcq',
+        prompt:`A young crab wrote:<br>${workedBlock}<br>What is the CORRECT difference?`,
+        sub:'Check whether every exchange (regroup) step happened.',
+        options: finalOpts,
+        correct: String(correct)
+      };
+    } else {
+      return {
+        type:'mcq',
+        prompt:`A young crab wrote:<br>${workedBlock}<br>What mistake did the crab make?`,
+        sub:'Compare the shown answer to what regrouping should have produced.',
+        options: shuffle(['Forgot to exchange (regroup) and just subtracted the smaller digit from the larger digit','Used addition instead of subtraction','Subtracted the wrong two numbers','There is no mistake — the answer is correct']),
+        correct: 'Forgot to exchange (regroup) and just subtracted the smaller digit from the larger digit'
+      };
+    }
+  }
+}
+function genPearlQuestions(n){ return buildUniqueSet(n, makePearlQuestion); }
+
+// WORLD 4 — The Sunken Zero Reef (regrouping across zeros + misconceptions)
+const ZERO_FACTS = [
+  {q:'1 ten = how many ones?', opts:['10','1','100','5'], correct:'10'},
+  {q:'1 hundred = how many tens?', opts:['10','1','100','20'], correct:'10'},
+  {q:'1 hundred = how many ones?', opts:['100','10','1,000','50'], correct:'100'},
+  {q:'1 thousand = how many hundreds?', opts:['10','100','1','5'], correct:'10'},
+  {q:'1 thousand = how many tens?', opts:['100','10','1,000','50'], correct:'100'},
+  {q:'1 thousand = how many ones?', opts:['1,000','100','10','500'], correct:'1,000'},
+  {q:'1 ten-thousand = how many thousands?', opts:['10','100','1','5'], correct:'10'},
+  {q:'1 hundred-thousand = how many ten-thousands?', opts:['10','100','1','5'], correct:'10'}
+];
+const ZERO_MISCONCEPTIONS = [
+  {s:'Zeros make subtraction impossible.', v:false},
+  {s:'If there is a zero in the tens place, you can still regroup by exchanging from a larger place.', v:true},
+  {s:'Regrouping means taking a number away from the next column.', v:false},
+  {s:'After regrouping, the total value of the number stays exactly the same.', v:true},
+  {s:'1 thousand can be exchanged for 10 hundreds.', v:true},
+  {s:'Once a digit becomes zero after regrouping, that value disappears completely.', v:false}
+];
+const ZERO_CHAIN_CONFIGS = [[1,2],[2,3],[3,4],[3,5],[4,5]];
+function makeZeroReefQuestion(){
+  const r = Math.random();
+  if(r < 0.28){
+    const f = pick(ZERO_FACTS);
+    return { type:'mcq', prompt:f.q, sub:'Place-value exchange fact.', options: shuffle(f.opts), correct:f.correct };
+  } else if(r < 0.56){
+    const m = pick(ZERO_MISCONCEPTIONS);
+    return { type:'truefalse', prompt: m.s, sub:'True or False?', correct: m.v ? 'True' : 'False' };
+  } else {
+    const cfg = pick(ZERO_CHAIN_CONFIGS);
+    const [a,b] = genZeroChainPair(cfg[0], cfg[1]);
+    const correct = a-b;
+    return {
+      type:'input',
+      prompt:`Cross the Zero Bridge: ${fmt(a)} − ${fmt(b)} = ?`,
+      sub:'Exchange larger units for smaller ones all the way down!',
+      visual: placeValueChart(a,b),
+      correct: correct
+    };
+  }
+}
+function genZeroReefQuestions(n){ return buildUniqueSet(n, makeZeroReefQuestion); }
+
+// WORLD 5 — Captain's Treasury Voyage (real-world, estimation, mastery mixed)
+const VOYAGE_CTX = [
+  {label:'gold doubloons', place:'The ship\u2019s treasury', verb:'holds', spendVerb:'spends'},
+  {label:'silver coins', place:'The ship\u2019s chest', verb:'holds', spendVerb:'pays out'},
+  {label:'pearls', place:'The dive crew', verb:'collects', spendVerb:'trades away'},
+  {label:'treasure maps', place:'The captain', verb:'has', spendVerb:'gives away'}
+];
+const VOYAGE_CHAIN_CONFIGS = [[3,4],[4,5]];
+const FINAL_CHAIN_CONFIGS = [[4,5],[3,6],[5,6]];
+function makeVoyageQuestion(){
+  const r = Math.random();
+  if(r < 0.4){
+    const c = pick(VOYAGE_CTX);
+    const cfg = pick(VOYAGE_CHAIN_CONFIGS);
+    const [a,b] = genZeroChainPair(cfg[0], cfg[1]);
+    const correct = a-b;
+    return {
+      type:'input',
+      prompt:`⚓ ${c.place} ${c.verb} ${fmt(a)} ${c.label}. The crew ${c.spendVerb} ${fmt(b)} ${c.label}. How many ${c.label} remain?`,
+      sub:'Real-world subtraction — line up the place values and regroup if needed!',
+      correct: correct
+    };
+  } else if(r < 0.7){
+    const digits = pick([4,5]);
+    const [a,b] = genRegroupSubPair(digits);
+    const exact = a-b;
+    const correctEst = Math.round(exact/1000)*1000;
+    const distractors = new Set([correctEst]);
+    let opts=[correctEst];
+    const alt1 = Math.floor(exact/1000)*1000, alt2 = Math.ceil(exact/1000)*1000;
+    [alt1,alt2].forEach(v=>{ if(!distractors.has(v)){opts.push(v); distractors.add(v);} });
+    if(!distractors.has(exact)){ opts.push(exact); distractors.add(exact); }
+    while(opts.length<4){ const v=correctEst + 1000*randInt(1,3)*(Math.random()<0.5?1:-1); if(v>=0 && !distractors.has(v)){opts.push(v);distractors.add(v);} }
+    return {
+      type:'mcq',
+      prompt:`Estimate ${fmt(a)} − ${fmt(b)} to the nearest thousand.`,
+      sub:'Round the exact difference to the nearest thousand.',
+      options: shuffle(opts.slice(0,4).map(fmt)),
+      correct: fmt(correctEst)
+    };
+  } else {
+    const cfg = pick(FINAL_CHAIN_CONFIGS);
+    const [a,b] = genZeroChainPair(cfg[0], cfg[1]);
+    const correct = a-b;
+    return {
+      type:'input',
+      prompt:`Final Voyage Challenge: ${fmt(a)} − ${fmt(b)} = ?`,
+      sub:'The crew is counting on your accuracy!',
+      correct: correct
+    };
+  }
+}
+function genVoyageQuestions(n){ return buildUniqueSet(n, makeVoyageQuestion); }
+
+/* ---------------- AMBIENT BACKDROP (sun rays, bubbles, fish, seaweed) ---------------- */
+function buildBackdrop(){
+  const rayField = document.getElementById('rayField');
+  const bubbleField = document.getElementById('bubbleField');
+  const fishField = document.getElementById('fishField');
+  const seaweedField = document.getElementById('seaweedField');
+  if(rayField){
+    let html='';
+    for(let i=0;i<6;i++){
+      html += `<div class="ray" style="left:${10+i*15}%;transform:rotate(${-15+i*6}deg);animation-delay:${(i*0.6).toFixed(2)}s;"></div>`;
+    }
+    rayField.innerHTML = html;
+  }
+  if(bubbleField){
+    let html='';
+    for(let i=0;i<28;i++){
+      const size = (Math.random()*14+6).toFixed(0);
+      html += `<div class="bubble" style="left:${Math.random()*100}%;width:${size}px;height:${size}px;animation-duration:${(6+Math.random()*8).toFixed(1)}s;animation-delay:${(Math.random()*6).toFixed(2)}s;"></div>`;
+    }
+    bubbleField.innerHTML = html;
+  }
+  if(fishField){
+    const fishEmojis=['🐟','🐠','🐡'];
+    let html='';
+    for(let i=0;i<7;i++){
+      html += `<div class="fish-drift" style="top:${10+Math.random()*55}%;animation-duration:${(18+Math.random()*14).toFixed(1)}s;animation-delay:${(i*3).toFixed(1)}s;">${fishEmojis[i%fishEmojis.length]}</div>`;
+    }
+    fishField.innerHTML = html;
+  }
+  if(seaweedField){
+    let html='';
+    for(let i=0;i<8;i++){
+      html += `<div class="seaweed" style="left:${5+i*12}%;animation-delay:${(i*0.3).toFixed(2)}s;">🌿</div>`;
+    }
+    seaweedField.innerHTML = html;
+  }
+}
+
+/* ---------------- WORLD SCENERY (themed animated backgrounds) ---------------- */
+function sceneHTML(stageId){
+  if(stageId==='tidepool'){
+    return `<div class="scene-tidepool">
+      <div class="wave"></div>
+      <div class="shell" style="top:12%;left:8%;">🐚</div>
+      <div class="shell" style="top:18%;right:10%;animation-delay:.6s;">🐚</div>
+      <div class="scene-icon" style="top:55%;left:6%;">☀️</div>
+      <div class="scene-icon" style="top:65%;right:8%;">🌊</div>
+    </div>`;
+  }
+  if(stageId==='current'){
+    return `<div class="scene-current">
+      <div class="stripe" style="top:20%;"></div>
+      <div class="stripe" style="top:45%;animation-delay:.5s;"></div>
+      <div class="stripe" style="top:70%;animation-delay:1s;"></div>
+      <div class="racer" style="top:25%;">🐬</div>
+      <div class="racer" style="top:60%;animation-delay:1.5s;">🐬</div>
+    </div>`;
+  }
+  if(stageId==='cove'){
+    return `<div class="scene-cove">
+      <div class="chest">🪸</div>
+      <div class="pearl" style="left:15%;animation-duration:3.2s;animation-delay:.1s;">🦪</div>
+      <div class="pearl" style="left:45%;animation-duration:2.6s;animation-delay:1s;">🔮</div>
+      <div class="pearl" style="left:75%;animation-duration:3.6s;animation-delay:.5s;">🦪</div>
+      <div class="coral" style="left:6%;">🪸</div>
+      <div class="coral" style="right:6%;">🪸</div>
+    </div>`;
+  }
+  if(stageId==='reef'){
+    return `<div class="scene-reef">
+      <div class="jelly" style="top:14%;left:12%;">🪼</div>
+      <div class="jelly" style="top:22%;right:14%;animation-delay:.8s;">🪼</div>
+      <div class="emptychest" style="top:60%;left:10%;">📦</div>
+      <div class="glowdot" style="top:35%;left:40%;"></div>
+      <div class="glowdot" style="top:55%;left:65%;animation-delay:.6s;"></div>
+      <div class="glowdot" style="top:70%;left:25%;animation-delay:1.1s;"></div>
+    </div>`;
+  }
+  if(stageId==='voyage'){
+    return `<div class="scene-voyage">
+      <div class="wheel">☸️</div>
+      <div class="doubloon" style="left:10%;animation-duration:3s;animation-delay:0s;">🪙</div>
+      <div class="doubloon" style="left:35%;animation-duration:3.6s;animation-delay:.7s;">🪙</div>
+      <div class="doubloon" style="left:60%;animation-duration:2.8s;animation-delay:1.3s;">🪙</div>
+      <div class="doubloon" style="left:85%;animation-duration:3.3s;animation-delay:.4s;">🪙</div>
+    </div>`;
+  }
+  return '';
+}
+
+/* ---------------- WALKER: animated character enters/exits with each question ---------------- */
+const WALKER_LINES = {
+  tidepool: ['Let\u2019s dive in!','Ready to explore!','What\u2019s in the pool today?','Splash time!'],
+  current: ['Racing ahead!','Follow the current!','Compare and conquer!','On your marks!'],
+  cove: ['Time to trade pearls!','Let\u2019s exchange!','Careful with the treasure!','Almost unlocked!'],
+  reef: ['Into the deep...','The zeros don\u2019t stop us!','Glowing through the dark!','Exchange chain, engage!'],
+  voyage: ['To the treasury!','Count it carefully!','The crew awaits!','Almost home!']
+};
+function spawnWalker(stageId, character, qNumber){
+  const wrap = document.getElementById('walkerWrap');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const w = document.createElement('div');
+  w.className = 'walker walk-in';
+  w.id = 'walkerChar';
+  const lines = WALKER_LINES[stageId] || ['Onward!'];
+  const line = lines[(qNumber-1) % lines.length];
+  w.innerHTML = `${character}<div class="speech">${line}</div>`;
+  wrap.appendChild(w);
+  sfxStepIn();
+}
+function reactWalker(isCorrect){
+  const w = document.getElementById('walkerChar');
+  if(!w) return;
+  w.classList.remove('reacting','good','bad');
+  void w.offsetWidth;
+  w.classList.add('reacting', isCorrect?'good':'bad');
+}
+function spawnSplashRing(){
+  const wrap = document.getElementById('walkerWrap');
+  if(!wrap) return;
+  const ring = document.createElement('div');
+  ring.className = 'splash-ring';
+  wrap.appendChild(ring);
+  setTimeout(()=> ring.remove(), 650);
+}
+function spawnMurkOverlay(){
+  const frame = document.getElementById('gameFrame');
+  if(!frame) return;
+  const old = frame.querySelector('.murk-overlay');
+  if(old) old.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'murk-overlay';
+  frame.appendChild(overlay);
+  setTimeout(()=> overlay.remove(), 650);
+}
+// DRAMATIC TRANSITION: a wave of water washes across the whole frame between
+// questions — content swaps underneath right as the wave fully covers the card.
+function waveTransitionThen(callback){
+  const frame = document.getElementById('gameFrame');
+  if(!frame){ callback(); return; }
+  sfxWaveWhoosh();
+  const wash = document.createElement('div');
+  wash.className = 'wave-wash';
+  wash.innerHTML = `
+    <div class="wave-shape foam"></div>
+    <div class="wave-shape wave-shape2"></div>
+    <div class="wave-droplet" style="left:20%;animation-delay:.15s;">💧</div>
+    <div class="wave-droplet" style="left:45%;animation-delay:.05s;">💧</div>
+    <div class="wave-droplet" style="left:70%;animation-delay:.25s;">💧</div>
+  `;
+  frame.appendChild(wash);
+  setTimeout(()=>{ callback(); }, 430); // swap the question right as the wave crests over the card
+  setTimeout(()=>{ wash.remove(); }, 1000);
+}
+function showLevelUpBanner(text){
+  const b = document.getElementById('levelupBanner');
+  if(!b) return;
+  b.textContent = text;
+  b.classList.remove('show');
+  void b.offsetWidth;
+  b.classList.add('show');
+  sfxLevelUp();
+}
+
+/* ---------------- STAGE CONFIG ---------------- */
+const QUESTIONS_PER_STAGE = 15;
+const STAGES = [
+  { id:'tidepool', name:'Tide Pool Basics', subtitle:'The three meanings of subtraction', character:'🦦', animClass:'anim-bounce',
+    story:"Welcome aboard, sailor! Captain Otto the sea otter is warming up in the sunny shallows. Before the voyage begins, help Otto master what subtraction really means — taking away, comparing, and finding what's missing.",
+    gen: genTidePoolQuestions },
+  { id:'current', name:'The Compare Current', subtitle:'Missing addends & checking with addition', character:'🐬', animClass:'anim-wiggle',
+    story:"Delphi the dolphin loves racing the current! To keep up, you'll need to compare distances, find missing addends, and use addition to double-check every subtraction.",
+    gen: genCompareQuestions },
+  { id:'cove', name:'Pearl Exchange Cove', subtitle:'Regrouping: exchanging place-value units', character:'🦀', animClass:'anim-pulse',
+    story:"Shelly the hermit crab runs the pearl exchange in this coral cove. When there aren't enough pearls in one pile, Shelly trades a bigger pearl for ten smaller ones. Help her exchange correctly — and catch any trading mistakes!",
+    gen: genPearlQuestions },
+  { id:'reef', name:'The Sunken Zero Reef', subtitle:'Regrouping across zeros', character:'🐙', animClass:'anim-float',
+    story:"Deep in the glowing trench, Inkwell the octopus guards the Sunken Zero Reef. Some treasure chests here are empty (zeros!) — but Inkwell knows the secret: exchange a bigger unit for ten smaller ones, all the way down the chain.",
+    gen: genZeroReefQuestions },
+  { id:'voyage', name:"Captain's Treasury Voyage", subtitle:'Real-world subtraction & estimation', character:'🦜', animClass:'anim-bounce',
+    story:"First Mate Squawk needs your help balancing the ship's treasury! Solve real voyage problems, estimate wisely, and tackle the final mastery challenges to complete the journey.",
+    gen: genVoyageQuestions }
+];
+
+/* ---------------- GAME STATE ---------------- */
+let state = {
+  currentStageIdx: 0,
+  currentQIdx: 0,
+  stageQuestions: [],
+  stageCorrect: 0,
+  totalXp: 0,
+  answered: false,
+  stageStars: {},
+  stageDone: {},
+  totalCorrectEver: 0,
+  totalAnsweredEver: 0
+};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  const fab = document.getElementById('wbFab');
+  const fabLabel = document.getElementById('wbFabLabel');
+  if(id === 'screen-question'){
+    fab.classList.add('show');
+    fabLabel.classList.add('show');
+    setTimeout(()=> fabLabel.classList.remove('show'), 2600); // brief hint, then fades
+  } else {
+    fab.classList.remove('show');
+    fabLabel.classList.remove('show');
+    closeWhiteboard();
+  }
+}
+
+function beginJourney(){
+  initAudio();
+  soundOn = true;
+  if(masterGain) masterGain.gain.value = volume;
+  startAmbient();
+  sfxWhoosh();
+  renderMap();
+  showScreen('screen-map');
+}
+
+function renderMap(){
+  const wrap = document.getElementById('stagePath');
+  wrap.innerHTML = '';
+  let totalDone=0, totalStars=0;
+  STAGES.forEach((st)=>{
+    const stars = state.stageStars[st.id]||0;
+    totalStars += stars;
+    totalDone += state.stageDone[st.id]||0;
+    const node = document.createElement('div');
+    node.className = 'stage-node';
+    node.onclick = ()=>{ sfxClick(); openStageIntro(STAGES.indexOf(st)); };
+    node.innerHTML = `
+      <div class="char ${st.animClass}" style="background:${stageColor(st.id)}22;">${st.character}</div>
+      <div class="info">
+        <h4>${STAGES.indexOf(st)+1}. ${st.name}</h4>
+        <p>${st.subtitle}</p>
+      </div>
+      <div class="stage-stars">${starString(stars)}</div>
+    `;
+    wrap.appendChild(node);
+  });
+  document.getElementById('overallProgress').textContent = `${totalDone} / ${STAGES.length*QUESTIONS_PER_STAGE} questions completed · ${totalStars} ⭐ earned`;
+}
+function stageColor(id){
+  const map={tidepool:'#0d9488',current:'#0284c7',cove:'#fb7185',reef:'#0f766e',voyage:'#c2410c'};
+  return map[id]||'#0d9488';
+}
+function frameThemeClass(stageId){ return 'frametheme-' + stageId; }
+function starString(n){
+  let s='';
+  for(let i=0;i<3;i++) s += i<n ? '<span class="filled">★</span>' : '☆';
+  return s;
+}
+function goToMap(){ renderMap(); showScreen('screen-map'); }
+
+function openStageIntro(idx){
+  state.currentStageIdx = idx;
+  const st = STAGES[idx];
+  const card = document.getElementById('stageIntroCard');
+  card.className = 'stage-intro-card themed ' + frameThemeClass(st.id).replace('frametheme-','bgtheme-');
+  card.style.background = stageIntroBG(st.id);
+  document.getElementById('stageIntroScene').innerHTML = sceneHTML(st.id);
+  document.getElementById('stageIntroChar').textContent = st.character;
+  document.getElementById('stageIntroChar').className = 'stage-intro-char ' + st.animClass;
+  document.getElementById('stageIntroTitle').textContent = (idx+1) + '. ' + st.name;
+  document.getElementById('stageIntroStory').textContent = st.story;
+  sfxWhoosh();
+  showScreen('screen-stage-intro');
+}
+function stageIntroBG(id){
+  const map={
+    tidepool:'linear-gradient(135deg,#0d9488,#0f766e)',
+    current:'linear-gradient(135deg,#0284c7,#075985)',
+    cove:'linear-gradient(135deg,#fb7185,#be123c)',
+    reef:'linear-gradient(135deg,#0f766e,#083344)',
+    voyage:'linear-gradient(135deg,#c2410c,#7c2d12)'
+  };
+  return map[id]||map.tidepool;
+}
+
+function startStageQuestions(){
+  const st = STAGES[state.currentStageIdx];
+  state.stageQuestions = st.gen(QUESTIONS_PER_STAGE);
+  state.currentQIdx = 0;
+  state.stageCorrect = 0;
+  state.answered = false;
+  showScreen('screen-question');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const st = STAGES[state.currentStageIdx];
+  const q = state.stageQuestions[state.currentQIdx];
+  state.answered = false;
+  clearWhiteboard(); // fresh scratch page for each new question
+
+  const frame = document.getElementById('gameFrame');
+  frame.className = 'game-frame ' + frameThemeClass(st.id);
+  document.getElementById('sceneLayer').innerHTML = sceneHTML(st.id);
+  document.getElementById('hudStageName').textContent = `${st.character} ${st.name}`;
+  document.getElementById('hudXp').textContent = `⭐ ${state.totalXp} XP`;
+  const pct = Math.round((state.currentQIdx)/QUESTIONS_PER_STAGE*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  spawnWalker(st.id, st.character, state.currentQIdx+1);
+
+  document.getElementById('qPrompt').innerHTML = q.prompt;
+  document.getElementById('qSub').textContent = q.sub||'';
+  const visualBox = document.getElementById('qVisual');
+  visualBox.innerHTML = q.visual || '';
+
+  const answerArea = document.getElementById('qAnswerArea');
+  answerArea.innerHTML = '';
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box';
+  fb.textContent = '';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  if(q.type === 'mcq'){
+    const grid = document.createElement('div');
+    grid.className = 'options-grid';
+    q.options.forEach(opt=>{
+      const b = document.createElement('button');
+      b.className = 'opt-btn';
+      b.innerHTML = opt;
+      b.onclick = ()=> submitAnswer(opt, q, b, grid);
+      grid.appendChild(b);
+    });
+    answerArea.appendChild(grid);
+  } else if(q.type === 'truefalse'){
+    const grid = document.createElement('div');
+    grid.className = 'options-grid';
+    ['True','False'].forEach(opt=>{
+      const b = document.createElement('button');
+      b.className = 'opt-btn';
+      b.textContent = opt;
+      b.onclick = ()=> submitAnswer(opt, q, b, grid);
+      grid.appendChild(b);
+    });
+    answerArea.appendChild(grid);
+  } else if(q.type === 'input'){
+    const row = document.createElement('div');
+    row.className = 'input-row';
+    row.innerHTML = `<input type="number" id="numInput" placeholder="Type your answer" inputmode="numeric"/>`;
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary btn-small';
+    btn.textContent = 'Check';
+    btn.onclick = ()=>{
+      const val = document.getElementById('numInput').value;
+      if(val==='') return;
+      submitAnswer(Number(val), q, btn, row, true);
+    };
+    row.appendChild(btn);
+    answerArea.appendChild(row);
+    setTimeout(()=>{ const el=document.getElementById('numInput'); if(el) el.focus(); }, 100);
+  }
+}
+
+function submitAnswer(given, q, btnEl, containerEl, isInput){
+  if(state.answered) return;
+  state.answered = true;
+  sfxClick();
+  let isCorrect;
+  if(q.type==='input'){
+    isCorrect = Number(given) === Number(q.correct);
+  } else {
+    isCorrect = String(given) === String(q.correct);
+  }
+
+  const fb = document.getElementById('feedbackBox');
+  const frame = document.getElementById('gameFrame');
+  if(isCorrect){
+    state.stageCorrect++;
+    state.totalXp += 10;
+    state.totalCorrectEver++;
+    fb.className = 'feedback-box show ok';
+    fb.textContent = '✅ Correct! ' + (q.explanation||'Great place-value thinking!');
+    sfxCorrect();
+    if(btnEl && !isInput) btnEl.classList.add('correct');
+    reactWalker(true);
+    frame.classList.remove('ripple-good'); void frame.offsetWidth; frame.classList.add('ripple-good');
+    spawnSplashRing();
+  } else {
+    fb.className = 'feedback-box show no';
+    const correctDisplay = q.type==='input' ? fmt(q.correct) : q.correct;
+    fb.textContent = `❌ Not quite. The correct answer is ${correctDisplay}. ${q.explanation||''}`;
+    sfxWrong();
+    if(btnEl && !isInput) btnEl.classList.add('wrong');
+    reactWalker(false);
+    frame.classList.remove('murk-bad'); void frame.offsetWidth; frame.classList.add('murk-bad');
+    spawnMurkOverlay();
+  }
+  state.totalAnsweredEver++;
+
+  if(containerEl && !isInput){
+    Array.from(containerEl.children).forEach(c=>{
+      if(c.tagName==='BUTTON'){
+        c.disabled = true;
+        const txt = c.innerHTML;
+        if(txt === (q.type==='input'?String(q.correct):q.correct) && !c.classList.contains('correct') && !c.classList.contains('wrong')){
+          c.classList.add('correct');
+        }
+        if(!c.classList.contains('correct') && !c.classList.contains('wrong')) c.classList.add('dim');
+      }
+    });
+  } else if(isInput){
+    document.getElementById('numInput').disabled = true;
+    btnEl.disabled = true;
+  }
+
+  document.getElementById('hudXp').textContent = `⭐ ${state.totalXp} XP`;
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function nextQuestion(){
+  sfxClick();
+  waveTransitionThen(()=>{
+    state.currentQIdx++;
+    if(state.currentQIdx >= state.stageQuestions.length){
+      finishStage();
+    } else {
+      showLevelUpBanner('Level ' + (state.currentQIdx+1) + '!');
+      renderQuestion();
+    }
+  });
+}
+
+function finishStage(){
+  const st = STAGES[state.currentStageIdx];
+  const total = state.stageQuestions.length;
+  const acc = Math.round(state.stageCorrect/total*100);
+  let stars = 1;
+  if(acc>=90) stars=3; else if(acc>=70) stars=2; else stars=1;
+  if(acc===0) stars=0;
+
+  const prevStars = state.stageStars[st.id]||0;
+  state.stageStars[st.id] = Math.max(prevStars, stars);
+  state.stageDone[st.id] = total;
+
+  document.getElementById('resultChar').textContent = st.character;
+  document.getElementById('resultTitle').textContent = `${st.name} — Cleared!`;
+  document.getElementById('resultStars').innerHTML = starString(stars);
+  document.getElementById('resultCorrect').textContent = `${state.stageCorrect}/${total}`;
+  document.getElementById('resultXp').textContent = state.stageCorrect*10;
+  document.getElementById('resultAcc').textContent = acc+'%';
+
+  let msg;
+  if(acc>=90) msg = "Outstanding! You've truly mastered these waters.";
+  else if(acc>=70) msg = "Well done! A little more practice and you'll sail even smoother.";
+  else msg = "Good try! Revisit this world to strengthen your skills.";
+  document.getElementById('resultMsg').textContent = msg;
+
+  sfxFanfare();
+  if(stars===3) setTimeout(sfxStar, 700);
+
+  showScreen('screen-stage-result');
+
+  const allDone = STAGES.every(s => (state.stageDone[s.id]||0) >= QUESTIONS_PER_STAGE);
+  if(allDone){
+    setTimeout(()=>{ if(confirm('You have cleared every world! View your Mastery Report now?')) showFinal(); }, 400);
+  }
+}
+
+function retryStage(){ startStageQuestions(); }
+
+function showFinal(){
+  const rubric = document.getElementById('finalRubric');
+  rubric.innerHTML = '';
+  let totalStars=0, totalPossible=0;
+  STAGES.forEach(st=>{
+    const stars = state.stageStars[st.id]||0;
+    totalStars += stars; totalPossible += 3;
+    const pct = Math.round(stars/3*100);
+    const row = document.createElement('div');
+    row.className = 'rubric-row';
+    row.innerHTML = `<div class="char">${st.character}</div><div class="name">${st.name}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${stageColor(st.id)};"></div></div>
+      <div class="pct">${starString(stars)}</div>`;
+    rubric.appendChild(row);
+  });
+  document.getElementById('finalTotalXp').textContent = state.totalXp;
+  document.getElementById('finalStars').textContent = totalStars + '/' + totalPossible;
+  const overallAcc = state.totalAnsweredEver ? Math.round(state.totalCorrectEver/state.totalAnsweredEver*100) : 0;
+  document.getElementById('finalAcc').textContent = overallAcc+'%';
+
+  let badgeText = 'Tidewater Apprentice';
+  if(totalStars>=13) badgeText = 'Grand Admiral of the Deep';
+  else if(totalStars>=9) badgeText = 'Trusted Ship Navigator';
+  else if(totalStars>=5) badgeText = 'Rising Tidewater Sailor';
+  document.getElementById('finalBadge').textContent = badgeText;
+
+  spawnConfetti();
+  sfxStar();
+  showScreen('screen-final');
+}
+
+function spawnConfetti(){
+  const card = document.getElementById('finalCard');
+  const emojis = ['🎉','⭐','🪙','✨','⚓','🐚'];
+  for(let i=0;i<24;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[randInt(0,emojis.length-1)];
+    c.style.left = randInt(0,100)+'%';
+    c.style.animationDuration = (1.5+Math.random()*1.5)+'s';
+    c.style.animationDelay = (Math.random()*0.6)+'s';
+    card.appendChild(c);
+    setTimeout(()=>c.remove(), 3500);
+  }
+}
+
+function restartAll(){
+  state = {
+    currentStageIdx:0, currentQIdx:0, stageQuestions:[], stageCorrect:0, totalXp:0,
+    answered:false, stageStars:{}, stageDone:{}, totalCorrectEver:0, totalAnsweredEver:0
+  };
+  showScreen('screen-start');
+}
+
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('soundPanel');
+  const btn = document.getElementById('soundToggleBtn');
+  if(panel.classList.contains('open') && !panel.contains(e.target) && e.target!==btn){
+    panel.classList.remove('open');
+  }
+});
+
+try{ buildBackdrop(); }catch(e){ console.error('Backdrop init failed (non-fatal):', e); }
+</script>
+</body>
+</html>
