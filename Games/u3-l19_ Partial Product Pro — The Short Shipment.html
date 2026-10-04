@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission 19: Partial Product Pro — The Short Shipment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00A7B2;--teal-2:#00928e;--teal-3:#42bcb8;--teal-tint:#E2F6F7;
+  --sun:#FAA71C;--sun-tint:#FFF3DA;--ember:#D77F28;--crimson:#C92426;--crimson-tint:#FBE6E6;
+  --off:#E4EAEB;--off-line:#b9c6c8;--ink:#141414;--muted:#46585a;--line:#c9e9eb;--white:#fff;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;--body:'Lexend','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);background:var(--white)}
+body{margin:0;min-height:100%;background:var(--white);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0}
+p{margin:0 0 .6em}
+
+.top{background:var(--teal);color:var(--white);padding:12px clamp(14px,3vw,30px);display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;justify-content:space-between;position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top h1{font-size:clamp(21px,3vw,28px);font-weight:800}
+.top .sub{font-size:13.5px;opacity:.95}
+.power{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.power .track{width:150px;height:14px;background:rgba(255,255,255,.3);border-radius:999px;overflow:hidden}
+.power .fill{height:100%;width:0;background:var(--sun);transition:width .6s ease}
+.clock{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.clock .time{font-family:var(--display);font-size:22px;font-weight:800;background:var(--white);color:var(--teal-2);padding:1px 12px;border-radius:10px;min-width:86px;text-align:center}
+.clock button{border:2px solid var(--white);background:transparent;color:var(--white);border-radius:10px;padding:4px 10px;font-weight:600;font-size:14px}
+
+.rail{display:flex;gap:8px;overflow-x:auto;padding:10px clamp(14px,3vw,30px);border-bottom:2px solid var(--teal-tint);background:var(--white);position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--topH,66px));z-index:15}
+.rail button{flex:0 0 auto;border:2px solid var(--line);background:var(--white);border-radius:14px;padding:5px 11px;text-align:left;font-size:13.5px;line-height:1.25}
+.rail button small{display:block;color:var(--muted);font-size:11.5px}
+.rail button.done{border-color:var(--sun)}
+.rail button.done::after{content:" ✓";color:var(--ember);font-weight:700}
+.rail button[aria-current="step"]{background:var(--teal);border-color:var(--teal);color:var(--white)}
+.rail button[aria-current="step"] small{color:var(--white)}
+.rail button.now:not([aria-current="step"]){box-shadow:inset 0 -4px 0 var(--sun)}
+
+main{max-width:1060px;margin:0 auto;padding:24px clamp(14px,3vw,30px) 70px}
+.stage{display:none}.stage.active{display:block}
+.head{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-bottom:14px}
+.head h2{font-size:clamp(28px,4.4vw,44px);font-weight:800;color:var(--teal-2);letter-spacing:-.02em}
+.head .when{background:var(--sun-tint);color:var(--ember);font-weight:600;border-radius:999px;padding:3px 12px;font-size:13.5px}
+
+/* story */
+.say{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start;margin:10px 0;max-width:820px}
+.av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;color:var(--white)}
+.av.r{background:var(--teal-2)} .av.a{background:var(--sun);color:var(--ink)} .av.k{background:var(--ember)}
+.bub{background:var(--teal-tint);border-radius:4px 18px 18px 18px;padding:10px 16px}
+.bub .who{display:block;font-size:13px;font-weight:700;color:var(--teal-2);margin-bottom:2px}
+.say.aria .bub{background:var(--sun-tint)} .say.aria .bub .who{color:var(--ember)}
+.say.kai .bub{background:#fbeee2} .say.kai .bub .who{color:var(--ember)}
+.guide{border-left:6px solid var(--teal);background:var(--white);border:2px solid var(--teal-tint);border-left-width:6px;border-left-color:var(--teal);padding:10px 14px;border-radius:0 14px 14px 0;margin:14px 0;max-width:820px;font-size:15.5px}
+.guide b{color:var(--teal-2)}
+
+.box{border:2px solid var(--line);border-radius:20px;padding:18px;margin:14px 0;background:var(--white)}
+.btn{border:0;border-radius:12px;padding:9px 16px;font-weight:600;background:var(--teal);color:var(--white)}
+.btn.alt{background:var(--sun);color:var(--ink)} .btn.ghost{background:var(--white);color:var(--teal-2);border:2px solid var(--teal)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input.n{width:84px;padding:7px 8px;border:2px solid var(--line);border-radius:10px;font-size:18px;text-align:center;background:var(--white)}
+input.n.bad{border-color:var(--crimson);animation:shake .3s}
+input.n.ok{border-color:var(--teal);background:var(--teal-tint)}
+textarea{width:100%;padding:10px;border:2px solid var(--line);border-radius:10px}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.fb{min-height:1.5em;font-weight:600;margin-top:6px}.fb.good{color:var(--teal-2)}.fb.bad{color:var(--crimson)}
+.complete{display:none;margin-top:14px;padding:12px 16px;border-radius:14px;background:var(--sun-tint);font-weight:600}
+.complete.show{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.hide{display:none!important}
+.pop{animation:pop .35s ease-out both}@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.choice{border:2px solid var(--line);background:var(--white);border-radius:12px;padding:8px 14px;font-weight:600}
+.choice.picked{border-color:var(--teal);background:var(--teal-tint)}
+.choice.wrong{border-color:var(--crimson);background:var(--crimson-tint)}
+
+/* panels (mission 1) */
+.panels{display:flex;gap:8px;margin:8px 0}
+.pnl{width:46px;height:62px;border-radius:6px;background:var(--off);border:2px dashed var(--off-line);transition:all .4s}
+.pnl.on{border:2px solid var(--teal-2);background:repeating-linear-gradient(0deg,rgba(255,255,255,.35) 0 1px,transparent 1px 10px),repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 1px,transparent 1px 10px),var(--teal)}
+.qrow{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1.5px dashed var(--line)}
+.qrow .k{width:28px;height:28px;border-radius:8px;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+
+/* seats (mission 2) */
+.seats{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;max-width:520px;padding:10px;background:var(--white);border:2px solid var(--line);border-radius:14px}
+.seat{aspect-ratio:1;border-radius:50% 50% 30% 30%;background:var(--off);transition:background .3s}
+.seat.c{background:var(--crimson)}
+.seat.tt{background:var(--teal)}.seat.to{background:var(--teal-3)}.seat.ot{background:var(--sun)}.seat.oo{background:var(--ember)}
+.seats.cutc .seat:nth-child(14n+10){margin-right:8px}
+.seats.cutc .seat:nth-child(n+141):nth-child(-n+154){margin-top:8px}
+
+/* array (mission 3) */
+.arr{display:inline-grid;grid-template-columns:repeat(7,34px);grid-auto-rows:34px;gap:8px;padding:12px;transition:gap .5s, padding .5s;position:relative}
+.arr i{display:block;border-radius:50%;background:var(--teal);transition:all .5s;margin:6px}
+.arr.sq i{border-radius:3px;margin:0;background:var(--teal-3);outline:1.5px solid var(--white)}
+.arr.solid{gap:0}
+.arr.solid i{outline-color:transparent;background:var(--teal)}
+.dimwrap{display:inline-grid;grid-template-columns:auto auto;gap:6px;align-items:center}
+.dimlab{font-family:var(--display);font-weight:800;color:var(--ember);font-size:22px;text-align:center}
+
+/* blueprint builder */
+.bp{border:2px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
+.bp-title{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:10px}
+.bp-title h3{font-size:24px;font-weight:800}
+.bp-title .nm{color:var(--muted);font-weight:600}
+.step{padding:8px 0}
+.rect{display:grid;max-width:640px;margin:10px 0;gap:4px}
+.rect .tl,.rect .sl{font-family:var(--display);font-weight:800;color:var(--ember);display:flex;align-items:center;justify-content:center;font-size:20px}
+.reg{border-radius:10px;background:var(--off);border:2px dashed var(--off-line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;min-height:76px;transition:background .45s,border-color .45s,color .45s;text-align:center}
+.reg .lab{font-weight:600;font-size:14.5px;color:var(--muted)}
+.reg .val{font-family:var(--display);font-weight:800;font-size:24px}
+.reg.lit{border-style:solid;color:var(--white)}
+.reg.lit .lab{color:inherit}
+.reg.tt.lit{background:var(--teal);border-color:var(--teal-2)}
+.reg.to.lit{background:var(--teal-3);border-color:var(--teal-2)}
+.reg.ot.lit{background:var(--sun);border-color:var(--ember);color:var(--ink)}
+.reg.oo.lit{background:var(--ember);border-color:var(--ember)}
+.reg.tap{cursor:pointer}
+.reg.found{outline:4px solid var(--crimson);outline-offset:2px}
+.key{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--muted)}
+.key span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+
+.badge{display:none;text-align:center;padding:28px;border-radius:24px;background:var(--sun-tint);border:3px solid var(--sun);margin-top:16px}
+.badge.show{display:block;animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+.medal{width:150px;height:150px;margin:0 auto 12px;border-radius:24px;display:grid;grid-template-columns:2fr 1fr;grid-template-rows:2fr 1fr;gap:5px;padding:12px;background:var(--white);border:6px solid var(--sun)}
+.medal i{border-radius:6px}.medal i:nth-child(1){background:var(--teal)}.medal i:nth-child(2){background:var(--sun)}.medal i:nth-child(3){background:var(--teal-3)}.medal i:nth-child(4){background:var(--ember)}
+.small{font-size:14px;color:var(--muted)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}.dot.tt{background:var(--teal)}.dot.to{background:var(--teal-3)}.dot.ot{background:var(--sun)}.dot.oo{background:var(--ember)}
+.col{display:inline-grid;gap:4px;font-family:var(--display);font-weight:800;font-size:20px;margin:8px 0;min-width:280px}
+.col div{display:flex;align-items:center;gap:12px;justify-content:flex-start}.col div span,.col div input{min-width:90px;text-align:right}
+.col hr{border:0;border-top:3px solid var(--ink);margin:2px 0;width:100px}
+.col em{font-style:normal;font-family:var(--body);font-weight:600;font-size:13.5px;border-radius:999px;padding:2px 10px;color:#fff}.col em.tt{background:var(--teal)}.col em.to{background:var(--teal-3)}.col em.ot{background:var(--sun);color:var(--ink)}.col em.oo{background:var(--ember)}
+.rowsbox{margin-top:10px;background:var(--teal-tint);border-radius:12px;padding:10px 14px}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:640px;margin:10px 0}
+.mcard{border:2px solid var(--line);background:var(--white);border-radius:14px;padding:16px 8px;font-family:var(--display);font-weight:800;font-size:20px}
+.mcard.ex{border-color:var(--teal)}.mcard.va{border-color:var(--sun)}
+.mcard.sel{background:var(--teal-tint);transform:translateY(-2px)}.mcard.no{border-color:var(--crimson);background:var(--crimson-tint)}
+.mcard.done{color:#fff;border-color:transparent}.mcard.done.tt{background:var(--teal)}.mcard.done.to{background:var(--teal-3)}.mcard.done.ot{background:var(--sun);color:var(--ink)}.mcard.done.oo{background:var(--ember)}
+.rect .reg{min-height:0}
+.reg select{font:inherit;font-size:16px;padding:4px;border-radius:8px;border:2px solid var(--line)}
+@media (max-width:620px){.mgrid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:620px){.qrow{grid-template-columns:30px 1fr}.qrow>div:last-child{grid-column:2}.reg .val{font-size:19px}input.n{width:70px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div><h1>Mission 19: Partial Product Pro</h1><div class="sub">The Short Shipment · MML Multiplication Engineering Lab</div></div>
+  <div class="power" aria-live="polite"><span>Factory output</span><span class="track"><span class="fill" id="pwr"></span></span><span id="pwrTxt">0%</span></div>
+  <div class="clock"><span class="time" id="clock">00:00</span><button id="clkGo">Start</button><button id="clkReset">Reset</button></div>
+</header>
+<nav class="rail" id="rail" aria-label="Missions"></nav>
+<main id="main"></main>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
+const fmtN=n=>n.toLocaleString('en-US');
+const num=v=>{const t=String(v).replace(/,/g,'').trim();return t===''?NaN:Number(t);};
+const setTop=()=>document.documentElement.style.setProperty('--topH',$('#top').offsetHeight+'px');
+addEventListener('resize',setTop);setTop();
+
+/* ---------- missions & navigation ---------- */
+const M=[['Factory Start-Up','0–5',0],['The Short Shipment','5–9',5],['The Distribution Line','9–18',9],['Two Ways to Run the Line','18–26',18],['The Case File','26–35',26],["Kai's Factory Report",'35–40',35],['Factory Shift','40–45',40],['Shortcut + Solar Redesign','45–48',45],['Supervisor Sign-Off','48–50',48]];
+const main=$('#main'),rail=$('#rail'),stages=[],done=new Set();
+M.forEach((m,i)=>{
+  const b=el('button',null,m[0]+'<small>'+m[1]+' min</small>');b.onclick=()=>go(i);rail.appendChild(b);
+  const s=el('section','stage');s.innerHTML='<div class="head"><h2>'+(i+1)+'. '+m[0]+'</h2><span class="when">'+m[1]+' min</span></div><div class="body"></div><div class="complete"><span class="msg"></span>'+(i<M.length-1?'<button class="btn">Next mission</button>':'')+'</div>';
+  const nb=s.querySelector('.complete .btn');if(nb)nb.onclick=()=>go(i+1);
+  main.appendChild(s);stages.push(s);
+});
+function go(i){stages.forEach((s,j)=>s.classList.toggle('active',j===i));Array.from(rail.children).forEach((b,j)=>{if(j===i)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});rail.children[i].scrollIntoView({block:'nearest',inline:'center'});scrollTo(0,0);}
+function finish(i,msg){if(!done.has(i)){done.add(i);rail.children[i].classList.add('done');const p=Math.round(done.size/M.length*100);$('#pwr').style.width=p+'%';$('#pwrTxt').textContent=p+'%';}
+  const c=stages[i].querySelector('.complete');c.querySelector('.msg').textContent=msg;c.classList.add('show');}
+const body=i=>stages[i].querySelector('.body');
+const say=(who,text)=>{const map={r:['r','Chief Engineer Rhea','R',''],a:['a','ARIA · blueprint AI','A',' aria'],k:['k','Kai · junior drafter','K',' kai']}[who];return '<div class="say'+map[3]+'"><div class="av '+map[0]+'">'+map[2]+'</div><div class="bub"><span class="who">'+map[1]+'</span>'+text+'</div></div>';};
+const guide=(t,h)=>'<div class="guide"><b>'+t+':</b> '+h+'</div>';
+
+/* clock */
+let sec=0,clk=null;const fmt=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+$('#clkGo').onclick=()=>{if(clk){clearInterval(clk);clk=null;$('#clkGo').textContent='Start';return;}clk=setInterval(()=>{sec++;$('#clock').textContent=fmt(sec);let cur=0;M.forEach((m,i)=>{if(sec/60>=m[2])cur=i;});Array.from(rail.children).forEach((b,j)=>b.classList.toggle('now',j===cur));if(sec>=3000){clearInterval(clk);clk=null;}},1000);$('#clkGo').textContent='Pause';};
+$('#clkReset').onclick=()=>{clearInterval(clk);clk=null;sec=0;$('#clock').textContent='00:00';$('#clkGo').textContent='Start';};
+
+/* ---------- blueprint builder ---------- */
+function Blueprint(host,cfg){
+  const a=cfg.a,b=cfg.b,at=a-a%10,ao=a%10,bt=b-b%10,bo=b%10;
+  const regs=[{k:'tt',x:at,y:bt},{k:'ot',x:ao,y:bt},{k:'to',x:at,y:bo},{k:'oo',x:ao,y:bo}];
+  const total=a*b;let lo=null,hi=null;
+  const w=el('div','bp');
+  w.innerHTML='<div class="bp-title"><h3>'+a+' × '+b+'</h3>'+(cfg.name?'<span class="nm">'+cfg.name+'</span>':'')+'</div>'+
+   (cfg.estimate?'<div class="step s-est">Estimate first. The product is between <input class="n lo" inputmode="numeric" aria-label="Low estimate"> and <input class="n hi" inputmode="numeric" aria-label="High estimate"> <button class="btn ghost estB">Lock estimate</button><div class="fb"></div></div>':'')+
+   (cfg.choice?'<div class="step s-choice"></div>':
+   '<div class="step s-split'+(cfg.estimate?' hide':'')+'"><p>Split each factor by place value.</p><div class="row">Across the top: '+a+' = <input class="n t1" inputmode="numeric" aria-label="Tens of '+a+'"> + <input class="n t2" inputmode="numeric" aria-label="Ones of '+a+'"></div><div class="row" style="margin-top:8px">Down the side: '+b+' = <input class="n d1" inputmode="numeric" aria-label="Tens of '+b+'"> + <input class="n d2" inputmode="numeric" aria-label="Ones of '+b+'"></div><div class="row" style="margin-top:8px"><button class="btn splitB">Check my split</button></div><div class="fb"></div></div>')+
+   (cfg.predict?'<div class="step s-pred hide"><p>Predict: how many regions will this blueprint have?</p><div class="row"><input class="n pr" inputmode="numeric" aria-label="Number of regions"><button class="btn prB">Lock prediction</button></div><div class="fb"></div></div>':'')+
+   '<div class="s-rect hide"><div class="rect"></div><div class="key"><span style="--c:var(--teal)">tens × tens</span><span style="--c:var(--teal-3)">tens × ones</span><span style="--c:var(--sun)">ones × tens</span><span style="--c:var(--ember)">ones × ones</span></div><div class="row" style="margin-top:10px"><button class="btn regB">Check regions</button></div><div class="fb rf"></div></div>'+
+   '<div class="step s-tot hide"><div class="row">Total: <span class="sumtxt"></span> = <input class="n tot" inputmode="numeric" style="width:110px" aria-label="Total"><button class="btn alt totB">Restore blueprint</button></div><div class="fb"></div></div>';
+  host.appendChild(w);
+  const q=s=>w.querySelector(s);
+  function showRect(){
+    q('.s-rect').classList.remove('hide');
+    const r=q('.rect'),cw1=at,cw2=Math.max(ao,at*.28),rh1=bt,rh2=Math.max(bo,bt*.32),H=Math.min(300,Math.max(190,b*5));
+    r.style.gridTemplateColumns='46px '+cw1+'fr '+cw2+'fr';r.style.gridTemplateRows='34px '+(H*rh1/(rh1+rh2))+'px '+(H*rh2/(rh1+rh2))+'px';
+    r.innerHTML='<span></span><span class="tl">'+at+'</span><span class="tl">'+ao+'</span>';
+    regs.forEach((g,i)=>{
+      if(i===0)r.insertAdjacentHTML('beforeend','<span class="sl">'+bt+'</span>');
+      if(i===2)r.insertAdjacentHTML('beforeend','<span class="sl">'+bo+'</span>');
+      const lab=g.x+' × '+g.y;
+      const d=el('div','reg '+g.k,'<span class="lab">'+(cfg.labels===false?'? × ?':lab)+'</span><input class="n" inputmode="numeric" aria-label="Area of region '+(i+1)+'">');
+      d.dataset.i=i;g.el=d;r.appendChild(d);
+    });
+    (cfg.prefill||[]).forEach(i=>light(i));
+    if(cfg.prefillNote)q('.rf').innerHTML='<span style="color:var(--teal-2)">'+cfg.prefillNote+'</span>';
+    const first=regs.find(g=>!g.lit);if(first)first.el.querySelector('input').focus();
+  }
+  function light(i){const g=regs[i];g.lit=true;g.el.classList.add('lit','pop');g.el.innerHTML='<span class="lab">'+g.x+' × '+g.y+'</span><span class="val">'+fmtN(g.x*g.y)+'</span>';}
+  function checkRegs(){let all=true,miss=0;regs.forEach((g,i)=>{if(g.lit)return;const inp=g.el.querySelector('input');const v=num(inp.value);
+      if(v===g.x*g.y)light(i);else{all=false;miss++;inp.classList.remove('bad');void inp.offsetWidth;inp.classList.add('bad');}});
+    const f=q('.rf');
+    if(all){f.className='fb good rf';f.textContent='All four regions are powered.';q('.regB').disabled=true;q('.s-tot').classList.remove('hide');q('.sumtxt').textContent=regs.map(g=>fmtN(g.x*g.y)).join(' + ');q('.tot').focus();}
+    else{f.className='fb bad rf';f.textContent=miss+' region'+(miss>1?'s are':' is')+' still dark. '+(cfg.labels===false?'Multiply the label on its column by the label on its row.':'Tens × tens makes hundreds; check the place value.');}
+  }
+  q('.regB').onclick=checkRegs;
+  w.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const c=e.target.closest('.reg,.s-tot,.s-split,.s-est,.s-pred');if(!c)return;const btn=c.classList.contains('reg')?q('.regB'):c.querySelector('.btn');if(btn&&!btn.disabled)btn.click();});
+  q('.totB').onclick=()=>{const v=num(q('.tot').value),f=q('.s-tot .fb');
+    if(v===total){q('.tot').classList.add('ok');q('.totB').disabled=true;f.className='fb good';
+      let m=fmtN(a)+' × '+fmtN(b)+' = '+fmtN(total)+'. Blueprint restored!';
+      if(lo!==null)m+=(total>=lo&&total<=hi)?' It is inside your estimate of '+fmtN(lo)+' to '+fmtN(hi)+'.':' It is outside your estimate ('+fmtN(lo)+' to '+fmtN(hi)+'), so think about why for next time.';
+      f.textContent=m;w.querySelector('.rect').style.boxShadow='0 0 0 4px var(--sun-tint)';cfg.onDone&&cfg.onDone();}
+    else{f.className='fb bad';f.textContent='Not yet. Add the four region values again, carefully.';}};
+  if(cfg.estimate)q('.estB').onclick=()=>{const L=num(q('.lo').value),Hh=num(q('.hi').value),f=q('.s-est .fb');
+    if(isNaN(L)||isNaN(Hh)||L>=Hh){f.className='fb bad';f.textContent='Type a low number and a higher number.';return;}
+    lo=L;hi=Hh;f.className='fb good';f.textContent='Estimate locked. Tip: the tens × tens region ('+at+' × '+bt+' = '+fmtN(at*bt)+') is the biggest part.';q('.estB').disabled=true;q('.s-split').classList.remove('hide');};
+  if(!cfg.choice){
+    if(cfg.prefillSplit){q('.t1').value=at;q('.t2').value=ao;q('.d1').value=bt;q('.d2').value=bo;}
+    q('.splitB').onclick=()=>{const t1=num(q('.t1').value),t2=num(q('.t2').value),d1=num(q('.d1').value),d2=num(q('.d2').value),f=q('.s-split .fb');
+      if(t1===at&&t2===ao&&d1===bt&&d2===bo){f.className='fb good';f.textContent='Place-value split confirmed: '+at+' + '+ao+' and '+bt+' + '+bo+'.';q('.splitB').disabled=true;next();}
+      else if(t1+t2===a&&d1+d2===b){f.className='fb bad';f.textContent='Those parts add up, but use tens and ones so the multiplying is easy (for example 40 + 3).';}
+      else{f.className='fb bad';f.textContent='Check: the two parts must add up to the factor. '+(t1&&t2&&t1+t2!==a?t1+' + '+t2+' = '+(t1+t2)+', not '+a+'.':'');}};
+  } else {
+    const c=q('.s-choice');let step=0;
+    const opts=[[a,[[Math.floor(a/10),ao],[at,ao],[at-10,ao+10]]],[b,[[Math.floor(b/10),bo],[bt,bo],[bt-10,bo+10]]]];
+    function ask(){const [f,os]=opts[step];c.innerHTML='<p>ARIA can see the '+(step?'side':'top')+' is <b>'+f+'</b>. How should we split '+f+'?</p><div class="row">'+os.map((o,i)=>'<button class="choice" data-i="'+i+'">'+o[0]+' + '+o[1]+'</button>').join('')+'</div><div class="fb"></div>';
+      c.querySelectorAll('.choice').forEach(bt2=>bt2.onclick=()=>{const o=os[+bt2.dataset.i],fb=c.querySelector('.fb');
+        if(+bt2.dataset.i===1){bt2.classList.add('picked');fb.className='fb good';fb.textContent=f+' = '+o[0]+' + '+o[1]+': tens and ones. ARIA approves.';setTimeout(()=>{step++;if(step<2)ask();else{c.innerHTML='<p class="fb good">Split locked: '+a+' = '+at+' + '+ao+' and '+b+' = '+bt+' + '+bo+'.</p>';next();}},900);}
+        else if(o[0]+o[1]!==f){bt2.classList.add('wrong');fb.className='fb bad';fb.textContent='ARIA: '+o[0]+' + '+o[1]+' = '+(o[0]+o[1])+', not '+f+'. What is the '+String(f)[0]+' in '+f+' really worth?';}
+        else{bt2.classList.add('wrong');fb.className='fb bad';fb.textContent='ARIA: that adds to '+f+', but '+o[0]+' and '+o[1]+' are not tens and ones. Splitting by place value makes the multiplying easiest.';}});}
+    ask();
+  }
+  function next(){if(cfg.predict)q('.s-pred').classList.remove('hide');else showRect();}
+  if(cfg.predict)q('.prB').onclick=()=>{const v=num(q('.pr').value),f=q('.s-pred .fb');if(isNaN(v)){f.className='fb bad';f.textContent='Type a number first.';return;}
+    q('.prB').disabled=true;f.className='fb '+(v===4?'good':'bad');f.textContent=v===4?'Correct: 2 parts across × 2 parts down = 4 regions. Every part of '+a+' meets every part of '+b+'.':'Watch: the '+at+' column crosses 2 rows, and so does the '+ao+' column. 2 × 2 = 4 regions.';
+    if(cfg.afterPredict)cfg.afterPredict(q('.s-pred'),showRect);else showRect();};
+  if(cfg.prefillSplit&&!cfg.estimate){/* split visible, prefilled */}
+  return {w};
+}
+
+/* ---------- helpers ---------- */
+function checkInputs(c){let all=true;c.querySelectorAll('input.n[data-a]').forEach(i=>{if(i.classList.contains('ok'))return;if(num(i.value)===+i.dataset.a){i.classList.add('ok');i.readOnly=true;}else{all=false;i.classList.remove('bad');void i.offsetWidth;i.classList.add('bad');}});return all;}
+const inp=(a,w)=>'<input class="n" data-a="'+a+'" inputmode="numeric"'+(w?' style="width:'+w+'px"':'')+' aria-label="answer">';
+function Model(host,top,side,opt){opt=opt||{};
+  const regs=[];side.forEach((s,ri)=>top.forEach((t,ci)=>regs.push({x:t,y:s,k:(ci===0?'t':'o')+(side.length===1?'t':(ri===0?'t':'o')),ri,ci})));
+  regs.forEach(r=>{r.k=r.k==='tt'?'tt':r.k==='ot'?'ot':r.k==='to'?'to':'oo';});
+  const H=opt.h||200,c2=Math.max(top[1],top[0]*.32),r2=side.length>1?Math.max(side[1],side[0]*.36):0;
+  const d=el('div','rect');d.style.gridTemplateColumns='46px '+top[0]+'fr '+c2+'fr';
+  const h2=side.length>1?Math.max(56,H*r2/(side[0]+r2)):0;d.style.gridTemplateRows='34px '+(side.length>1?(H-h2)+'px '+h2+'px':(opt.h||110)+'px');
+  d.innerHTML='<span></span><span class="tl">'+(opt.hideEdges?'':top[0])+'</span><span class="tl">'+(opt.hideEdges?'':top[1])+'</span>';
+  regs.forEach((r,i)=>{if(r.ci===0)d.insertAdjacentHTML('beforeend','<span class="sl">'+(opt.hideEdges?'':side[r.ri])+'</span>');
+    const e=el('div','reg '+r.k,'<span class="lab">'+(opt.labels===false?'':r.x+' × '+r.y)+'</span><span class="val"></span>');e.dataset.i=i;r.el=e;d.appendChild(e);});
+  host.appendChild(d);
+  return {regs,d,light(i,v){const r=regs[i];r.el.classList.add('lit','pop');r.el.querySelector('.lab').textContent=r.x+' × '+r.y;r.el.querySelector('.val').textContent=fmtN(v==null?r.x*r.y:v);},
+    lightAll(){regs.forEach((r,i)=>this.light(i));}};
+}
+function choiceGroup(c,correct,onRight,msgs){c.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const f=c.querySelector('.fb');if(b.dataset.v===correct){c.querySelectorAll('.choice').forEach(x=>x.disabled=true);b.classList.add('picked');f.className='fb good';f.textContent=msgs[0];onRight&&onRight();}else{b.classList.add('wrong');f.className='fb bad';f.textContent=msgs[1];}});}
+function stepper(steps){steps.forEach((s,i)=>{if(i>0)s.classList.add('hide');});return i=>{if(steps[i])steps[i].classList.remove('hide');};}
+
+/* ================= MISSION 1 ================= */
+(function(){const b=body(0);
+  b.innerHTML=say('r','Factory Supervisor, welcome to the Partial Product Factory. The blueprints you restored are ready to build. First, start the machines: each correct answer switches one on.')+
+  say('a','Four machines offline. Answers needed.')+'<div class="box"><div class="panels">'+'<i class="pnl"></i>'.repeat(4)+'</div><div id="m1q"></div></div>'+
+  guide("Supervisor's tip",'Think place value: 60 × 8 is 6 tens × 8 = 48 tens.');
+  const Q=[['60 × 8 = ?',480],['In the 43 × 27 blueprint, what is the area of the 3 × 20 region?',60],['6 × 14 = ? (an area model can help)',84],['How many regions does a 35 × 46 area model have?',4]];
+  let got=0;Q.forEach((x,i)=>{const r=el('div','qrow','<span class="k">'+(i+1)+'</span><span>'+x[0]+'</span><div class="row"><input class="n" inputmode="numeric" aria-label="Answer '+(i+1)+'"><button class="btn ghost">Check</button></div>');
+    const ip=r.querySelector('input'),bt=r.querySelector('button');const chk=()=>{if(ip.classList.contains('ok'))return;if(num(ip.value)===x[1]){ip.classList.add('ok');bt.disabled=true;b.querySelectorAll('.pnl')[got].classList.add('on');got++;if(got===4)finish(0,'ARIA: All four machines online. Production can begin.');}else{ip.classList.remove('bad');void ip.offsetWidth;ip.classList.add('bad');}};
+    bt.onclick=chk;ip.onkeydown=e=>{if(e.key==='Enter')chk();};b.querySelector('#m1q').appendChild(r);});
+})();
+
+/* ================= MISSION 2 ================= */
+(function(){const b=body(1);
+  b.innerHTML=say('r','Problem already. The airfield ordered <b>6 crates with 14 solar kits</b> in each. The factory shipped only <b>60 kits</b>.')+
+  say('a','Production line for 6 × 14 = 6 × (10 + 4). Station Teal made 6 × 10. Station Light-Teal… shows no power.')+
+  '<div class="box"><div id="m2m"></div>'+
+  '<div class="step s1"><p><b>1.</b> How many kits should have been shipped?</p><div class="row">'+inp(84)+'<button class="btn">Check</button></div><div class="fb"></div></div>'+
+  '<div class="step s2"><p><b>2.</b> Which station was switched off?</p><div class="row"><button class="choice" data-v="a">6 × 10</button><button class="choice" data-v="b">6 × 4</button></div><div class="fb"></div></div>'+
+  '<div class="step s3"><p><b>3.</b> How many kits went missing? Power the station.</p><div class="row">'+inp(24)+'<button class="btn">Power it</button></div><div class="fb"></div></div>'+
+  '<div class="step s4"><div class="say aria"><div class="av a">A</div><div class="bub"><span class="who">ARIA · factory rule</span><b>Distributive property:</b> 6 × (10 + 4) = 6 × 10 + 6 × 4. The 6 must be sent to <b>every</b> station, not just one.</div></div>'+
+  '<p style="margin-top:10px"><b>Your turn:</b> 7 × 13 = 7 × (10 + 3) = '+inp(70)+' + '+inp(21)+' = '+inp(91)+' <button class="btn alt">Check</button></p><div class="fb"></div></div></div>'+
+  guide('Remember','Distribute means share. The multiplier visits every part of the other factor.');
+  const m=Model(b.querySelector('#m2m'),[10,4],[6],{h:90});m.light(0);
+  const S=[...b.querySelectorAll('.step')],open=stepper(S);
+  S[0].querySelector('.btn').onclick=()=>{const f=S[0].querySelector('.fb');if(checkInputs(S[0])){f.className='fb good';f.textContent='6 × 14 = 84 kits. Only 60 arrived.';open(1);}else{f.className='fb bad';f.textContent='Six crates of 14: try 6 × 10 and 6 × 4.';}};
+  choiceGroup(S[1],'b',()=>open(2),['Yes: the 6 × 4 station never ran.','Station 6 × 10 made the 60 kits that did arrive. Which one is dark?']);
+  S[2].querySelector('.btn').onclick=()=>{const f=S[2].querySelector('.fb');if(checkInputs(S[2])){m.light(1);f.className='fb good';f.textContent='6 × 4 = 24 kits restored. 60 + 24 = 84.';open(3);}else{f.className='fb bad';f.textContent='6 crates × 4 kits.';}};
+  S[3].querySelector('.btn').onclick=()=>{const f=S[3].querySelector('.fb');if(checkInputs(S[3])){f.className='fb good';f.textContent='7 × 13 = 70 + 21 = 91. Every part got its 7.';finish(1,'Shipment fixed: 6 × 14 = 6 × 10 + 6 × 4 = 84 kits.');}else{f.className='fb bad';f.textContent='Send the 7 to the 10 and to the 3.';}};
+})();
+
+/* ================= MISSION 3 ================= */
+(function(){const b=body(2);
+  b.innerHTML=say('r','Now the big one: the master order, <b>43 × 27</b>. Both factors have two parts, so this line needs more stations.')+
+  guide('Supervisor\'s tip','Every part of 43 must be multiplied by every part of 27. Count the stations before you switch them on.')+
+  '<div class="box"><div class="step s1"><p><b>1. Split both factors by place value.</b></p><div class="row">43 = '+inp(40)+' + '+inp(3)+' &nbsp; 27 = '+inp(20)+' + '+inp(7)+'<button class="btn">Check</button></div><div class="fb"></div></div>'+
+  '<div class="step s2"><p><b>2. Switch on only the real stations</b> for (40 + 3) × (20 + 7).</p><div class="row" id="chips"></div><div class="row" style="margin-top:8px"><button class="btn">Start production</button></div><div class="fb"></div></div>'+
+  '<div class="step s3"><p><b>3. Power each station.</b> Each answer lights its region.</p><div class="row" style="align-items:flex-start;gap:24px"><div id="m3m" style="flex:1 1 320px"></div><div id="m3in" style="flex:0 0 auto"></div></div><div class="row"><button class="btn">Power stations</button></div><div class="fb"></div></div>'+
+  '<div class="step s4"><p><b>4. Total production:</b> 800 + 280 + 60 + 21 = '+inp(1161,100)+' <button class="btn alt">Ship it</button></p><div class="fb"></div><div id="col" class="hide"></div></div></div>';
+  const S=[...b.querySelectorAll('.step')],open=stepper(S);
+  S[0].querySelector('.btn').onclick=()=>{const f=S[0].querySelector('.fb');if(checkInputs(S[0])){f.className='fb good';f.textContent='(40 + 3) × (20 + 7)';open(1);}else{f.className='fb bad';f.textContent='Use tens and ones: the 4 in 43 is worth 40.';}};
+  const C=[['40 × 20',1],['40 × 7',1],['3 × 20',1],['3 × 7',1],['4 × 2',0,'4 × 2 forgets place value: the 4 is 40 and the 2 is 20.'],['40 + 20',0,'40 + 20 adds. Stations multiply.']];
+  C.sort(()=>Math.random()-.5).forEach(c=>{const x=el('button','choice',c[0]);x.dataset.ok=c[1];x.dataset.why=c[2]||'';x.onclick=()=>x.classList.toggle('picked');S[1].querySelector('#chips').appendChild(x);});
+  S[1].querySelector('.btn').onclick=()=>{const f=S[1].querySelector('.fb'),ch=[...S[1].querySelectorAll('#chips .choice')];const bad=ch.filter(x=>x.classList.contains('picked')&&x.dataset.ok==='0'),miss=ch.filter(x=>!x.classList.contains('picked')&&x.dataset.ok==='1');
+    if(!bad.length&&!miss.length){ch.forEach(x=>x.disabled=true);f.className='fb good';f.textContent='Four stations: 40 × 20 + 40 × 7 + 3 × 20 + 3 × 7.';open(2);}
+    else{f.className='fb bad';f.textContent=bad.length?'ARIA: '+bad[0].dataset.why:'ARIA: '+miss.length+' station'+(miss.length>1?'s are':' is')+' still off. Does every part of 43 meet every part of 27?';bad.forEach(x=>x.classList.add('wrong'));setTimeout(()=>bad.forEach(x=>x.classList.remove('wrong')),900);}};
+  const m=Model(b.querySelector('#m3m'),[40,3],[20,7]);
+  b.querySelector('#m3in').innerHTML=m.regs.map((r,i)=>'<div class="row" style="margin:6px 0"><span class="dot '+r.k+'"></span>'+r.x+' × '+r.y+' = <input class="n" data-a="'+(r.x*r.y)+'" data-r="'+i+'" inputmode="numeric" aria-label="'+r.x+' times '+r.y+'"></div>').join('');
+  S[2].querySelector('.btn').onclick=()=>{const f=S[2].querySelector('.fb');const ok=checkInputs(S[2]);S[2].querySelectorAll('input.ok').forEach(i=>{const r=m.regs[+i.dataset.r];if(!r.el.classList.contains('lit'))m.light(+i.dataset.r);});
+    if(ok){f.className='fb good';f.textContent='All four stations powered.';open(3);}else{f.className='fb bad';f.textContent='Tens × tens make hundreds: 4 tens × 2 tens = 8 hundreds.';}};
+  S[3].querySelector('.btn').onclick=()=>{const f=S[3].querySelector('.fb');if(checkInputs(S[3])){f.className='fb good';f.textContent='43 × 27 = (40 + 3) × (20 + 7) = 800 + 280 + 60 + 21 = 1,161.';
+      const c=b.querySelector('#col');c.classList.remove('hide');c.innerHTML='<p style="margin-top:10px"><b>ARIA\'s production log</b> (the partial-products column):</p><div class="col"><div><span>43</span></div><div><span>× 27</span></div><hr><div><span>21</span><em class="oo">7 × 3, ones × ones</em></div><div><span>280</span><em class="to">7 × 40, ones × tens</em></div><div><span>60</span><em class="ot">20 × 3, tens × ones</em></div><div><span>800</span><em class="tt">20 × 40, tens × tens</em></div><hr><div><span>1,161</span></div></div>';
+      finish(2,'Master order shipped complete: four stations, 1,161 kits.');}else{f.className='fb bad';f.textContent='Add all four station totals.';}};
+})();
+
+/* ================= MISSION 4 ================= */
+(function(){const b=body(3);
+  b.innerHTML=say('r','There are two ways to run a production line. Let\'s try both.')+
+  '<div class="box"><div class="step s1"><h3 style="font-size:20px">A. Four stations: 32 × 15</h3><p style="margin-top:6px">(30 + 2) × (10 + 5) = 30 × 10 + 30 × 5 + 2 × 10 + 2 × 5</p><p>= '+inp(300)+' + '+inp(150)+' + '+inp(20)+' + '+inp(10)+' = '+inp(480,90)+' <button class="btn">Check</button></p><div class="fb"></div></div>'+
+  '<div class="step s2"><p><b>Tap the region that is 2 × 10.</b></p><div id="m4m" style="max-width:420px"></div><div class="fb"></div></div>'+
+  '<div class="step s3"><h3 style="font-size:20px">B. Two production rows: split only 27</h3><p style="margin-top:6px">43 × 27 = 43 × '+inp(20)+' + 43 × '+inp(7)+' = '+inp(860)+' + '+inp(301)+' = '+inp(1161,90)+' <button class="btn">Check</button></p><div class="fb"></div><div id="rows"></div></div>'+
+  '<div class="step s4"><p><b>If you split only one factor, how many partial products do you get?</b></p><div class="row"><button class="choice" data-v="2">2</button><button class="choice" data-v="4">4</button><button class="choice" data-v="1">1</button></div><div class="fb"></div></div></div>'+
+  guide('Tip','43 × 20 means 43 groups of 2 tens = 86 tens = 860.');
+  const S=[...b.querySelectorAll('.step')],open=stepper(S);
+  S[0].querySelector('.btn').onclick=()=>{const f=S[0].querySelector('.fb');if(checkInputs(S[0])){f.className='fb good';f.textContent='32 × 15 = 480.';open(1);}else{f.className='fb bad';f.textContent='Multiply each pair, then add.';}};
+  const m=Model(b.querySelector('#m4m'),[30,2],[10,5],{labels:false,h:150});
+  m.regs.forEach((r,i)=>{r.el.classList.add('tap');r.el.onclick=()=>{const f=S[1].querySelector('.fb');if(S[1].dataset.done)return;if(i===1){m.lightAll();S[1].dataset.done=1;f.className='fb good';f.textContent='Top-right: the 2 ones of 32 meet the 10 of 15.';open(2);}else{f.className='fb bad';f.textContent='Find where the 2 column meets the 10 row.';}};});
+  S[2].querySelector('.btn').onclick=()=>{const f=S[2].querySelector('.fb');if(checkInputs(S[2])){f.className='fb good';f.textContent='Same answer: 1,161.';
+      b.querySelector('#rows').innerHTML='<div class="rowsbox"><div><b>Top row</b> (43 × 20): <span class="dot tt"></span>800 + <span class="dot ot"></span>60 = 860</div><div><b>Bottom row</b> (43 × 7): <span class="dot to"></span>280 + <span class="dot oo"></span>21 = 301</div><p class="small" style="margin:6px 0 0">The two rows are the two production lines. They come back next mission!</p></div>';open(3);}
+    else{f.className='fb bad';f.textContent='27 = 20 + 7. Then 43 × 20 and 43 × 7.';}};
+  choiceGroup(S[3],'2',()=>finish(3,'Two ways, one answer: four stations or two rows.'),['Two: one for each part of the split factor.','Count the parts of the factor you split.']);
+})();
+
+/* ================= MISSION 5 ================= */
+(function(){const b=body(4);
+  b.innerHTML=say('r','The factory has four unsolved cases. Work through them on your own. When you\'re done, present Cases 2 and 3 out loud.')+
+  guide('Detective tip','Use the words region, partial product and distributive when you present.')+
+  '<div class="row" id="tabs"></div><div id="cases"></div>';
+  const done5=new Set(),T=b.querySelector('#tabs'),H=b.querySelector('#cases');
+  const cases=[];
+  function mk(title,html,setup){const d=el('div','box case hide','<h3 style="font-size:21px;margin-bottom:8px">'+title+'</h3>'+html);H.appendChild(d);const t=el('button','choice',title.split(' — ')[0]);T.appendChild(t);const i=cases.length;cases.push(d);t.onclick=()=>show(i);setup(d,i);}
+  function show(i){cases.forEach((c,j)=>c.classList.toggle('hide',j!==i));[...T.children].forEach((t,j)=>t.classList.toggle('picked',j===i));}
+  function solved(i){done5.add(i);T.children[i].textContent='✓ '+T.children[i].textContent.replace('✓ ','');if([0,1,2,3].every(x=>done5.has(x)))finish(4,'Case File closed: all four cases solved.');}
+  mk('Case 1 — The Matching Case','<p>For <b>54 × 37</b>, put each partial product in its region, then find the total.</p><div class="m5a" style="max-width:460px"></div><p>Total: '+inp(1998,100)+' <button class="btn">Close the case</button></p><div class="fb"></div>',(d,i)=>{
+    const m=Model(d.querySelector('.m5a'),[50,4],[30,7],{labels:false,h:170});const vals=[1500,120,350,28];const opts=[1500,350,120,28];
+    m.regs.forEach((r,j)=>{r.el.querySelector('.val').innerHTML='<select aria-label="Region '+(j+1)+'" data-a="'+vals[j]+'"><option value="">?</option>'+opts.map(o=>'<option>'+o+'</option>').join('')+'</select>';});
+    d.querySelector('.btn').onclick=()=>{const f=d.querySelector('.fb');let ok=true;d.querySelectorAll('select').forEach(s=>{if(+s.value!==+s.dataset.a){ok=false;s.style.outline='3px solid var(--crimson)';}else s.style.outline='none';});
+      if(ok&&checkInputs(d)){m.lightAll();f.className='fb good';f.textContent='1,500 + 120 + 350 + 28 = 1,998.';solved(i);}else{f.className='fb bad';f.textContent=ok?'Regions right. Add them again.':'Multiply the edge numbers for each region: e.g. 50 × 30 = 1,500.';}};});
+  mk('Case 2 — The Imposter Equation','<p>Two of these equal <b>38 × 25</b>. Tap the imposter.</p><div class="row" style="flex-direction:column;align-items:flex-start"><button class="choice" data-v="a">(a) 30 × 25 + 8 × 25</button><button class="choice" data-v="b">(b) 38 × 20 + 38 × 5</button><button class="choice" data-v="c">(c) 30 × 20 + 8 × 5</button></div><div class="fb"></div><div class="more hide"><p>Imposter value: '+inp(640)+' &nbsp; Real product of 38 × 25: '+inp(950)+' <button class="btn">Check</button></p><div class="fb f2"></div></div>',(d,i)=>{
+    choiceGroup(d,'c',()=>d.querySelector('.more').classList.remove('hide'),['Caught it! (c) skips 30 × 5 and 8 × 20: only two of the four stations.','That one shares the multiplier with every part. Look for missing stations.']);
+    d.querySelector('.btn').onclick=()=>{const f=d.querySelector('.f2');if(checkInputs(d.querySelector('.more'))){f.className='fb good';f.textContent='600 + 40 = 640, but 38 × 25 = 950. The imposter is 310 short.';solved(i);}else{f.className='fb bad';f.textContent='(a): 750 + 200. (c): 600 + 40.';}};});
+  mk('Case 3 — The Reverse Case','<p>The factory found this order: <b>(60 + 2) × (10 + 9)</b>.</p><p>Which multiplication is it? '+inp(62)+' × '+inp(19)+'</p><p>60 × 10 = '+inp(600)+' &nbsp; 60 × 9 = '+inp(540)+' &nbsp; 2 × 10 = '+inp(20)+' &nbsp; 2 × 9 = '+inp(18)+'</p><p>Total: '+inp(1178,100)+' <button class="btn">Close the case</button></p><div class="fb"></div>',(d,i)=>{
+    d.querySelector('.btn').onclick=()=>{const f=d.querySelector('.fb');if(checkInputs(d)){f.className='fb good';f.textContent='62 × 19 = 1,178.';solved(i);}else{f.className='fb bad';f.textContent='60 + 2 = 62 and 10 + 9 = 19. Then power each station.';}};});
+  mk('Case 4 — The Column Case','<p>Complete ARIA\'s production log for <b>45 × 23</b>.</p><div class="col"><div><span>45</span></div><div><span>× 23</span></div><hr><div>'+inp(15)+'<em class="oo">3 × 5</em></div><div>'+inp(120)+'<em class="to">3 × 40</em></div><div>'+inp(100)+'<em class="ot">20 × 5</em></div><div>'+inp(800)+'<em class="tt">20 × 40</em></div><hr><div>'+inp(1035,100)+'</div></div><button class="btn">Close the case</button><div class="fb"></div><div class="box" style="margin-top:12px"><p><b>Speed case (bonus):</b> 58 × 16 = '+inp(928,100)+' <button class="btn ghost sp">Check</button></p><div class="fb sf"></div></div>',(d,i)=>{
+    d.querySelector('.btn').onclick=()=>{const f=d.querySelector('.fb');const c=d.querySelector('.col');if(checkInputs(c)){f.className='fb good';f.textContent='15 + 120 + 100 + 800 = 1,035.';solved(i);}else{f.className='fb bad';f.textContent='Multiply the pair on each line. 3 × 40 = 3 × 4 tens.';}};
+    d.querySelector('.sp').onclick=()=>{const f=d.querySelector('.sf'),bx=d.querySelector('.sp').parentNode;if(checkInputs(bx)){f.className='fb good';f.textContent='500 + 300 + 80 + 48 = 928. Speedy!';}else{f.className='fb bad';f.textContent='(50 + 8) × (10 + 6).';}};});
+  show(0);
+})();
+
+/* ================= MISSION 6 ================= */
+(function(){const b=body(5);
+  b.innerHTML=say('k','Shift report! Order 23 × 14 is done: <b>20 × 10 + 3 × 4 = 200 + 12 = 212 kits</b>. Super fast!')+
+  say('a','Alert: shipment of 212 kits is short. Some stations did not run.')+
+  '<div class="box"><div id="m6m" style="max-width:440px"></div>'+
+  '<div class="step"><p><b>1. Is Kai correct?</b></p><div class="row"><button class="choice" data-v="n">No</button><button class="choice" data-v="y">Yes</button></div><div class="fb"></div></div>'+
+  '<div class="step"><p><b>2. Tap the two stations Kai switched off.</b></p><div class="row" id="st6"></div><div class="row" style="margin-top:6px"><button class="btn">Check</button></div><div class="fb"></div></div>'+
+  '<div class="step"><p><b>3. Power them.</b> 20 × 4 = '+inp(80)+' &nbsp; 3 × 10 = '+inp(30)+' <button class="btn">Power</button></p><div class="fb"></div></div>'+
+  '<div class="step"><p><b>4. Correct total:</b> 200 + 80 + 30 + 12 = '+inp(322)+' <button class="btn">Check</button></p><div class="fb"></div></div>'+
+  '<div class="step"><p><b>5.</b> Kai\'s answer is 110 short. Where did the 110 come from?</p><div class="row" style="flex-direction:column;align-items:flex-start"><button class="choice" data-v="a">80 + 30: the two missing stations</button><button class="choice" data-v="b">Kai added wrong</button><button class="choice" data-v="c">The ones were too big</button></div><div class="fb"></div></div>'+
+  '<div class="step"><p><b>6. Prove it another way</b> (split only 14): 23 × 10 + 23 × 4 = '+inp(230)+' + '+inp(92)+' = '+inp(322)+' <button class="btn alt">Prove it</button></p><div class="fb"></div></div></div>'+
+  guide('Detective tip','Kai multiplied tens with tens and ones with ones, as if it were adding. Multiplication needs every part to meet every part.');
+  const m=Model(b.querySelector('#m6m'),[20,3],[10,4],{h:160});m.light(0);m.light(3);
+  const S=[...b.querySelectorAll('.step')],open=stepper(S);
+  choiceGroup(S[0],'n',()=>open(1),['Right. 212 is too small: 23 × 14 is more than 20 × 14 = 280.','Estimate: 20 × 14 alone is 280. Can 23 × 14 be 212?']);
+  ['20 × 10','20 × 4','3 × 10','3 × 4'].forEach((t,i)=>{const x=el('button','choice',t);x.dataset.ok=(i===1||i===2)?1:0;x.onclick=()=>x.classList.toggle('picked');S[1].querySelector('#st6').appendChild(x);});
+  S[1].querySelector('.btn').onclick=()=>{const f=S[1].querySelector('.fb'),ch=[...S[1].querySelectorAll('#st6 .choice')],ok=ch.every(x=>x.classList.contains('picked')===(x.dataset.ok==='1'));
+    if(ok){ch.forEach(x=>x.disabled=true);f.className='fb good';f.textContent='Switched off: 20 × 4 and 3 × 10.';open(2);}else{f.className='fb bad';f.textContent='Kai used 20 × 10 and 3 × 4. Which two pairs did he skip?';}};
+  S[2].querySelector('.btn').onclick=()=>{const f=S[2].querySelector('.fb');if(checkInputs(S[2])){m.light(1);m.light(2);f.className='fb good';f.textContent='Both stations running.';open(3);}else{f.className='fb bad';f.textContent='2 tens × 4 = 8 tens; 3 × 1 ten = 3 tens.';}};
+  S[3].querySelector('.btn').onclick=()=>{const f=S[3].querySelector('.fb');if(checkInputs(S[3])){f.className='fb good';f.textContent='322 kits.';open(4);}else{f.className='fb bad';f.textContent='Add all four.';}};
+  choiceGroup(S[4],'a',()=>open(5),['Exactly: 80 + 30 = 110, the two stations Kai skipped.','Kai\'s adding was fine. What was missing?']);
+  S[5].querySelector('.btn').onclick=()=>{const f=S[5].querySelector('.fb');if(checkInputs(S[5])){f.className='fb good';f.textContent='Proved two ways: 322.';finish(5,'Kai: "Every part meets every part. Got it!"');}else{f.className='fb bad';f.textContent='23 × 10 = 23 tens = 230.';}};
+})();
+
+/* ================= MISSION 7 ================= */
+(function(){const b=body(6);
+  b.innerHTML=say('a','Factory Shift game. Round 1: match each station to its output before the shift timer runs out.')+
+  '<div class="box"><h3 style="font-size:21px">Round 1 — Match: 47 × 26</h3><p class="small">Tap a station, then tap its output. <span id="t7">60</span> seconds left on the shift.</p><div class="mgrid" id="mg"></div><div class="fb" id="mf"></div><div class="hide" id="mt"><p>Total: '+inp(1222,100)+' <button class="btn">Ship</button></p><div class="fb"></div></div></div>'+
+  '<div class="box hide" id="r2"><h3 style="font-size:21px">Round 2 — Saboteur: 38 × 24</h3>'+say('k','Uh-oh, someone took a station card off the board!')+'<div id="m7m" style="max-width:420px"></div><p>Missing station: '+inp(8,60)+' × '+inp(20,60)+' = '+inp(160)+' &nbsp; Total: '+inp(912,100)+' <button class="btn">Check</button></p><div class="fb"></div></div>'+
+  '<div class="box hide" id="r3"><h3 style="font-size:21px">Round 3 — You\'re the saboteur</h3><p>Choose two 2-digit numbers (no zero in the ones). ARIA hides one station; your teacher must find it.</p><div class="row"><input class="n" id="g1" inputmode="numeric" aria-label="First number"> × <input class="n" id="g2" inputmode="numeric" aria-label="Second number"><button class="btn" id="gb">Hide a station</button></div><div class="fb" id="gf"></div><div id="gv"></div></div>';
+  const P=[['40 × 20',800],['40 × 6',240],['7 × 20',140],['7 × 6',42]];let cards=[];P.forEach((p,i)=>{cards.push({t:p[0],i,kind:'e'});cards.push({t:fmtN(p[1]),i,kind:'v'});});
+  cards.sort(()=>Math.random()-.5);const G=b.querySelector('#mg');let sel=null,matched=0,t=60,tick=null;
+  const kcls=['tt','to','ot','oo'];
+  cards.forEach(c=>{const x=el('button','mcard '+(c.kind==='e'?'ex':'va'),c.t);x.onclick=()=>{if(!tick)tick=setInterval(()=>{t--;b.querySelector('#t7').textContent=Math.max(0,t);if(t<=0)clearInterval(tick);},1000);
+      if(x.classList.contains('done'))return;if(!sel){sel={x,c};x.classList.add('sel');return;}
+      if(sel.x===x){x.classList.remove('sel');sel=null;return;}
+      if(sel.c.i===c.i&&sel.c.kind!==c.kind){[sel.x,x].forEach(y=>{y.classList.remove('sel');y.classList.add('done',kcls[c.i]);});matched++;sel=null;
+        if(matched===4){clearInterval(tick);const f=b.querySelector('#mf');f.className='fb good';f.textContent=t>0?'All matched with '+t+' seconds to spare!':'All matched. Shift overtime, but every station is right!';b.querySelector('#mt').classList.remove('hide');}}
+      else{x.classList.add('no');sel.x.classList.add('no');const a=sel.x;setTimeout(()=>{x.classList.remove('no');a.classList.remove('no','sel');},500);sel=null;}};G.appendChild(x);});
+  b.querySelector('#mt .btn').onclick=()=>{const c=b.querySelector('#mt'),f=c.querySelector('.fb');if(checkInputs(c)){f.className='fb good';f.textContent='47 × 26 = 1,222.';b.querySelector('#r2').classList.remove('hide');}else{f.className='fb bad';f.textContent='800 + 240 + 140 + 42.';}};
+  const m=Model(b.querySelector('#m7m'),[30,8],[20,4],{h:150,labels:false});m.light(0);m.light(2);m.light(3);m.regs[1].el.querySelector('.lab').textContent='missing';
+  b.querySelector('#r2 .btn').onclick=()=>{const c=b.querySelector('#r2'),f=c.querySelector(':scope > .fb');if(checkInputs(c)){m.light(1);f.className='fb good';f.textContent='8 × 20 = 160 found. 600 + 160 + 120 + 32 = 912.';b.querySelector('#r3').classList.remove('hide');}else{f.className='fb bad';f.textContent='The dark region is where the 8 column meets the 20 row.';}};
+  b.querySelector('#gb').onclick=()=>{const x=num(b.querySelector('#g1').value),y=num(b.querySelector('#g2').value),f=b.querySelector('#gf');
+    if(!(x>=11&&x<=99&&y>=11&&y<=99&&x%10&&y%10)){f.className='fb bad';f.textContent='Two 2-digit numbers with no zero in the ones, please.';return;}
+    const xt=x-x%10,xo=x%10,yt=y-y%10,yo=y%10,list=[[xt,yt],[xo,yt],[xt,yo],[xo,yo]],h=Math.floor(Math.random()*4);
+    f.className='fb good';f.textContent='Show your teacher: '+x+' × '+y+'. One station is hidden. Can they find it and the total?';
+    b.querySelector('#gv').innerHTML='<p>'+list.map((p,i)=>i===h?'<b style="color:var(--crimson)">[ ? ]</b>':fmtN(p[0]*p[1])).join(' + ')+' = <b>?</b></p><button class="btn ghost" id="grv">Reveal</button>';
+    b.querySelector('#grv').onclick=()=>{b.querySelector('#gv').insertAdjacentHTML('beforeend','<p class="fb good">Hidden station: '+list[h][0]+' × '+list[h][1]+' = '+fmtN(list[h][0]*list[h][1])+'. Total: '+fmtN(x*y)+'.</p>');b.querySelector('#grv').remove();finish(6,'Shift complete. Factory output perfect!');};};
+})();
+
+/* ================= MISSION 8 ================= */
+(function(){const b=body(7);
+  b.innerHTML=say('r','Two final jobs before sign-off: a clever shortcut, and a redesign for the solar farm.')+
+  '<div class="box"><h3 style="font-size:21px">A. Smart Shortcut</h3><div class="step"><p>49 × 6 = 50 × 6 − 1 × 6 = '+inp(300)+' − '+inp(6)+' = '+inp(294)+' <button class="btn">Check</button></p><div class="fb"></div></div>'+
+  '<div class="step"><p><b>What did we change?</b></p><div class="row" style="flex-direction:column;align-items:flex-start"><button class="choice" data-v="a">Rounded 49 up to 50, then took away the extra 6</button><button class="choice" data-v="b">Added 1 to the answer</button><button class="choice" data-v="c">Multiplied 49 by 5 instead</button></div><div class="fb"></div></div>'+
+  '<div class="step"><p>Now you: 29 × 14 = 30 × 14 − '+inp(14)+' = '+inp(420)+' − 14 = '+inp(406)+' <button class="btn">Check</button></p><div class="fb"></div></div></div>'+
+  '<div class="box"><h3 style="font-size:21px">B. Solar Redesign</h3>'+say('r','The runway is expanding. The solar field must become <b>12 rows</b>. Can it still hold <b>432 panels</b> with 36 per row?')+
+  '<div class="step"><p>12 × 36 = 10 × 36 + 2 × 36 = '+inp(360)+' + '+inp(72)+' = '+inp(432)+' <button class="btn">Check</button></p><div class="fb"></div></div>'+
+  '<div class="step"><p>Another design: 16 rows of 27. (10 + 6) × (20 + 7) = 10 × 20 + 10 × 7 + 6 × 20 + 6 × 7</p><p>= '+inp(200)+' + '+inp(70)+' + '+inp(120)+' + '+inp(42)+' = '+inp(432)+' <button class="btn">Check</button></p><div class="fb"></div></div>'+
+  '<div class="step"><p><b>Why can 24 × 18, 12 × 36 and 16 × 27 all give 432 panels?</b></p><div class="row" style="flex-direction:column;align-items:flex-start"><button class="choice" data-v="a">Different side lengths can make the same area</button><button class="choice" data-v="b">The distributive property changes the area</button><button class="choice" data-v="c">They don\'t really; one must be wrong</button></div><div class="fb"></div></div></div>'+
+  guide('Strategy check','Ask yourself: what did I change, why does the product stay the same, and when is this shortcut useful?');
+  const S=[...b.querySelectorAll('.step')],open=stepper(S);
+  const go2=(i,ok,bad,n)=>S[i].querySelector('.btn').onclick=()=>{const f=S[i].querySelector('.fb');if(checkInputs(S[i])){f.className='fb good';f.textContent=ok;open(i+1);}else{f.className='fb bad';f.textContent=bad;}};
+  go2(0,'294. Six groups of 50 is six too many.','50 × 6 = 300, then take away one 6.');
+  choiceGroup(S[1],'a',()=>open(2),['Yes. It works because each of the 6 groups had one extra.','Look at the equation: 50 × 6 − 1 × 6.']);
+  go2(2,'420 − 14 = 406. Fourteen groups of 30, minus one 14.','30 × 14 = 420. Subtract one 14.');
+  go2(3,'Yes: 12 × 36 = 432 panels.','10 × 36 = 360 and 2 × 36 = 72.');
+  go2(4,'16 × 27 = 432 too!','Power each station: 10 × 20, 10 × 7, 6 × 20, 6 × 7.');
+  choiceGroup(S[5],'a',()=>finish(7,'Shortcut mastered and solar redesign approved: 432 panels three ways.'),['Right: different rectangles can share the same area.','The distributive property only splits the work; it never changes the total.']);
+})();
+
+/* ================= MISSION 9 ================= */
+(function(){const b=body(8);
+  b.innerHTML=say('r','Supervisor sign-off. Three questions on your own, then the factory is yours.')+
+  '<div class="box"><p><b>1.</b> 7 × 58 = 7 × (50 + 8) = '+inp(350)+' + '+inp(56)+' = '+inp(406)+'</p></div>'+
+  '<div class="box"><p><b>2.</b> Write all four partial products for <b>36 × 42</b> (any order), then the total.</p><p><input class="n pp" inputmode="numeric" aria-label="Partial product 1"> + <input class="n pp" inputmode="numeric" aria-label="Partial product 2"> + <input class="n pp" inputmode="numeric" aria-label="Partial product 3"> + <input class="n pp" inputmode="numeric" aria-label="Partial product 4"> = '+inp(1512,100)+'</p></div>'+
+  '<div class="box"><p><b>3.</b> Explain why 20 × 10 + 3 × 4 is <b>not</b> equal to 23 × 14.</p><textarea id="e3" rows="3" aria-label="Your explanation"></textarea><p class="small" style="margin-top:6px">Check your explanation. Did you:</p><label><input type="checkbox" class="xc"> say two partial products (20 × 4 and 3 × 10) are missing?</label><br><label><input type="checkbox" class="xc"> say every part of one factor must multiply every part of the other?</label><br><label><input type="checkbox" class="xc"> give the correct answer, 322?</label></div>'+
+  '<div class="row"><button class="btn alt" id="xb">Sign off</button></div><div class="fb" id="xf"></div>'+
+  '<div class="badge" id="badge"><div class="medal"><i></i><i></i><i></i><i></i></div><h3 style="font-size:32px;color:var(--teal-2)">Partial Product Pro badge unlocked</h3><p style="font-size:18px;margin-top:8px">Every station on, every shipment complete.</p>'+say('r','Today the top row of 43 × 27 became 43 × 20 and the bottom row became 43 × 7. Next mission, you\'ll find those two rows hiding inside the standard algorithm.')+'</div>';
+  b.querySelector('#xb').onclick=()=>{const f=b.querySelector('#xf'),msg=[];
+    const box1=b.querySelectorAll('.box')[0];if(!checkInputs(box1))msg.push('Question 1: send the 7 to the 50 and the 8.');
+    const pp=[...b.querySelectorAll('.pp')].map(i=>num(i.value)).sort((x,y)=>x-y),want=[12,60,240,1200];const okp=pp.every((v,i)=>v===want[i]);
+    b.querySelectorAll('.pp').forEach(i=>{i.classList.toggle('ok',okp);});const box2=b.querySelectorAll('.box')[1];const okt=checkInputs(box2);
+    if(!okp||!okt)msg.push('Question 2: (30 + 6) × (40 + 2) has four stations.');
+    const q3=b.querySelector('#e3').value.trim().length>20&&[...b.querySelectorAll('.xc')].filter(x=>x.checked).length>=2;if(!q3)msg.push('Question 3: write a full explanation and tick your checks.');
+    if(msg.length){f.className='fb bad';f.textContent=msg.join(' ');return;}
+    f.className='fb good';f.textContent='Signed off!';b.querySelector('#badge').classList.add('show');finish(8,'Mission 19 complete. Factory running at 100%.');b.querySelector('#badge').scrollIntoView({behavior:'smooth',block:'center'});};
+})();
+
+go(0);
+
+})();
+</script>
+</body>
+</html>
