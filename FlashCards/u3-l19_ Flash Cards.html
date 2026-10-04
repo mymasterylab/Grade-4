@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission 19 Revision: Partial Product Pro Flash Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00A7B2;--teal-2:#00928e;--teal-tint:#E2F6F7;--sun:#FAA71C;--sun-tint:#FFF3DA;--ember:#D77F28;--crimson:#C92426;
+  --ink:#141414;--muted:#46585a;--line:#c9e9eb;--white:#fff;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;--body:'Lexend','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0;background:var(--white)}
+body{color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:22px 18px 40px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,5vw,34px);color:var(--teal-2);margin:0;line-height:1.1}
+.sub{color:var(--muted);font-size:15px;margin-top:4px}
+.known{background:var(--sun-tint);color:var(--ember);font-weight:600;border-radius:999px;padding:4px 12px;font-size:14px}
+.dots{display:flex;gap:6px;margin:0 0 14px;flex-wrap:wrap}
+.dots button{width:30px;height:8px;border-radius:999px;border:0;background:var(--line);padding:0}
+.dots button.cur{background:var(--teal)} .dots button.ok{background:var(--sun)} .dots button.cur.ok{background:var(--teal-2)}
+
+.card{position:relative;width:100%;min-height:290px;perspective:1400px;border:0;background:none;padding:0;text-align:left}
+.inner{position:relative;display:grid;width:100%;min-height:290px;transition:transform .5s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+.card.flipped .inner{transform:rotateY(180deg)}
+.face{grid-area:1/1;position:relative;min-height:290px;border-radius:24px;padding:26px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column}
+.front{background:var(--teal);color:var(--white)}
+.back{background:var(--white);border:3px solid var(--teal);transform:rotateY(180deg)}
+.num{font-family:var(--display);font-weight:800;font-size:15px;opacity:.85}
+.front .big{font-family:var(--display);font-weight:800;font-size:clamp(28px,6vw,42px);line-height:1.1;margin:auto 0;letter-spacing:-.01em}
+.front .tap{font-size:14px;opacity:.9}
+.back h2{font-family:var(--display);font-weight:800;font-size:22px;color:var(--teal-2);margin:0 0 8px}
+.back p{margin:0 0 8px}
+.ex{background:var(--teal-tint);border-radius:12px;padding:10px 14px;font-weight:600;margin-top:auto}
+.bar{display:flex;gap:3px;margin:6px 0}
+.bar i{display:grid;place-items:center;height:30px;border-radius:6px;background:var(--teal);color:#fff;font-style:normal;font-weight:700;font-size:14px}
+.bar i.d{background:var(--teal-2)} .bar i.a{background:var(--sun);color:var(--ink)}
+.bar small{align-self:center;margin-left:8px;font-weight:600}
+
+.am{display:inline-grid;gap:3px;margin:6px 0;font-size:13px;font-weight:700}.am .e{color:var(--ember);display:grid;place-items:center;font-family:var(--display)}.am i{font-style:normal;display:grid;place-items:center;border-radius:6px;color:#fff;padding:4px 6px;text-align:center;line-height:1.2}.am .tt{background:var(--teal)}.am .ot{background:var(--sun);color:var(--ink)}.am .to{background:#42bcb8}.am .oo{background:var(--ember)}.am .off{background:#E4EAEB;color:#46585a;border:2px dashed #b9c6c8}
+.nav{display:flex;justify-content:space-between;align-items:center;margin:14px 0 22px;gap:10px}
+.btn{border:0;border-radius:12px;padding:10px 18px;font-weight:600;background:var(--teal);color:var(--white)}
+.btn.ghost{background:var(--white);color:var(--teal-2);border:2px solid var(--teal)}
+.btn.sun{background:var(--sun);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.practice{border:2px solid var(--line);border-radius:20px;padding:18px 20px;background:var(--white)}
+.practice h3{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 6px;color:var(--ember)}
+.practice .q{font-size:18px;margin:0 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input.ans{width:120px;padding:9px 10px;border:2px solid var(--line);border-radius:10px;font-size:20px;text-align:center}
+.choice{border:2px solid var(--line);background:var(--white);border-radius:12px;padding:9px 16px;font-weight:600}
+.choice[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-tint)}
+.fb{min-height:1.5em;font-weight:600;margin-top:10px}
+.fb.good{color:var(--teal-2)} .fb.bad{color:var(--crimson)}
+.hint{display:none;margin-top:8px;font-size:15px;color:var(--muted);background:var(--sun-tint);border-radius:10px;padding:8px 12px}
+.hint.show{display:block}
+.done{display:none;text-align:center;border-radius:20px;background:var(--sun-tint);border:3px solid var(--sun);padding:22px;margin-top:18px}
+.done.show{display:block}
+.done h2{font-family:var(--display);font-weight:800;color:var(--teal-2);margin:0 0 6px}
+@media (prefers-reduced-motion:reduce){.inner{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Partial Product Pro revision</h1>
+      <div class="sub">Mission 19 · Flip each card, then try its practice question.</div>
+    </div>
+    <span class="known" id="known" aria-live="polite">0 of 8 practised</span>
+  </header>
+
+  <div class="dots" id="dots" aria-label="Cards"></div>
+
+  <button class="card" id="card" aria-label="Flash card. Press to flip.">
+    <div class="inner">
+      <div class="face front">
+        <span class="num" id="fNum"></span>
+        <div class="big" id="fBig"></div>
+        <span class="tap">Tap to flip</span>
+      </div>
+      <div class="face back" id="back"></div>
+    </div>
+  </button>
+
+  <div class="nav">
+    <button class="btn ghost" id="prev">Previous</button>
+    <button class="btn ghost" id="shuffle">Shuffle</button>
+    <button class="btn" id="next">Next</button>
+  </div>
+
+  <section class="practice" aria-live="polite">
+    <h3>Practice question</h3>
+    <p class="q" id="pq"></p>
+    <div class="row" id="pin"></div>
+    <div class="fb" id="pfb"></div>
+    <div class="row" style="margin-top:6px"><button class="btn ghost" id="hintBtn">Show a hint</button></div>
+    <div class="hint" id="hint"></div>
+  </section>
+
+  <div class="done" id="done">
+    <h2>All 8 cards practised</h2>
+    <p>You can send the multiplier to every part and find every partial product. That's the Partial Product Pro skill.</p>
+    <button class="btn sun" id="again">Practise again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  const am=(t,s,r,cols)=>'<div class="am" style="grid-template-columns:28px '+(cols||'110px 54px')+';grid-template-rows:20px 50px 34px"><span></span><span class="e">'+t[0]+'</span><span class="e">'+t[1]+'</span><span class="e">'+s[0]+'</span><i class="tt">'+r[0]+'</i><i class="'+(r[1]==='?'?'off':'ot')+'">'+r[1]+'</i><span class="e">'+s[1]+'</span><i class="'+(r[2]==='?'?'off':'to')+'">'+r[2]+'</i><i class="oo">'+r[3]+'</i></div>';
+  const CARDS=[
+    {front:'What is the distributive property?',
+     title:'Distribute = share with every part',
+     body:'<p>Split one factor into parts. Multiply <b>each part</b>, then add.</p><p><b>a × (b + c) = a × b + a × c</b></p>',
+     ex:'6 × 14 = 6 × (10 + 4) = 60 + 24 = 84',
+     q:'Use the distributive property: 8 × 13 = ?',type:'num',ans:104,
+     hint:'8 × 10 + 8 × 3'},
+    {front:'Does the multiplier go to one part or every part?',
+     title:'Every part gets the multiplier',
+     body:'<p>A common slip: 6 × (10 + 4) = 6 × 10 + 4. That forgets to multiply the 4!</p><p>In the area model, the 4-strip is 6 rows tall, so it is 6 × 4.</p>',
+     ex:'Wrong: 60 + 4 = 64   Right: 60 + 24 = 84',
+     q:'5 × (20 + 3) = ?',type:'choice',opts:['100 + 3','100 + 15','25 + 3'],ans:'100 + 15',
+     follow:'Yes! 5 × 20 + 5 × 3 = 100 + 15 = 115.',
+     hint:'Send the 5 to the 20 AND to the 3.'},
+    {front:'What is a partial product?',
+     title:'One region = one partial product',
+     body:'<p>Each region of the area model makes one partial product. It is not a random calculation: it is a real piece of the rectangle.</p>'+am([40,3],[20,7],['800','60','280','21']),
+     ex:'43 × 27: 800 + 60 + 280 + 21 = 1,161',
+     q:'In 43 × 27, what is the partial product 40 × 7?',type:'num',ans:280,
+     hint:'4 tens × 7 = 28 tens.'},
+    {front:'How many partial products for 2-digit × 2-digit?',
+     title:'Four partial products',
+     body:'<p>(40 + 3) × (20 + 7) = <b>40 × 20 + 40 × 7 + 3 × 20 + 3 × 7</b></p><p>Every part of one factor meets every part of the other.</p>',
+     ex:'tens × tens, tens × ones, ones × tens, ones × ones',
+     q:'32 × 15 = (30 + 2) × (10 + 5). Find the four partial products and the total.',type:'num',ans:480,
+     hint:'300 + 150 + 20 + 10'},
+    {front:'How do I write partial products in a column?',
+     title:'The partial-products column',
+     body:'<p>Write each partial product on its own line, labelled with where it came from. Any order works; then add.</p><p style="font-family:var(--display);font-weight:800;line-height:1.35">&nbsp;&nbsp;&nbsp;21 &nbsp;(7 × 3)<br>&nbsp;&nbsp;280 &nbsp;(7 × 40)<br>&nbsp;&nbsp;&nbsp;60 &nbsp;(20 × 3)<br>&nbsp;&nbsp;800 &nbsp;(20 × 40)<br>1,161</p>',
+     ex:'43 × 27 = 1,161',
+     q:'Use a partial-products column: 45 × 23 = ?',type:'num',ans:1035,
+     hint:'15 + 120 + 100 + 800'},
+    {front:'Can I split only one factor?',
+     title:'Two rows, two partial products',
+     body:'<p>Split just one factor and you get two partial products: the two rows of the area model.</p>'+am([40,3],[20,7],['800','60','280','21']),
+     ex:'43 × 27 = 43 × 20 + 43 × 7 = 860 + 301 = 1,161',
+     q:'18 × 42 = 18 × 40 + 18 × 2 = ?',type:'num',ans:756,
+     hint:'720 + 36'},
+    {front:"What was Kai's factory mistake?",
+     title:'Never skip a station',
+     body:'<p>Kai wrote 23 × 14 = 20 × 10 + 3 × 4 = 212. He skipped 20 × 4 and 3 × 10, so the order was 110 short.</p>'+am([20,3],[10,4],['200','?','?','12']),
+     ex:'Correct: 200 + 30 + 80 + 12 = 322',
+     q:'Someone wrote: 52 × 31 = 50 × 30 + 2 × 1 = 1,502. What is the correct product?',type:'num',ans:1612,
+     hint:'Add the skipped stations: 50 × 1 and 2 × 30. 1,500 + 50 + 60 + 2.'},
+    {front:'Is there a shortcut for 49 × 6?',
+     title:'Round up, then subtract',
+     body:'<p>49 is close to 50. Six groups of 50, then take away the extra six.</p><p>Useful when a factor ends in 8 or 9.</p>',
+     ex:'49 × 6 = 50 × 6 − 1 × 6 = 300 − 6 = 294',
+     q:'Use the shortcut: 19 × 5 = ?',type:'num',ans:95,
+     hint:'20 × 5 − 1 × 5 = 100 − 5'}
+  ];
+  let order=CARDS.map((_,i)=>i),pos=0;const done=new Set();
+  const dots=$('#dots');
+  function renderDots(){dots.innerHTML='';order.forEach((ci,i)=>{const b=document.createElement('button');b.setAttribute('aria-label','Card '+(i+1));if(i===pos)b.classList.add('cur');if(done.has(ci))b.classList.add('ok');b.onclick=()=>{pos=i;show();};dots.appendChild(b);});}
+  function show(){
+    const c=CARDS[order[pos]];
+    $('#card').classList.remove('flipped');
+    $('#fNum').textContent='Card '+(pos+1)+' of '+CARDS.length;
+    $('#fBig').textContent=c.front;
+    $('#back').innerHTML='<h2>'+c.title+'</h2>'+c.body+'<div class="ex">'+c.ex+'</div>';
+    $('#pq').textContent=c.q;$('#pfb').textContent='';$('#pfb').className='fb';
+    $('#hint').textContent=c.hint;$('#hint').classList.remove('show');
+    const pin=$('#pin');
+    if(c.type==='num'){
+      pin.innerHTML='<input class="ans" id="a" inputmode="numeric" aria-label="Your answer"><button class="btn" id="chk">Check</button>';
+      $('#chk').onclick=check;$('#a').onkeydown=e=>{if(e.key==='Enter')check();};
+    } else {
+      pin.innerHTML=c.opts.map(o=>'<button class="choice" aria-pressed="false" data-o="'+o+'" style="font-size:24px;min-width:64px">'+o+'</button>').join('');
+      pin.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{pin.querySelectorAll('.choice').forEach(x=>x.setAttribute('aria-pressed',x===b));check(b.dataset.o);});
+    }
+    $('#prev').disabled=pos===0;$('#next').textContent=pos===CARDS.length-1?'Finish':'Next';
+    renderDots();
+  }
+  function check(choice){
+    const c=CARDS[order[pos]],f=$('#pfb');let ok;
+    if(c.type==='num'){const v=$('#a').value.trim();if(!v){f.className='fb bad';f.textContent='Type an answer first.';return;}ok=+v===c.ans;}
+    else ok=choice===c.ans;
+    if(ok){f.className='fb good';f.textContent=c.type==='choice'?c.follow:'Correct: '+c.ans+'.';done.add(order[pos]);
+      $('#known').textContent=done.size+' of '+CARDS.length+' practised';renderDots();
+      if(done.size===CARDS.length)$('#done').classList.add('show');}
+    else{f.className='fb bad';f.textContent='Not yet. Flip the card or show a hint, then try again.';}
+  }
+  $('#card').onclick=()=>$('#card').classList.toggle('flipped');
+  $('#prev').onclick=()=>{if(pos>0){pos--;show();}};
+  $('#next').onclick=()=>{if(pos<CARDS.length-1){pos++;show();}else if(done.size<CARDS.length){const m=order.findIndex(ci=>!done.has(ci));pos=m;show();$('#pfb').className='fb';$('#pfb').textContent='This card still needs a practice answer.';}else $('#done').scrollIntoView({behavior:'smooth'});};
+  $('#shuffle').onclick=()=>{for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}pos=0;show();};
+  $('#hintBtn').onclick=()=>$('#hint').classList.add('show');
+  $('#again').onclick=()=>{done.clear();$('#known').textContent='0 of '+CARDS.length+' practised';$('#done').classList.remove('show');pos=0;show();window.scrollTo(0,0);};
+  show();
+})();
+</script>
+</body>
+</html>
