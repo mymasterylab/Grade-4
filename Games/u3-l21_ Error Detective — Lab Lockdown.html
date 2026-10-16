@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission 21: Error Detective — Lab Lockdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00A7B2;--teal-2:#00928e;--teal-3:#42bcb8;--teal-tint:#E2F6F7;
+  --sun:#FAA71C;--sun-tint:#FFF3DA;--ember:#D77F28;--crimson:#C92426;--crimson-tint:#FBE6E6;
+  --off:#E4EAEB;--off-line:#b9c6c8;--ink:#141414;--muted:#46585a;--line:#c9e9eb;--white:#fff;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;--body:'Lexend','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);background:var(--white)}
+body{margin:0;min-height:100%;background:var(--white);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0}
+p{margin:0 0 .6em}
+
+.top{background:var(--teal);color:var(--white);padding:12px clamp(14px,3vw,30px);display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;justify-content:space-between;position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top h1{font-size:clamp(21px,3vw,28px);font-weight:800}
+.top .sub{font-size:13.5px;opacity:.95}
+.power{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.power .track{width:150px;height:14px;background:rgba(255,255,255,.3);border-radius:999px;overflow:hidden}
+.power .fill{height:100%;width:0;background:var(--sun);transition:width .6s ease}
+.clock{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.clock .time{font-family:var(--display);font-size:22px;font-weight:800;background:var(--white);color:var(--teal-2);padding:1px 12px;border-radius:10px;min-width:86px;text-align:center}
+.clock button{border:2px solid var(--white);background:transparent;color:var(--white);border-radius:10px;padding:4px 10px;font-weight:600;font-size:14px}
+
+.rail{display:flex;gap:8px;overflow-x:auto;padding:10px clamp(14px,3vw,30px);border-bottom:2px solid var(--teal-tint);background:var(--white);position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--topH,66px));z-index:15}
+.rail button{flex:0 0 auto;border:2px solid var(--line);background:var(--white);border-radius:14px;padding:5px 11px;text-align:left;font-size:13.5px;line-height:1.25}
+.rail button small{display:block;color:var(--muted);font-size:11.5px}
+.rail button.done{border-color:var(--sun)}
+.rail button.done::after{content:" ✓";color:var(--ember);font-weight:700}
+.rail button[aria-current="step"]{background:var(--teal);border-color:var(--teal);color:var(--white)}
+.rail button[aria-current="step"] small{color:var(--white)}
+.rail button.now:not([aria-current="step"]){box-shadow:inset 0 -4px 0 var(--sun)}
+
+main{max-width:1060px;margin:0 auto;padding:24px clamp(14px,3vw,30px) 70px}
+.stage{display:none}.stage.active{display:block}
+.head{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-bottom:14px}
+.head h2{font-size:clamp(28px,4.4vw,44px);font-weight:800;color:var(--teal-2);letter-spacing:-.02em}
+.head .when{background:var(--sun-tint);color:var(--ember);font-weight:600;border-radius:999px;padding:3px 12px;font-size:13.5px}
+
+/* story */
+.say{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start;margin:10px 0;max-width:820px}
+.av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;color:var(--white)}
+.av.r{background:var(--teal-2)} .av.a{background:var(--sun);color:var(--ink)} .av.k{background:var(--ember)}
+.bub{background:var(--teal-tint);border-radius:4px 18px 18px 18px;padding:10px 16px}
+.bub .who{display:block;font-size:13px;font-weight:700;color:var(--teal-2);margin-bottom:2px}
+.say.aria .bub{background:var(--sun-tint)} .say.aria .bub .who{color:var(--ember)}
+.say.kai .bub{background:#fbeee2} .say.kai .bub .who{color:var(--ember)}
+.guide{border-left:6px solid var(--teal);background:var(--white);border:2px solid var(--teal-tint);border-left-width:6px;border-left-color:var(--teal);padding:10px 14px;border-radius:0 14px 14px 0;margin:14px 0;max-width:820px;font-size:15.5px}
+.guide b{color:var(--teal-2)}
+
+.box{border:2px solid var(--line);border-radius:20px;padding:18px;margin:14px 0;background:var(--white)}
+.btn{border:0;border-radius:12px;padding:9px 16px;font-weight:600;background:var(--teal);color:var(--white)}
+.btn.alt{background:var(--sun);color:var(--ink)} .btn.ghost{background:var(--white);color:var(--teal-2);border:2px solid var(--teal)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input.n{width:84px;padding:7px 8px;border:2px solid var(--line);border-radius:10px;font-size:18px;text-align:center;background:var(--white)}
+input.n.bad{border-color:var(--crimson);animation:shake .3s}
+input.n.ok{border-color:var(--teal);background:var(--teal-tint)}
+textarea{width:100%;padding:10px;border:2px solid var(--line);border-radius:10px}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.fb{min-height:1.5em;font-weight:600;margin-top:6px}.fb.good{color:var(--teal-2)}.fb.bad{color:var(--crimson)}
+.complete{display:none;margin-top:14px;padding:12px 16px;border-radius:14px;background:var(--sun-tint);font-weight:600}
+.complete.show{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.hide{display:none!important}
+.pop{animation:pop .35s ease-out both}@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.choice{border:2px solid var(--line);background:var(--white);border-radius:12px;padding:8px 14px;font-weight:600}
+.choice.picked{border-color:var(--teal);background:var(--teal-tint)}
+.choice.wrong{border-color:var(--crimson);background:var(--crimson-tint)}
+
+/* panels (mission 1) */
+.panels{display:flex;gap:8px;margin:8px 0}
+.pnl{width:46px;height:62px;border-radius:6px;background:var(--off);border:2px dashed var(--off-line);transition:all .4s}
+.pnl.on{border:2px solid var(--teal-2);background:repeating-linear-gradient(0deg,rgba(255,255,255,.35) 0 1px,transparent 1px 10px),repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 1px,transparent 1px 10px),var(--teal)}
+.qrow{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1.5px dashed var(--line)}
+.qrow .k{width:28px;height:28px;border-radius:8px;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+
+/* seats (mission 2) */
+.seats{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;max-width:520px;padding:10px;background:var(--white);border:2px solid var(--line);border-radius:14px}
+.seat{aspect-ratio:1;border-radius:50% 50% 30% 30%;background:var(--off);transition:background .3s}
+.seat.c{background:var(--crimson)}
+.seat.tt{background:var(--teal)}.seat.to{background:var(--teal-3)}.seat.ot{background:var(--sun)}.seat.oo{background:var(--ember)}
+.seats.cutc .seat:nth-child(14n+10){margin-right:8px}
+.seats.cutc .seat:nth-child(n+141):nth-child(-n+154){margin-top:8px}
+
+/* array (mission 3) */
+.arr{display:inline-grid;grid-template-columns:repeat(7,34px);grid-auto-rows:34px;gap:8px;padding:12px;transition:gap .5s, padding .5s;position:relative}
+.arr i{display:block;border-radius:50%;background:var(--teal);transition:all .5s;margin:6px}
+.arr.sq i{border-radius:3px;margin:0;background:var(--teal-3);outline:1.5px solid var(--white)}
+.arr.solid{gap:0}
+.arr.solid i{outline-color:transparent;background:var(--teal)}
+.dimwrap{display:inline-grid;grid-template-columns:auto auto;gap:6px;align-items:center}
+.dimlab{font-family:var(--display);font-weight:800;color:var(--ember);font-size:22px;text-align:center}
+
+/* blueprint builder */
+.bp{border:2px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
+.bp-title{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:10px}
+.bp-title h3{font-size:24px;font-weight:800}
+.bp-title .nm{color:var(--muted);font-weight:600}
+.step{padding:8px 0}
+.rect{display:grid;max-width:640px;margin:10px 0;gap:4px}
+.rect .tl,.rect .sl{font-family:var(--display);font-weight:800;color:var(--ember);display:flex;align-items:center;justify-content:center;font-size:20px}
+.reg{border-radius:10px;background:var(--off);border:2px dashed var(--off-line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;min-height:76px;transition:background .45s,border-color .45s,color .45s;text-align:center}
+.reg .lab{font-weight:600;font-size:14.5px;color:var(--muted)}
+.reg .val{font-family:var(--display);font-weight:800;font-size:24px}
+.reg.lit{border-style:solid;color:var(--white)}
+.reg.lit .lab{color:inherit}
+.reg.tt.lit{background:var(--teal);border-color:var(--teal-2)}
+.reg.to.lit{background:var(--teal-3);border-color:var(--teal-2)}
+.reg.ot.lit{background:var(--sun);border-color:var(--ember);color:var(--ink)}
+.reg.oo.lit{background:var(--ember);border-color:var(--ember)}
+.reg.tap{cursor:pointer}
+.reg.found{outline:4px solid var(--crimson);outline-offset:2px}
+.key{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--muted)}
+.key span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+
+.badge{display:none;text-align:center;padding:28px;border-radius:24px;background:var(--sun-tint);border:3px solid var(--sun);margin-top:16px}
+.badge.show{display:block;animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+.medal{width:150px;height:150px;margin:0 auto 12px;border-radius:24px;display:grid;grid-template-columns:2fr 1fr;grid-template-rows:2fr 1fr;gap:5px;padding:12px;background:var(--white);border:6px solid var(--sun)}
+.medal i{border-radius:6px}.medal i:nth-child(1){background:var(--teal)}.medal i:nth-child(2){background:var(--sun)}.medal i:nth-child(3){background:var(--teal-3)}.medal i:nth-child(4){background:var(--ember)}
+.small{font-size:14px;color:var(--muted)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}.dot.tt{background:var(--teal)}.dot.to{background:var(--teal-3)}.dot.ot{background:var(--sun)}.dot.oo{background:var(--ember)}
+.col{display:inline-grid;gap:4px;font-family:var(--display);font-weight:800;font-size:20px;margin:8px 0;min-width:280px}
+.col div{display:flex;align-items:center;gap:12px;justify-content:flex-start}.col div span,.col div input{min-width:90px;text-align:right}
+.col hr{border:0;border-top:3px solid var(--ink);margin:2px 0;width:100px}
+.col em{font-style:normal;font-family:var(--body);font-weight:600;font-size:13.5px;border-radius:999px;padding:2px 10px;color:#fff}.col em.tt{background:var(--teal)}.col em.to{background:var(--teal-3)}.col em.ot{background:var(--sun);color:var(--ink)}.col em.oo{background:var(--ember)}
+.rowsbox{margin-top:10px;background:var(--teal-tint);border-radius:12px;padding:10px 14px}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:640px;margin:10px 0}
+.mcard{border:2px solid var(--line);background:var(--white);border-radius:14px;padding:16px 8px;font-family:var(--display);font-weight:800;font-size:20px}
+.mcard.ex{border-color:var(--teal)}.mcard.va{border-color:var(--sun)}
+.mcard.sel{background:var(--teal-tint);transform:translateY(-2px)}.mcard.no{border-color:var(--crimson);background:var(--crimson-tint)}
+.mcard.done{color:#fff;border-color:transparent}.mcard.done.tt{background:var(--teal)}.mcard.done.to{background:var(--teal-3)}.mcard.done.ot{background:var(--sun);color:var(--ink)}.mcard.done.oo{background:var(--ember)}
+.rect .reg{min-height:0}
+.alert{background:var(--crimson-tint);color:var(--crimson);border:2px solid var(--crimson);border-radius:12px;padding:8px 14px;font-weight:700;margin-bottom:10px;animation:blink 1.6s ease-in-out 3}
+@keyframes blink{50%{opacity:.45}}
+.banned{display:inline-block;margin-top:6px;background:var(--crimson-tint);color:var(--crimson);border-radius:999px;padding:4px 14px;font-weight:600;font-size:14px}
+.algo{position:sticky;top:calc(var(--topH,66px) + 74px);display:inline-grid;font-family:var(--display);font-weight:800;font-size:30px;line-height:1.15;padding:10px 16px;border:2px solid var(--line);border-radius:14px;background:var(--white)}
+.algo .ar{display:grid;grid-template-columns:repeat(var(--w),30px);text-align:center}
+.algo .a-reg{font-size:18px;color:var(--ember);height:24px}
+.algo .aline{border-top:3px solid var(--ink);margin:4px 0}
+.algo .a-ans span{border-radius:6px}.algo .a-ans span.lit{background:var(--teal-tint);color:var(--teal-2)}
+.g3{display:grid;grid-template-columns:40px 260px 110px 96px;grid-template-rows:30px 90px;gap:4px}
+.g3 .reg{min-height:0}.g3 .reg .n{width:70px}
+.algo2{display:inline-grid;font-family:var(--display);font-weight:800;font-size:28px;text-align:right;min-width:170px;padding:10px 16px;border:2px solid var(--line);border-radius:14px;line-height:1.25}
+.algo2 hr{border:0;border-top:3px solid var(--ink);margin:3px 0}
+.algo2 .bl{min-height:36px;display:flex;justify-content:flex-end;align-items:center;gap:10px}
+.algo2 .bl em{font-style:normal;font-family:var(--body);font-size:12.5px;font-weight:600;background:var(--sun-tint);color:var(--ember);border-radius:999px;padding:1px 8px;order:-1}
+.algo2.kai{border-color:var(--crimson);background:var(--crimson-tint);margin-bottom:10px}
+.algo2 sup{font-size:15px;color:var(--ember)}.algo2 .shift{color:var(--crimson);text-align:right}
+.qrow.log{grid-template-columns:30px 1fr auto}
+.dh{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:6px 0 10px}
+.dhr{width:var(--w);height:var(--h);background:var(--teal);border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:700}
+.arrow{font-size:28px;color:var(--ember);font-weight:800}
+.bcard{border:2px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+.bcard .bh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}.bcard .bh b{font-family:var(--display);font-size:30px;color:var(--teal-2)}
+.medal.m-pv,.medal.m-sm{display:grid;place-items:center;border-radius:50%;width:140px;height:140px;padding:0;grid-template-columns:none;grid-template-rows:none;text-align:center;font-family:var(--display);font-weight:800;font-size:16px;line-height:1.15}
+.medal.m-pv{background:var(--teal);color:#fff;border:6px solid var(--sun)}.medal.m-sm{background:var(--sun);color:var(--ink);border:6px solid var(--teal)}
+.lockbar{display:flex;align-items:center;gap:6px;margin:6px 0 12px;flex-wrap:wrap}.lockbar .lt{font-weight:700;color:var(--muted);margin-right:6px;font-size:14px}
+.lockbar b{width:40px;height:48px;border-radius:10px;display:grid;place-items:center;font-family:var(--display);font-size:24px;background:var(--off);color:var(--muted);border:2px dashed var(--off-line)}
+.lockbar b.on{background:var(--teal);color:#fff;border:2px solid var(--teal-2);animation:pop .4s}
+.routine{display:flex;gap:6px;flex-wrap:wrap}.routine span{background:var(--teal-tint);color:var(--teal-2);border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:600}
+.bench{border:2px solid var(--line);border-radius:20px;padding:16px;margin:14px 0}
+.bh2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.bh2 h3{font-size:24px;color:var(--teal-2)}
+.bgrid{display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:18px}
+.kcard{border:2px solid var(--crimson);background:var(--crimson-tint);border-radius:14px;padding:12px;align-self:start}
+.kcard .who2{display:inline-block;background:var(--crimson);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:1px 10px;margin-bottom:6px}
+.kw{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.35;margin:4px 0}
+.p.rl,.rl{margin:0 0 4px}.rn{background:var(--sun);color:var(--ink);font-weight:700;font-size:12.5px;border-radius:999px;padding:2px 10px}
+.digit{margin-top:10px;background:var(--sun-tint);border-radius:12px;padding:10px 14px;font-weight:600}.digit b{font-family:var(--display);font-size:24px;color:var(--teal-2)}
+.vt2{display:inline-grid;font-family:var(--display);font-weight:800;font-size:22px;text-align:right;min-width:110px}.vt2 hr{border:0;border-top:2.5px solid var(--ink);margin:2px 0}.vt2 .red{color:var(--crimson)}.vt2 .sm{font-size:14px;color:var(--ember)}
+.bars5{display:flex;gap:3px;margin:6px 0}.bars5 i{font-style:normal;display:grid;place-items:center;width:52px;height:32px;border-radius:6px;background:var(--teal);color:#fff;font-weight:700}.bars5 i:nth-child(even){background:var(--teal-2)}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.slots span{min-height:58px;border:2px dashed var(--off-line);border-radius:12px;padding:8px;font-weight:600;font-size:14px;display:flex;align-items:center}.slots span.on{border:2px solid var(--teal);background:var(--teal-tint)}
+.medal.m-ed{display:grid;place-items:center;border-radius:50%;width:150px;height:150px;padding:0;grid-template-columns:none;grid-template-rows:none;text-align:center;font-family:var(--display);font-weight:800;font-size:18px;line-height:1.15;background:var(--crimson);color:#fff;border:6px solid var(--sun)}
+@media (max-width:700px){.bgrid{grid-template-columns:1fr}.slots{grid-template-columns:1fr 1fr}}
+.reg select{font:inherit;font-size:16px;padding:4px;border-radius:8px;border:2px solid var(--line)}
+@media (max-width:620px){.mgrid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:620px){.qrow{grid-template-columns:30px 1fr}.qrow>div:last-child{grid-column:2}.reg .val{font-size:19px}input.n{width:70px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div><h1>Mission 21: Error Detective</h1><div class="sub">Lab Lockdown · MML Multiplication Engineering Lab</div></div>
+  <div class="power" aria-live="polite"><span>Escape progress</span><span class="track"><span class="fill" id="pwr"></span></span><span id="pwrTxt">0%</span></div>
+  <div class="clock"><span class="time" id="clock">00:00</span><button id="clkGo">Start</button><button id="clkReset">Reset</button></div>
+</header>
+<nav class="rail" id="rail" aria-label="Missions"></nav>
+<main id="main"></main>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
+const fmtN=n=>n.toLocaleString('en-US');
+const num=v=>{const t=String(v).replace(/,/g,'').trim();return t===''?NaN:Number(t);};
+const setTop=()=>document.documentElement.style.setProperty('--topH',$('#top').offsetHeight+'px');
+addEventListener('resize',setTop);setTop();
+
+/* ---------- missions & navigation ---------- */
+const M=[['Lockdown!','0–4',0],['The Detective Routine','4–6',4],['Bench 1','6–10',6],['Benches 2–3','10–18',10],['Benches 4–6','18–28',18],['Unlock the Lab','28–30',28],['Lab Clearance','30–38',30],['Create the Error','38–43',38],['Readiness Scan','43–50',43]];
+const main=$('#main'),rail=$('#rail'),stages=[],done=new Set();
+M.forEach((m,i)=>{
+  const b=el('button',null,m[0]+'<small>'+m[1]+' min</small>');b.onclick=()=>go(i);rail.appendChild(b);
+  const s=el('section','stage');s.innerHTML='<div class="head"><h2>'+(i+1)+'. '+m[0]+'</h2><span class="when">'+m[1]+' min</span></div><div class="body"></div><div class="complete"><span class="msg"></span>'+(i<M.length-1?'<button class="btn">Next mission</button>':'')+'</div>';
+  const nb=s.querySelector('.complete .btn');if(nb)nb.onclick=()=>go(i+1);
+  main.appendChild(s);stages.push(s);
+});
+function go(i){stages.forEach((s,j)=>s.classList.toggle('active',j===i));Array.from(rail.children).forEach((b,j)=>{if(j===i)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});rail.children[i].scrollIntoView({block:'nearest',inline:'center'});scrollTo(0,0);}
+function finish(i,msg){if(!done.has(i)){done.add(i);rail.children[i].classList.add('done');const p=Math.round(done.size/M.length*100);$('#pwr').style.width=p+'%';$('#pwrTxt').textContent=p+'%';}
+  const c=stages[i].querySelector('.complete');c.querySelector('.msg').textContent=msg;c.classList.add('show');}
+const body=i=>stages[i].querySelector('.body');
+const say=(who,text)=>{const map={r:['r','Chief Engineer Rhea','R',''],a:['a','ARIA · blueprint AI','A',' aria'],k:['k','Kai · junior drafter','K',' kai']}[who];return '<div class="say'+map[3]+'"><div class="av '+map[0]+'">'+map[2]+'</div><div class="bub"><span class="who">'+map[1]+'</span>'+text+'</div></div>';};
+const guide=(t,h)=>'<div class="guide"><b>'+t+':</b> '+h+'</div>';
+
+/* clock */
+let sec=0,clk=null;const fmt=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+$('#clkGo').onclick=()=>{if(clk){clearInterval(clk);clk=null;$('#clkGo').textContent='Start';return;}clk=setInterval(()=>{sec++;$('#clock').textContent=fmt(sec);let cur=0;M.forEach((m,i)=>{if(sec/60>=m[2])cur=i;});Array.from(rail.children).forEach((b,j)=>b.classList.toggle('now',j===cur));if(sec>=3000){clearInterval(clk);clk=null;}},1000);$('#clkGo').textContent='Pause';};
+$('#clkReset').onclick=()=>{clearInterval(clk);clk=null;sec=0;$('#clock').textContent='00:00';$('#clkGo').textContent='Start';};
+
+/* ---------- blueprint builder ---------- */
+function Blueprint(host,cfg){
+  const a=cfg.a,b=cfg.b,at=a-a%10,ao=a%10,bt=b-b%10,bo=b%10;
+  const regs=[{k:'tt',x:at,y:bt},{k:'ot',x:ao,y:bt},{k:'to',x:at,y:bo},{k:'oo',x:ao,y:bo}];
+  const total=a*b;let lo=null,hi=null;
+  const w=el('div','bp');
+  w.innerHTML='<div class="bp-title"><h3>'+a+' × '+b+'</h3>'+(cfg.name?'<span class="nm">'+cfg.name+'</span>':'')+'</div>'+
+   (cfg.estimate?'<div class="step s-est">Estimate first. The product is between <input class="n lo" inputmode="numeric" aria-label="Low estimate"> and <input class="n hi" inputmode="numeric" aria-label="High estimate"> <button class="btn ghost estB">Lock estimate</button><div class="fb"></div></div>':'')+
+   (cfg.choice?'<div class="step s-choice"></div>':
+   '<div class="step s-split'+(cfg.estimate?' hide':'')+'"><p>Split each factor by place value.</p><div class="row">Across the top: '+a+' = <input class="n t1" inputmode="numeric" aria-label="Tens of '+a+'"> + <input class="n t2" inputmode="numeric" aria-label="Ones of '+a+'"></div><div class="row" style="margin-top:8px">Down the side: '+b+' = <input class="n d1" inputmode="numeric" aria-label="Tens of '+b+'"> + <input class="n d2" inputmode="numeric" aria-label="Ones of '+b+'"></div><div class="row" style="margin-top:8px"><button class="btn splitB">Check my split</button></div><div class="fb"></div></div>')+
+   (cfg.predict?'<div class="step s-pred hide"><p>Predict: how many regions will this blueprint have?</p><div class="row"><input class="n pr" inputmode="numeric" aria-label="Number of regions"><button class="btn prB">Lock prediction</button></div><div class="fb"></div></div>':'')+
+   '<div class="s-rect hide"><div class="rect"></div><div class="key"><span style="--c:var(--teal)">tens × tens</span><span style="--c:var(--teal-3)">tens × ones</span><span style="--c:var(--sun)">ones × tens</span><span style="--c:var(--ember)">ones × ones</span></div><div class="row" style="margin-top:10px"><button class="btn regB">Check regions</button></div><div class="fb rf"></div></div>'+
+   '<div class="step s-tot hide"><div class="row">Total: <span class="sumtxt"></span> = <input class="n tot" inputmode="numeric" style="width:110px" aria-label="Total"><button class="btn alt totB">Restore blueprint</button></div><div class="fb"></div></div>';
+  host.appendChild(w);
+  const q=s=>w.querySelector(s);
+  function showRect(){
+    q('.s-rect').classList.remove('hide');
+    const r=q('.rect'),cw1=at,cw2=Math.max(ao,at*.28),rh1=bt,rh2=Math.max(bo,bt*.32),H=Math.min(300,Math.max(190,b*5));
+    r.style.gridTemplateColumns='46px '+cw1+'fr '+cw2+'fr';r.style.gridTemplateRows='34px '+(H*rh1/(rh1+rh2))+'px '+(H*rh2/(rh1+rh2))+'px';
+    r.innerHTML='<span></span><span class="tl">'+at+'</span><span class="tl">'+ao+'</span>';
+    regs.forEach((g,i)=>{
+      if(i===0)r.insertAdjacentHTML('beforeend','<span class="sl">'+bt+'</span>');
+      if(i===2)r.insertAdjacentHTML('beforeend','<span class="sl">'+bo+'</span>');
+      const lab=g.x+' × '+g.y;
+      const d=el('div','reg '+g.k,'<span class="lab">'+(cfg.labels===false?'? × ?':lab)+'</span><input class="n" inputmode="numeric" aria-label="Area of region '+(i+1)+'">');
+      d.dataset.i=i;g.el=d;r.appendChild(d);
+    });
+    (cfg.prefill||[]).forEach(i=>light(i));
+    if(cfg.prefillNote)q('.rf').innerHTML='<span style="color:var(--teal-2)">'+cfg.prefillNote+'</span>';
+    const first=regs.find(g=>!g.lit);if(first)first.el.querySelector('input').focus();
+  }
+  function light(i){const g=regs[i];g.lit=true;g.el.classList.add('lit','pop');g.el.innerHTML='<span class="lab">'+g.x+' × '+g.y+'</span><span class="val">'+fmtN(g.x*g.y)+'</span>';}
+  function checkRegs(){let all=true,miss=0;regs.forEach((g,i)=>{if(g.lit)return;const inp=g.el.querySelector('input');const v=num(inp.value);
+      if(v===g.x*g.y)light(i);else{all=false;miss++;inp.classList.remove('bad');void inp.offsetWidth;inp.classList.add('bad');}});
+    const f=q('.rf');
+    if(all){f.className='fb good rf';f.textContent='All four regions are powered.';q('.regB').disabled=true;q('.s-tot').classList.remove('hide');q('.sumtxt').textContent=regs.map(g=>fmtN(g.x*g.y)).join(' + ');q('.tot').focus();}
+    else{f.className='fb bad rf';f.textContent=miss+' region'+(miss>1?'s are':' is')+' still dark. '+(cfg.labels===false?'Multiply the label on its column by the label on its row.':'Tens × tens makes hundreds; check the place value.');}
+  }
+  q('.regB').onclick=checkRegs;
+  w.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const c=e.target.closest('.reg,.s-tot,.s-split,.s-est,.s-pred');if(!c)return;const btn=c.classList.contains('reg')?q('.regB'):c.querySelector('.btn');if(btn&&!btn.disabled)btn.click();});
+  q('.totB').onclick=()=>{const v=num(q('.tot').value),f=q('.s-tot .fb');
+    if(v===total){q('.tot').classList.add('ok');q('.totB').disabled=true;f.className='fb good';
+      let m=fmtN(a)+' × '+fmtN(b)+' = '+fmtN(total)+'. Blueprint restored!';
+      if(lo!==null)m+=(total>=lo&&total<=hi)?' It is inside your estimate of '+fmtN(lo)+' to '+fmtN(hi)+'.':' It is outside your estimate ('+fmtN(lo)+' to '+fmtN(hi)+'), so think about why for next time.';
+      f.textContent=m;w.querySelector('.rect').style.boxShadow='0 0 0 4px var(--sun-tint)';cfg.onDone&&cfg.onDone();}
+    else{f.className='fb bad';f.textContent='Not yet. Add the four region values again, carefully.';}};
+  if(cfg.estimate)q('.estB').onclick=()=>{const L=num(q('.lo').value),Hh=num(q('.hi').value),f=q('.s-est .fb');
+    if(isNaN(L)||isNaN(Hh)||L>=Hh){f.className='fb bad';f.textContent='Type a low number and a higher number.';return;}
+    lo=L;hi=Hh;f.className='fb good';f.textContent='Estimate locked. Tip: the tens × tens region ('+at+' × '+bt+' = '+fmtN(at*bt)+') is the biggest part.';q('.estB').disabled=true;q('.s-split').classList.remove('hide');};
+  if(!cfg.choice){
+    if(cfg.prefillSplit){q('.t1').value=at;q('.t2').value=ao;q('.d1').value=bt;q('.d2').value=bo;}
+    q('.splitB').onclick=()=>{const t1=num(q('.t1').value),t2=num(q('.t2').value),d1=num(q('.d1').value),d2=num(q('.d2').value),f=q('.s-split .fb');
+      if(t1===at&&t2===ao&&d1===bt&&d2===bo){f.className='fb good';f.textContent='Place-value split confirmed: '+at+' + '+ao+' and '+bt+' + '+bo+'.';q('.splitB').disabled=true;next();}
+      else if(t1+t2===a&&d1+d2===b){f.className='fb bad';f.textContent='Those parts add up, but use tens and ones so the multiplying is easy (for example 40 + 3).';}
+      else{f.className='fb bad';f.textContent='Check: the two parts must add up to the factor. '+(t1&&t2&&t1+t2!==a?t1+' + '+t2+' = '+(t1+t2)+', not '+a+'.':'');}};
+  } else {
+    const c=q('.s-choice');let step=0;
+    const opts=[[a,[[Math.floor(a/10),ao],[at,ao],[at-10,ao+10]]],[b,[[Math.floor(b/10),bo],[bt,bo],[bt-10,bo+10]]]];
+    function ask(){const [f,os]=opts[step];c.innerHTML='<p>ARIA can see the '+(step?'side':'top')+' is <b>'+f+'</b>. How should we split '+f+'?</p><div class="row">'+os.map((o,i)=>'<button class="choice" data-i="'+i+'">'+o[0]+' + '+o[1]+'</button>').join('')+'</div><div class="fb"></div>';
+      c.querySelectorAll('.choice').forEach(bt2=>bt2.onclick=()=>{const o=os[+bt2.dataset.i],fb=c.querySelector('.fb');
+        if(+bt2.dataset.i===1){bt2.classList.add('picked');fb.className='fb good';fb.textContent=f+' = '+o[0]+' + '+o[1]+': tens and ones. ARIA approves.';setTimeout(()=>{step++;if(step<2)ask();else{c.innerHTML='<p class="fb good">Split locked: '+a+' = '+at+' + '+ao+' and '+b+' = '+bt+' + '+bo+'.</p>';next();}},900);}
+        else if(o[0]+o[1]!==f){bt2.classList.add('wrong');fb.className='fb bad';fb.textContent='ARIA: '+o[0]+' + '+o[1]+' = '+(o[0]+o[1])+', not '+f+'. What is the '+String(f)[0]+' in '+f+' really worth?';}
+        else{bt2.classList.add('wrong');fb.className='fb bad';fb.textContent='ARIA: that adds to '+f+', but '+o[0]+' and '+o[1]+' are not tens and ones. Splitting by place value makes the multiplying easiest.';}});}
+    ask();
+  }
+  function next(){if(cfg.predict)q('.s-pred').classList.remove('hide');else showRect();}
+  if(cfg.predict)q('.prB').onclick=()=>{const v=num(q('.pr').value),f=q('.s-pred .fb');if(isNaN(v)){f.className='fb bad';f.textContent='Type a number first.';return;}
+    q('.prB').disabled=true;f.className='fb '+(v===4?'good':'bad');f.textContent=v===4?'Correct: 2 parts across × 2 parts down = 4 regions. Every part of '+a+' meets every part of '+b+'.':'Watch: the '+at+' column crosses 2 rows, and so does the '+ao+' column. 2 × 2 = 4 regions.';
+    if(cfg.afterPredict)cfg.afterPredict(q('.s-pred'),showRect);else showRect();};
+  if(cfg.prefillSplit&&!cfg.estimate){/* split visible, prefilled */}
+  return {w};
+}
+
+/* ---------- helpers ---------- */
+function checkInputs(c){let all=true;c.querySelectorAll('input.n[data-a]').forEach(i=>{if(i.classList.contains('ok'))return;if(num(i.value)===+i.dataset.a){i.classList.add('ok');i.readOnly=true;}else{all=false;i.classList.remove('bad');void i.offsetWidth;i.classList.add('bad');}});return all;}
+const inp=(a,w)=>'<input class="n" data-a="'+a+'" inputmode="numeric"'+(w?' style="width:'+w+'px"':'')+' aria-label="answer">';
+function choiceGroup(c,correct,onRight,msgs){c.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const f=c.querySelector(':scope > .fb');if(b.dataset.v===correct){c.querySelectorAll('.choice').forEach(x=>x.disabled=true);b.classList.add('picked');f.className='fb good';f.textContent=msgs[0];onRight&&onRight();}else{b.classList.add('wrong');f.className='fb bad';f.textContent=msgs[1];}});}
+const ch=(opts)=>'<div class="row" style="flex-direction:column;align-items:flex-start">'+[...opts].sort(()=>Math.random()-.5).map(o=>'<button class="choice" data-v="'+o[0]+'">'+o[1]+'</button>').join('')+'</div>';
+function runSteps(host,steps,done){
+  steps.forEach((s,i)=>{const d=el('div','step'+(i?' hide':''),(s.label?'<p class="rl"><span class="rn">'+s.label+'</span></p>':'')+s.html+(s.choice?'':'<div class="row" style="margin-top:6px"><button class="btn">'+(s.btn||'Check')+'</button></div>')+'<div class="fb"></div>');host.appendChild(d);s.el=d;});
+  steps.forEach((s,i)=>{const d=s.el,next=()=>{s.on&&s.on();if(steps[i+1])steps[i+1].el.classList.remove('hide');else done&&done();};
+    if(s.choice)choiceGroup(d,s.choice,next,s.msgs);
+    else d.querySelector('.btn').onclick=()=>{const f=d.querySelector(':scope > .fb');if(checkInputs(d)){d.querySelector('.btn').disabled=true;f.className='fb good';f.textContent=s.ok||'Correct.';next();}else{f.className='fb bad';f.textContent=s.bad||'Not yet: check the red boxes.';}};});
+}
+function Model(host,top,side,opt){opt=opt||{};const regs=[];side.forEach((s,ri)=>top.forEach((t,ci)=>regs.push({x:t,y:s,k:['tt','ot','to','oo'][ri*2+ci],ri,ci})));
+  const H=opt.h||180,c2=Math.max(top[1],top[0]*.32),r2=Math.max(side[1],side[0]*.36),h2=Math.max(56,H*r2/(side[0]+r2));
+  const d=el('div','rect');d.style.gridTemplateColumns='46px '+top[0]+'fr '+c2+'fr';d.style.gridTemplateRows='34px '+(H-h2)+'px '+h2+'px';
+  d.innerHTML='<span></span><span class="tl">'+top[0]+'</span><span class="tl">'+top[1]+'</span>';
+  regs.forEach((r,i)=>{if(r.ci===0)d.insertAdjacentHTML('beforeend','<span class="sl">'+side[r.ri]+'</span>');const e=el('div','reg '+r.k,'<span class="lab">'+(opt.labels===false?'':r.x+' × '+r.y)+'</span><span class="val"></span>');r.el=e;d.appendChild(e);});
+  host.appendChild(d);return {regs,light(i){const r=regs[i];r.el.classList.add('lit','pop');r.el.querySelector('.lab').textContent=r.x+' × '+r.y;r.el.querySelector('.val').textContent=fmtN(r.x*r.y);}};}
+const code=['','','','','',''];
+function drawLock(){document.querySelectorAll('.lockbar').forEach(l=>{l.innerHTML='<span class="lt">Exit code</span>'+code.map(c=>'<b class="'+(c?'on':'')+'">'+(c||'?')+'</b>').join('');});}
+const lockbar='<div class="lockbar"></div>';
+const ROUTINE='<div class="routine"><span>1 Estimate</span><span>2 Mistake</span><span>3 Fix</span><span>4 Prove</span></div>';
+function Bench(host,cfg){const d=el('div','bench','<div class="bh2"><h3>Bench '+cfg.n+'</h3>'+ROUTINE+'</div><div class="bgrid"><div class="kcard"><span class="who2">Kai\'s work</span>'+cfg.kai+'</div><div class="bsteps"></div></div>');host.appendChild(d);
+  const st=[{label:'1 · Estimate',html:'<p>'+cfg.est[0]+'</p>'+ch(cfg.est[1]),choice:cfg.est[2],msgs:cfg.est[3]},
+    {label:'2 · Mistake',html:'<p>What exactly went wrong?</p>'+ch(cfg.mis[0]),choice:cfg.mis[1],msgs:cfg.mis[2]},
+    {label:'3 · Fix',html:'<p>Which idea fixes it?</p>'+ch(cfg.fix[0]),choice:cfg.fix[1],msgs:['Yes: that\'s the idea that fixes it.','Think about what Kai forgot to do.']},
+    {label:'4 · Prove',html:cfg.prove,ok:cfg.proveOk,bad:cfg.proveBad,on:cfg.onProve}];
+  runSteps(d.querySelector('.bsteps'),st,()=>{if(cfg.digit!=null){code[cfg.digit[0]]=cfg.digit[1];drawLock();}const m=el('div','digit pop',cfg.digit!=null?'ARIA: Bench '+cfg.n+' fixed. Code digit unlocked: <b>'+cfg.digit[1]+'</b>':'ARIA: Bonus bench fixed. Expert detective!');d.appendChild(m);cfg.onDone&&cfg.onDone();});
+  return d;}
+
+/* ================= MISSION 1 ================= */
+(function(){const b=body(0);
+  b.innerHTML='<div class="alert">⚠ SECURITY LOCKDOWN · all doors sealed · emergency power only</div>'+
+  say('a','Audit complete. Six faulty calculations found on the lab benches. Security lockdown activated.')+
+  say('k','Uh-oh… I think those calculations are mine.')+
+  say('r','Stay calm. First we need emergency lights. Six quick answers, from everything we\'ve learned.')+
+  '<div class="box"><div class="panels">'+'<i class="pnl"></i>'.repeat(6)+'</div><div id="m1q"></div></div>';
+  const Q=[['3 times as many as 9 = ?',27],['3 more than 9 = ?',12],['How many partial products in 46 × 35?',4],['35 ones = ___ tens and 5 ones',3],['52 × 10 = ?',520],['25 × 12 the smart way = ?',300]];
+  let got=0;Q.forEach((x,i)=>{const r=el('div','qrow','<span class="k">'+(i+1)+'</span><span>'+x[0]+'</span><div class="row"><input class="n" inputmode="numeric" aria-label="Answer '+(i+1)+'"><button class="btn ghost">Check</button></div>');
+    const ip=r.querySelector('input'),bt=r.querySelector('button');const c=()=>{if(ip.classList.contains('ok'))return;if(num(ip.value)===x[1]){ip.classList.add('ok');bt.disabled=true;b.querySelectorAll('.pnl')[got].classList.add('on');got++;if(got===6)finish(0,'Emergency lights on. Now find the exit code.');}else{ip.classList.remove('bad');void ip.offsetWidth;ip.classList.add('bad');}};
+    bt.onclick=c;ip.onkeydown=e=>{if(e.key==='Enter')c();};b.querySelector('#m1q').appendChild(r);});
+})();
+
+/* ================= MISSION 2 ================= */
+(function(){const b=body(1);
+  b.innerHTML=say('a','The exit code has six digits. Each one is hidden in a faulty bench. Fix a bench and I release its digit.')+lockbar+
+  say('r','Every detective uses the same routine. Put the four steps in the right order.')+
+  '<div class="box"><div class="slots" id="slots"><span></span><span></span><span></span><span></span></div><div class="row" id="pool"></div><div class="fb" id="rf"></div></div>'+
+  guide('Detective tip','Estimating first can catch a wrong answer in seconds, before you do any long calculation.');
+  const order=['Estimate: is it even possible?','Mistake: what exactly went wrong?','Fix: which idea fixes it?','Prove: show the answer another way'];
+  let k=0;const pool=b.querySelector('#pool'),slots=[...b.querySelectorAll('#slots span')];
+  [...order].sort(()=>Math.random()-.5).forEach(t=>{const x=el('button','choice',t);x.onclick=()=>{const f=b.querySelector('#rf');if(t===order[k]){slots[k].textContent=(k+1)+'. '+t;slots[k].classList.add('on');x.remove();k++;f.className='fb good';f.textContent=k<4?'Next step?':'The detective routine is ready.';if(k===4)finish(1,'Routine loaded. Bench 1 is waiting.');}else{x.classList.add('wrong');setTimeout(()=>x.classList.remove('wrong'),500);f.className='fb bad';f.textContent='Think: what would you do first, before any long calculating?';}};pool.appendChild(x);});
+})();
+
+/* ================= MISSION 3 ================= */
+(function(){const b=body(2);
+  b.innerHTML=lockbar+say('r','Bench 1. I\'ll walk through the routine with you this time.')+'<div id="b1"></div>';
+  Bench(b.querySelector('#b1'),{n:1,digit:[0,'4'],
+    kai:'<p class="kw">"5 times as many as 8 = 13"</p>',
+    est:['Five 8s. Is 13 even close?',[['n','No: five 8s is 40'],['y','Yes, 13 looks fine']],'n',['Right: 8, 16, 24, 32, 40.','Count five 8s: 8, 16, 24…']],
+    mis:[[['a','Kai added 8 + 5, which is "5 more than 8"'],['b','Kai multiplied wrongly'],['c','Kai used the wrong numbers']],'a',['Exactly: he solved "5 more than", not "5 times as many".','What gives 13 from 8 and 5?']],
+    fix:[[['a','Multiplicative comparison: times as many means multiply'],['b','The distributive property'],['c','Regrouping']],'a'],
+    prove:'<div class="bars5">'+'<i>8</i>'.repeat(5)+'</div><p>5 × 8 = '+inp(40)+'</p>',proveOk:'Five 8-bars = 40.',
+    onDone:()=>finish(2,'Bench 1 fixed. First digit: 4.')});
+})();
+
+/* ================= MISSION 4 ================= */
+(function(){const b=body(3);
+  b.innerHTML=lockbar+say('r','Benches 2 and 3. You lead; I\'ll only ask questions.')+'<div id="b2"></div><div id="b3" class="hide"></div>'+guide('Detective tip','Kai\'s mistakes often look like adding: tens with tens, ones with ones.');
+  Bench(b.querySelector('#b2'),{n:2,digit:[1,'3'],
+    kai:'<p class="kw">23 × 14<br>= 20 × 10 + 3 × 4<br>= 200 + 12<br>= 212</p>',
+    est:['23 × 14 is more than 20 × 14 = 280. Can it be 212?',[['n','No, 212 is too small'],['y','Yes']],'n',['Right: it must be more than 280.','Compare 212 with 280.']],
+    mis:[[['a','Only 2 of the 4 partial products: 20 × 4 and 3 × 10 are missing'],['b','20 × 10 should be 2,000'],['c','He added 200 + 12 wrongly']],'a',['Yes: two stations were switched off.','How many partial products should 2-digit × 2-digit have?']],
+    fix:[[['a','Distributive property: every part meets every part'],['b','Multiplicative comparison'],['c','Double and halve']],'a'],
+    prove:'<p>200 + '+inp(80)+' + '+inp(30)+' + 12 = '+inp(322)+'</p><p class="small">Second proof: 23 × 10 + 23 × 4 = 230 + 92</p>',proveOk:'322. Kai was 110 short.',
+    onDone:()=>b.querySelector('#b3').classList.remove('hide')});
+  Bench(b.querySelector('#b3'),{n:3,digit:[2,'2'],
+    kai:'<div class="vt2"><div>23</div><div>× 14</div><hr><div>92</div><div class="red">23</div><hr><div>115</div></div>',
+    est:['23 × 14 is more than 20 × 10 = 200. Can it be 115?',[['n','No'],['y','Yes']],'n',['Right: 115 is less than 200.','Compare 115 with 200.']],
+    mis:[[['a','The second line should be 23 × 1 ten, but Kai wrote 23 ones'],['b','23 × 4 should be 82'],['c','Kai added the lines wrongly']],'a',['Yes: the 1 in 14 is one ten.','What is the 1 in 14 really worth?']],
+    fix:[[['a','Place value: the second line is tens'],['b','Multiplicative comparison'],['c','Round and subtract']],'a'],
+    prove:'<p>Second line: 23 × 1 ten = '+inp(230)+' &nbsp; Total: 92 + 230 = '+inp(322)+'</p>',proveOk:'322, matching Bench 2. Two benches, one truth!',
+    onDone:()=>finish(3,'Benches 2 and 3 fixed. Digits so far: 4, 3, 2.')});
+})();
+
+/* ================= MISSION 5 ================= */
+(function(){const b=body(4);
+  b.innerHTML=lockbar+say('r','Three benches left, and you\'re on your own now. I\'ll stay quiet.')+'<div id="b4"></div><div id="b5" class="hide"></div><div id="b6" class="hide"></div><div id="b7" class="hide"></div>';
+  const m4=el('div');
+  const B4=Bench(b.querySelector('#b4'),{n:4,digit:[3,'8'],
+    kai:'<div id="kai4"></div><p class="kw">800 + 60 + 21 = 881</p>',
+    est:['40 × 27 alone is 1,080. Can 43 × 27 be 881?',[['n','No, it must be more than 1,080'],['y','Yes']],'n',['Right: 881 is far too small.','43 × 27 must be bigger than 40 × 27.']],
+    mis:[[['a','The 40 × 7 region has no power'],['b','3 × 20 should be 6'],['c','800 should be 80']],'a',['Yes: one region is missing.','Look at the dark region in Kai\'s model.']],
+    fix:[[['a','Area model: four regions every time'],['b','Multiplicative comparison'],['c','Double and halve']],'a'],
+    prove:'<p>Missing region: 40 × 7 = '+inp(280)+' &nbsp; Total = '+inp(1161,100)+'</p><p>Second proof: 43 × 7 + 43 × 20 = '+inp(301)+' + '+inp(860)+'</p>',proveOk:'1,161 two ways.',onProve:()=>mm.light(2),
+    onDone:()=>b.querySelector('#b5').classList.remove('hide')});
+  const mm=Model(B4.querySelector('#kai4'),[40,3],[20,7],{h:120});mm.light(0);mm.light(1);mm.light(3);
+  Bench(b.querySelector('#b5'),{n:5,digit:[4,'1'],
+    kai:'<div class="vt2"><div class="sm">1</div><div>1,204</div><div>× 4</div><hr><div>4,806</div></div>',
+    est:['1,200 × 4 = 4,800, and Kai got 4,806. Does a close estimate prove he\'s right?',[['n','No: it is close, so check each place carefully'],['y','Yes, close means correct']],'n',['Smart: an estimate catches big errors, not small ones.','A close estimate can still hide a small mistake.']],
+    mis:[[['a','The regrouped 1 ten from 16 ones was lost'],['b','0 tens × 4 should be 4 tens'],['c','4 × 4 should be 12']],'a',['Yes: 0 tens + 1 regrouped ten = 1 ten, not 0.','What happened to the 1 ten from 16 ones?']],
+    fix:[[['a','Regrouping: 16 ones = 1 ten and 6 ones'],['b','Double and halve'],['c','Multiplicative comparison']],'a'],
+    prove:'<p>4,000 + 800 + 0 + 16 = '+inp(4816,100)+'</p>',proveOk:'4,816. Kai was exactly 10 short: the lost ten!',
+    onDone:()=>b.querySelector('#b6').classList.remove('hide')});
+  Bench(b.querySelector('#b6'),{n:6,digit:[5,'6'],
+    kai:'<p class="kw">Double and halve:<br>18 × 35 = 36 × 70<br>= 2,520</p>',
+    est:['18 × 35 is about 20 × 35 = 700. Can it be 2,520?',[['n','No, far too big'],['y','Yes']],'n',['Right: 2,520 is more than 3 times the estimate.','Compare 2,520 with 700.']],
+    mis:[[['a','Kai doubled BOTH factors, so the product became 4 times bigger'],['b','36 × 70 should be 2,250'],['c','He should have added']],'a',['Yes: double one, halve the other.','Look at what Kai did to 18 and to 35.']],
+    fix:[[['a','Double ONE factor and halve the OTHER'],['b','Distributive property only'],['c','Multiplicative comparison']],'a'],
+    prove:'<p>Halve 18, double 35: 9 × 70 = '+inp(630)+'</p><p>Check with partial products: 300 + 50 + 240 + 40 = '+inp(630)+'</p>',proveOk:'630 two ways. Kai\'s 2,520 is 4 times too big.',
+    onDone:()=>{finish(4,'All six benches fixed! Go to Unlock.');b.querySelector('#b7').classList.remove('hide');}});
+  b.querySelector('#b7').innerHTML='<div class="box"><h3 style="font-size:20px">Bonus Bench 7 (expert)</h3><p class="kw" style="color:var(--crimson)">243 × 27 = 4,000 + 1,400 + 800 + 60 + 21 = 6,281</p><p>How many regions should a 3-digit × 2-digit model have? '+inp(6)+'</p><p>Which partial product is missing? 40 × 7 = '+inp(280)+' &nbsp; Correct total: '+inp(6561,100)+'</p><button class="btn ghost">Check</button><div class="fb"></div></div>';
+  const B7=b.querySelector('#b7 .box');B7.querySelector('.btn').onclick=()=>{const f=B7.querySelector('.fb');if(checkInputs(B7)){f.className='fb good';f.textContent='3 parts × 2 parts = 6 regions. 6,561 (check: 4,860 + 1,701). Expert detective!';}else{f.className='fb bad';f.textContent='243 = 200 + 40 + 3 and 27 = 20 + 7.';}};
+})();
+
+/* ================= MISSION 6 ================= */
+(function(){const b=body(5);
+  b.innerHTML=lockbar+say('a','Enter the six-digit exit code.')+
+  '<div class="box"><div class="row"><input class="n" id="kp" inputmode="numeric" style="width:200px;letter-spacing:8px;font-size:26px" maxlength="6" aria-label="Exit code"><button class="btn alt" id="kpb">Unlock</button></div><div class="fb" id="kpf"></div></div>'+
+  '<div class="hide" id="m6b"><div class="box"><p><b>Which bench\'s error would cause the biggest problem in a real airfield budget?</b></p><div class="row">'+[1,2,3,4,5,6].map(n=>'<button class="choice" data-r="'+n+'">Bench '+n+'</button>').join('')+'</div><div class="fb" id="rkf"></div></div>'+
+  '<div class="box"><p><b>Tick every word you used out loud on the benches.</b></p><div class="row" id="vocab"></div><div class="fb" id="vf"></div></div>'+
+  '<div class="box"><p><b>Your personal check:</b> which mistake are you most likely to make, and what will you check for in the Mastery Mission?</p><textarea id="pc" rows="2" aria-label="Your check"></textarea><button class="btn" id="pcb" style="margin-top:8px">Save my check</button><div class="fb" id="pcf"></div></div></div>';
+  b.querySelector('#kpb').onclick=()=>{const v=b.querySelector('#kp').value.trim(),f=b.querySelector('#kpf');
+    if(v===code.join('')&&code.every(c=>c)){f.className='fb good';f.textContent='ACCESS GRANTED. The doors slide open!';b.querySelector('.alert')&&0;b.querySelector('#m6b').classList.remove('hide');}
+    else if(!code.every(c=>c)){f.className='fb bad';f.textContent='Some benches are still unsolved. Check the code bar.';}
+    else{f.className='fb bad';f.textContent='ACCESS DENIED. Read the digits from the code bar in order.';}};
+  const why={1:'Adding instead of multiplying: 13 instead of 40, less than a third of the real amount.',2:'Missing stations: 110 lost out of every 322.',3:'A shifted line: 115 instead of 322, under half.',4:'A missing region: 280 lost.',5:'A lost regroup: only 10 out, but on money that still matters.',6:'Doubling both: 4 times too big, a huge overspend!'};
+  b.querySelectorAll('[data-r]').forEach(c=>c.onclick=()=>{b.querySelectorAll('[data-r]').forEach(x=>x.classList.remove('picked'));c.classList.add('picked');const f=b.querySelector('#rkf');f.className='fb good';f.textContent='Good reasoning. Bench '+c.dataset.r+': '+why[c.dataset.r];});
+  ['factor','product','multiplicative comparison','area model','partial product','distributive property','regroup','place value','standard algorithm'].forEach(w=>{const x=el('button','choice',w);x.onclick=()=>{x.classList.toggle('picked');const n=b.querySelectorAll('#vocab .picked').length,f=b.querySelector('#vf');f.className='fb '+(n>=5?'good':'');f.textContent=n+' words'+(n>=5?': true detective vocabulary!':'');};b.querySelector('#vocab').appendChild(x);});
+  b.querySelector('#pcb').onclick=()=>{const f=b.querySelector('#pcf');if(b.querySelector('#pc').value.trim().length<8){f.className='fb bad';f.textContent='Write one mistake and one check.';return;}f.className='fb good';f.textContent='Saved. Bring this check to the Mastery Mission.';finish(5,'Lab unlocked! But Rhea has one more job before you leave.');};
+})();
+
+/* ================= MISSION 7 ================= */
+(function(){const b=body(6);
+  b.innerHTML=say('r','Before we leave: a rival company sent the airfield a solar proposal. Audit it.')+
+  '<div class="box"><p class="kw" style="color:var(--crimson)">"Our field has 26 rows of 17 panels = 422 panels. That is 3 times as many as the old 144-panel field."</p><div id="m7a"></div></div>'+
+  '<div class="box hide" id="m7bb"><h3 style="font-size:20px">Strategy selection</h3><p class="small">Choose a tool, solve, and be ready to say why.</p><div id="m7b"></div></div>';
+  runSteps(b.querySelector('#m7a'),[
+    {html:'<p>Check 26 × 17 with an area model: 20 × 10 + 20 × 7 + 6 × 10 + 6 × 7 = '+inp(200)+' + '+inp(140)+' + '+inp(60)+' + '+inp(42)+' = '+inp(442)+'</p>',ok:'442 panels, not 422: the rival is 20 out.'},
+    {html:'<p>3 times as many as 144 = '+inp(432)+'</p>'},
+    {html:'<p>Is the claim "3 times as many" true for 442 panels?</p>'+ch([['n','No: 442 is 10 more than 3 times 144'],['y','Yes']]),choice:'n',msgs:['Correct: 442 ≠ 432.','3 × 144 = 432. Is 442 the same?']},
+    {html:'<p>Redesign: a rectangle with exactly 432 panels. Rows '+'<input class="n" id="rr" inputmode="numeric" aria-label="Rows"> × panels per row <input class="n" id="rc" inputmode="numeric" aria-label="Panels per row"></p>',btn:'Submit design'}
+  ],()=>{b.querySelector('#m7bb').classList.remove('hide');});
+  const last=b.querySelectorAll('#m7a .step')[3];last.querySelector('.btn').onclick=()=>{const r=num(b.querySelector('#rr').value),c=num(b.querySelector('#rc').value),f=last.querySelector(':scope > .fb');
+    if(r>1&&c>1&&r*c===432){f.className='fb good';f.textContent=r+' × '+c+' = 432. Design approved!';last.querySelector('.btn').disabled=true;b.querySelector('#m7bb').classList.remove('hide');}else{f.className='fb bad';f.textContent=(r&&c?r+' × '+c+' = '+fmtN(r*c)+'. ':'')+'Try 24 × 18, or another pair that makes 432.';}};
+  const T={dh:'Double and halve',fb:'Factor breakdown',rs:'Round and subtract',sa:'Algorithm / area model'};
+  const C=[['50 × 28',1400,['dh','fb']],['3,006 × 4',12024,['sa']],['48 × 52',2496,['sa']]];let n=0;
+  const H=b.querySelector('#m7b');
+  C.forEach((c,i)=>{const d=el('div','bcard','<div class="bh"><span>Card '+(i+1)+'</span><b>'+c[0]+'</b></div><div class="row">'+Object.entries(T).map(([k,v])=>'<button class="choice" data-s="'+k+'">'+v+'</button>').join('')+'</div><p style="margin-top:8px">Answer: '+inp(c[1],110)+' <button class="btn">Lock in</button></p><div class="fb"></div>');let p=null;
+    d.querySelectorAll('[data-s]').forEach(x=>x.onclick=()=>{d.querySelectorAll('[data-s]').forEach(y=>y.classList.remove('picked'));x.classList.add('picked');p=x.dataset.s;});
+    d.querySelector('.btn').onclick=()=>{const f=d.querySelector(':scope > .fb');if(!p){f.className='fb bad';f.textContent='Choose a tool.';return;}if(!checkInputs(d)){f.className='fb bad';f.textContent='Check the calculation.';return;}
+      d.querySelector('.btn').disabled=true;f.className='fb good';f.textContent=c[2].includes(p)?'Efficient choice!':'Correct. A faster tool: '+c[2].map(k=>T[k]).join(' or ')+'.';n++;if(n===3)H.appendChild(L8);};H.appendChild(d);});
+  const L8=el('div','box','<p><b>Expert:</b> 19 × 6 = '+inp(114)+' and 19 × 60 = '+inp(1140)+'</p><p>How does the first help the second?</p>'+ch([['a','19 × 60 is ten times as many as 19 × 6'],['b','Add 54 to 114'],['c','They are not related']])+'<div class="fb"></div>');
+  L8.querySelectorAll('.choice').forEach(x=>x.onclick=()=>{const f=L8.querySelector(':scope > .fb');if(!checkInputs(L8)){f.className='fb bad';f.textContent='Fill both products first.';return;}if(x.dataset.v==='a'){x.classList.add('picked');f.className='fb good';f.textContent='Yes: 60 is ten times 6, so the product is ten times as many.';finish(6,'Lab cleared: rival proposal audited and strategies chosen.');}else{x.classList.add('wrong');f.className='fb bad';f.textContent='Compare 6 and 60.';}});
+})();
+
+/* ================= MISSION 8 ================= */
+(function(){const b=body(7);
+  b.innerHTML=say('k','Your turn to trick someone! Make an error so believable that even your teacher has to think hard.')+
+  '<div class="box"><p><b>1. Choose an error type.</b></p><div class="row" id="et"><button class="choice" data-t="cmp">Times vs more</button><button class="choice" data-t="mis">Missing regions</button><button class="choice" data-t="sh">Shifted line</button><button class="choice" data-t="rg">Lost regroup</button></div><div id="ein" style="margin-top:10px"></div><div class="fb" id="ef"></div><div id="eout"></div></div>'+
+  '<div class="box hide" id="judge"><p><b>2. Your teacher runs the routine out loud. Did they…</b></p><label><input type="checkbox" class="jc"> estimate first?</label><br><label><input type="checkbox" class="jc"> name the exact mistake?</label><br><label><input type="checkbox" class="jc"> name the idea that fixes it?</label><br><label><input type="checkbox" class="jc"> prove it another way?</label><p style="margin-top:10px"><b>3. Why is your error tempting?</b></p><textarea id="tw" rows="2" aria-label="Why tempting"></textarea><button class="btn" id="jb" style="margin-top:8px">Finish the game</button><div class="fb" id="jf"></div></div>';
+  let t=null;const forms={cmp:['Number of times (2–9)','Original amount (2–20)'],mis:['First number (2-digit)','Second number (2-digit)'],sh:['First number (2-digit)','Second number (2-digit)'],rg:['Big number (3 or 4 digits)','Multiplier (2–9)']};
+  b.querySelectorAll('#et .choice').forEach(x=>x.onclick=()=>{b.querySelectorAll('#et .choice').forEach(y=>y.classList.remove('picked'));x.classList.add('picked');t=x.dataset.t;
+    b.querySelector('#ein').innerHTML='<div class="row">'+forms[t][0]+': <input class="n" id="e1" inputmode="numeric" aria-label="'+forms[t][0]+'"> '+forms[t][1]+': <input class="n" id="e2" inputmode="numeric" aria-label="'+forms[t][1]+'"><button class="btn" id="eg">Make Kai-style work</button></div>';
+    b.querySelector('#eg').onclick=gen;});
+  function gen(){const a=num(b.querySelector('#e1').value),c=num(b.querySelector('#e2').value),f=b.querySelector('#ef');let out='',ok=true;
+    const two=n=>n>=11&&n<=99&&n%10;
+    if(t==='cmp'){ok=a>=2&&a<=9&&c>=2&&c<=20;if(ok)out='"'+a+' times as many as '+c+' = '+(a+c)+'"';}
+    if(t==='mis'){ok=two(a)&&two(c);if(ok){const at=a-a%10,ct=c-c%10;out=a+' × '+c+' = '+at+' × '+ct+' + '+(a%10)+' × '+(c%10)+' = '+fmtN(at*ct+(a%10)*(c%10));}}
+    if(t==='sh'){ok=two(a)&&two(c);if(ok){const l1=a*(c%10),l2=a*Math.floor(c/10);out='<div class="vt2" style="display:inline-grid"><div>'+a+'</div><div>× '+c+'</div><hr><div>'+fmtN(l1)+'</div><div>'+fmtN(l2)+'</div><hr><div>'+fmtN(l1+l2)+'</div></div>';}}
+    if(t==='rg'){ok=a>=100&&a<=9999&&c>=2&&c<=9&&Math.floor((a%10)*c/10)>0;if(ok){const lost=Math.floor((a%10)*c/10)*10;out=fmtN(a)+' × '+c+' = '+fmtN(a*c-lost);}}
+    if(!ok){f.className='fb bad';f.textContent=t==='rg'?'Use a 3- or 4-digit number whose ones digit times the multiplier is 10 or more.':'Check the number rules for this error type.';return;}
+    f.className='fb good';f.textContent='Show this to your teacher. Don\'t tell them the mistake!';b.querySelector('#eout').innerHTML='<div class="kcard" style="margin-top:10px"><span class="who2">Kai-style work</span><div class="kw">'+out+'</div></div>';b.querySelector('#judge').classList.remove('hide');}
+  b.querySelector('#jb').onclick=()=>{const f=b.querySelector('#jf'),n=[...b.querySelectorAll('.jc')].filter(x=>x.checked).length;if(b.querySelector('#tw').value.trim().length<8){f.className='fb bad';f.textContent='Explain why your error is tempting.';return;}
+    f.className='fb good';f.textContent=n===4?'Your teacher completed the full routine!':'Your teacher missed '+(4-n)+' step'+(4-n>1?'s':'')+'. Detective-level judging!';finish(7,'Game over: you out-tricked Kai.');};
+})();
+
+/* ================= MISSION 9 ================= */
+(function(){const b=body(8);
+  b.innerHTML=say('r','Last thing before the Mastery Mission: a readiness scan. Five questions, on your own.')+
+  '<div class="box" id="r1"><p><b>1.</b> What is 6 times as many as 7? '+inp(42)+'</p></div>'+
+  '<div class="box" id="r2"><p><b>2.</b> Power the area model for 26 × 14, then total.</p><div class="rx" style="max-width:420px"></div><p>Total: '+inp(364)+'</p></div>'+
+  '<div class="box" id="r3"><p><b>3.</b> 3,108 × 6 = '+inp(18648,110)+'</p></div>'+
+  '<div class="box" id="r4"><p><b>4.</b> 57 × 23: line 1 (57 × 3) = '+inp(171)+' &nbsp; line 2 = '+inp(1140)+' &nbsp; total = '+inp(1311)+'</p><p>Line 2 is…</p><div class="row q4"><button class="choice" data-v="a">57 × 2 tens = 114 tens</button><button class="choice" data-v="b">57 × 2 with a zero added</button><button class="choice" data-v="c">57 × 20 tens</button></div></div>'+
+  '<div class="box" id="r5"><p><b>5.</b> Choose a tool for 35 × 18 and solve.</p><div class="row q5"><button class="choice" data-v="dh">Double and halve</button><button class="choice" data-v="rs">Round and subtract</button><button class="choice" data-v="sa">Standard algorithm</button></div><p style="margin-top:8px">35 × 18 = '+inp(630)+'</p></div>'+
+  '<div class="row"><button class="btn alt" id="rb">Finish the scan</button></div><div class="fb" id="rsf"></div>'+
+  '<div class="badge" id="badge"><div class="medal m-ed"><span>Error<br>Detective</span></div><h3 style="font-size:30px;color:var(--teal-2);margin-top:12px">Error Detective badge unlocked</h3><p id="rmsg" style="font-size:18px;margin-top:8px"></p>'+say('r','You escaped the lab by proving every answer two ways. Next session is your Mastery Mission. Bring your top three checks.')+'</div>';
+  const m=Model(b.querySelector('#r2 .rx'),[20,6],[10,4],{h:130,labels:false});
+  m.regs.forEach((r,i)=>{r.el.querySelector('.val').innerHTML='<input class="n" data-a="'+(r.x*r.y)+'" inputmode="numeric" aria-label="Region '+(i+1)+'">';});
+  const pk={};['q4','q5'].forEach(k=>b.querySelectorAll('.'+k+' .choice').forEach(c=>c.onclick=()=>{b.querySelectorAll('.'+k+' .choice').forEach(y=>y.classList.remove('picked'));c.classList.add('picked');pk[k]=c.dataset.v;}));
+  b.querySelector('#rb').onclick=()=>{let s=0;const r=id=>checkInputs(b.querySelector(id));
+    const s1=r('#r1'),s2=r('#r2'),s3=r('#r3'),s4=r('#r4')&&pk.q4==='a',s5=r('#r5')&&!!pk.q5;
+    if(s2)m.regs.forEach((x,i)=>m.light(i));s=[s1,s2,s3,s4,s5].filter(Boolean).length;
+    const f=b.querySelector('#rsf');f.className='fb '+(s>=4?'good':'bad');f.textContent='Readiness scan: '+s+' / 5.';
+    const ready=s===5||(s===4&&s2&&s4);
+    b.querySelector('#rmsg').textContent=ready?'You are ready for the Mastery Mission!':'Great effort. You and your teacher will do one more short practice before the Mastery Mission.';
+    b.querySelector('#badge').classList.add('show');finish(8,'Mission 21 complete. Doors open, detective certified.');b.querySelector('#badge').scrollIntoView({behavior:'smooth',block:'center'});};
+})();
+
+drawLock();go(0);
+
+
+
+})();
+</script>
+</body>
+</html>
