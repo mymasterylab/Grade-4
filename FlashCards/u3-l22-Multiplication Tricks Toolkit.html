@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Multiplication Tricks Toolkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#00A7B2;--teal-2:#00928e;--teal-3:#42bcb8;--teal-tint:#E2F6F7;--sun:#FAA71C;--sun-tint:#FFF3DA;--ember:#D77F28;--crimson:#C92426;--crimson-tint:#FBE6E6;--ink:#141414;--muted:#46585a;--line:#c9e9eb;--white:#fff;
+--display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;--body:'Lexend','Segoe UI',system-ui,sans-serif;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}html,body{margin:0;background:#fff;height:100%}body{font-family:var(--body);color:var(--ink);font-size:17px;line-height:1.5}
+button,input{font:inherit;color:inherit}button{cursor:pointer}:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
+.wrap{max-width:860px;margin:0 auto;padding:22px 18px 50px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-weight:800;font-size:clamp(26px,5vw,36px);color:var(--teal-2)}.sub{color:var(--muted);font-size:15px;margin-top:4px}
+.prog{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;color:var(--ember)}.track{width:160px;height:12px;border-radius:999px;background:var(--sun-tint);overflow:hidden}.track i{display:block;height:100%;width:0;background:var(--sun);transition:width .5s}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tile{border:2px solid var(--line);background:#fff;border-radius:20px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:140px;transition:transform .15s,border-color .15s}
+.tile:hover{transform:translateY(-2px);border-color:var(--teal)}
+.tile .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:20px;background:var(--teal);color:#fff}
+.tile h3{font-size:19px}.tile p{margin:0;font-size:14px;color:var(--muted)}
+.tile .st{margin-top:auto;font-size:13px;font-weight:600;color:var(--muted)}.tile.done{border-color:var(--sun);background:var(--sun-tint)}.tile.done .st{color:var(--ember)}
+.view{display:none}.view.on{display:block}
+.back{border:0;background:none;color:var(--teal-2);font-weight:600;padding:0;margin-bottom:10px}
+.act{border:3px solid var(--teal);border-radius:24px;padding:22px}
+.act .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}.act .top .ic{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:24px;background:var(--teal);color:#fff}
+.act h2{font-size:28px;color:var(--teal-2)}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.how div{background:var(--teal-tint);border-radius:14px;padding:10px 12px;font-size:14.5px}.how b{display:block;color:var(--teal-2);font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.how div:nth-child(2){background:var(--sun-tint)}.how div:nth-child(2) b{color:var(--ember)}
+.ex{background:#fff;border:2px dashed var(--line);border-radius:14px;padding:10px 14px;font-family:var(--display);font-weight:700;font-size:19px;margin-bottom:14px}
+.qbox{border:2px solid var(--line);border-radius:18px;padding:16px}
+.qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.qhead h3{font-size:17px;color:var(--ember)}
+.dots{display:flex;gap:6px}.dots i{width:26px;height:8px;border-radius:999px;background:var(--line)}.dots i.ok{background:var(--sun)}.dots i.cur{background:var(--teal)}
+.q{font-size:19px;margin:6px 0 12px}
+input.ans{width:130px;padding:9px 10px;border:2px solid var(--line);border-radius:10px;font-size:20px;text-align:center}
+.btn{border:0;border-radius:12px;padding:10px 18px;font-weight:600;background:var(--teal);color:#fff}.btn.ghost{background:#fff;color:var(--teal-2);border:2px solid var(--teal)}.btn.sun{background:var(--sun);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.choice{border:2px solid var(--line);background:#fff;border-radius:12px;padding:9px 16px;font-weight:600}.choice.picked{border-color:var(--teal);background:var(--teal-tint)}.choice.wrong{border-color:var(--crimson);background:var(--crimson-tint)}
+.fb{min-height:1.5em;font-weight:600;margin-top:10px}.fb.good{color:var(--teal-2)}.fb.bad{color:var(--crimson)}
+.hint{display:none;margin-top:8px;font-size:15px;color:var(--muted);background:var(--sun-tint);border-radius:10px;padding:8px 12px}.hint.show{display:block}
+.won{display:none;margin-top:14px;padding:14px;border-radius:16px;background:var(--sun-tint);border:2px solid var(--sun);font-weight:600}.won.show{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.bars{display:flex;gap:3px;flex-wrap:wrap}.bars i{font-style:normal;display:grid;place-items:center;height:28px;min-width:36px;border-radius:6px;background:var(--teal);color:#fff;font-size:14px}.bars i.a{background:var(--sun);color:var(--ink);min-width:24px}
+.mini{display:inline-grid;grid-template-columns:24px 100px 46px;grid-template-rows:18px 42px 30px;gap:3px;font-size:12px;font-weight:700}.mini .e{color:var(--ember);display:grid;place-items:center}.mini i{font-style:normal;display:grid;place-items:center;border-radius:6px;color:#fff}.mini .tt{background:var(--teal)}.mini .ot{background:var(--sun);color:var(--ink)}.mini .to{background:var(--teal-3)}.mini .oo{background:var(--ember)}
+.allDone{display:none;text-align:center;margin-top:18px;padding:20px;border-radius:20px;background:var(--sun-tint);border:3px solid var(--sun)}.allDone.show{display:block}
+@media (max-width:640px){.how{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><div class="wrap">
+<header><div><h1>Multiplication Tricks Toolkit</h1><div class="sub">Nine tools from Missions 17–22. Pick a trick, learn why it works, then try three questions.</div></div><div class="prog"><span id="pt">0 of 9 tricks mastered</span><span class="track"><i id="pb"></i></span></div></header>
+<section class="view on" id="home"><div class="tiles" id="tiles"></div><div class="allDone" id="all"><h2 style="color:var(--teal-2)">Toolkit complete!</h2><p>You can use every multiplication tool from the unit, and you know when each one is the best choice.</p></div></section>
+<section class="view" id="actv"><button class="back" id="back">← Back to the toolkit</button><div class="act" id="act"></div></section>
+</div>
+<script>
+(function(){
+const $=s=>document.querySelector(s);const num=v=>{const t=String(v).replace(/,/g,'').trim();return t===''?NaN:Number(t);};
+const mini=(t,s,r)=>'<div class="mini"><span></span><span class="e">'+t[0]+'</span><span class="e">'+t[1]+'</span><span class="e">'+s[0]+'</span><i class="tt">'+r[0]+'</i><i class="ot">'+r[1]+'</i><span class="e">'+s[1]+'</span><i class="to">'+r[2]+'</i><i class="oo">'+r[3]+'</i></div>';
+const T=[
+ {ic:'×',name:'Times as many vs more than',tag:'Mission 17',how:'"Times as many" copies the whole amount. "More than" adds a piece to the end.',why:'Times as many is multiplication: the bar is repeated. More than is addition: the bar only gets longer by a bit.',when:'Any word problem with "times" or "more". Decide the sign before you calculate.',
+  ex:'<div class="bars"><i>8</i><i>8</i><i>8</i><i>8</i><i>8</i></div><div style="margin-top:4px">5 times as many as 8 = 40<br>5 more than 8 = 13</div>',
+  qs:[['7 times as many as 6 = ?',42,'Seven copies of 6.'],['7 more than 6 = ?',13,'Add 7 to 6.'],['45 is ___ times as many as 9.',5,'? × 9 = 45']]},
+ {ic:'0',name:'Multiply by 10 and 100',tag:'Missions 17–18',how:'× 10 makes every digit worth ten times more: ones become tens. × 100 makes ones become hundreds.',why:'The digits move one place (× 10) or two places (× 100) to the left. The zero shows the empty ones place.',when:'Multiplying by any multiple of 10: 46 × 30 = 46 × 3 × 10.',
+  ex:'34 × 10 = 340<br>34 × 100 = 3,400<br>34 × 20 = 34 × 2 × 10 = 68 × 10 = 680',
+  qs:[['46 × 10 = ?',460,'46 tens.'],['46 × 100 = ?',4600,'46 hundreds.'],['52 × 30 = ?',1560,'52 × 3 = 156, then × 10.']]},
+ {ic:'▦',name:'The area model split',tag:'Mission 18',how:'Draw a rectangle. Split each factor into tens and ones. Find the area of each region, then add.',why:'The rectangle\'s area is the product. Splitting it doesn\'t change the total area; it just makes smaller, easier pieces.',when:'Any 2-digit × 2-digit problem, especially to check an answer or explain it.',
+  ex:mini([20,3],[10,4],[200,30,80,12])+'<div style="margin-top:4px">23 × 14 = 200 + 30 + 80 + 12 = 322</div>',
+  qs:[['Use an area model: 31 × 12 = ?',372,'300 + 60 + 10 + 2'],['Use an area model: 45 × 21 = ?',945,'800 + 100 + 40 + 5'],['How many regions does 67 × 38 have?',4,'2 parts × 2 parts.']]},
+ {ic:'⊞',name:'Split one factor',tag:'Mission 19',how:'Break one factor into tens and ones. Multiply each part by the other factor, then add.',why:'Distributive property: a × (b + c) = a × b + a × c. Every part is multiplied, so nothing is lost.',when:'One factor is a single digit, or you want two easy rows instead of four regions.',
+  ex:'7 × 58 = 7 × 50 + 7 × 8 = 350 + 56 = 406',
+  qs:[['6 × 47 = ?',282,'6 × 40 + 6 × 7'],['9 × 34 = ?',306,'9 × 30 + 9 × 4'],['18 × 36 = 18 × 30 + 18 × 6 = ?',648,'540 + 108']]},
+ {ic:'−',name:'Round and subtract',tag:'Missions 19–20',how:'Round a factor up to a friendly ten or hundred, multiply, then take away the extra.',why:'49 × 6 is six groups of 50 with one taken from each group, so subtract 6 × 1 = 6.',when:'A factor ends in 8 or 9 (like 49, 99, 2,998).',
+  ex:'49 × 6 = 50 × 6 − 1 × 6 = 300 − 6 = 294',
+  qs:[['29 × 5 = ?',145,'30 × 5 − 5'],['99 × 8 = ?',792,'100 × 8 − 8'],['39 × 7 = ?',273,'40 × 7 − 7. Subtract, don\'t add!']]},
+ {ic:'⇅',name:'Double and halve',tag:'Mission 20',how:'Halve one factor and double the other.',why:'The rectangle becomes half as tall and twice as long: same area. Never double both: that makes it 4 times bigger.',when:'One factor is even and the other ends in 5 (or doubles to a friendly number).',
+  ex:'18 × 35 → 9 × 70 = 630',
+  qs:[['16 × 25 = ?',400,'8 × 50'],['12 × 15 = ?',180,'6 × 30'],['14 × 45 = ?',630,'7 × 90']]},
+ {ic:'⚙',name:'Factor breakdown',tag:'Mission 20',how:'Split a factor into a friendly pair of factors, then regroup.',why:'Grouping factors differently never changes the product (24 × 15 = 12 × 2 × 15 = 12 × 30).',when:'You can make 10, 30 or 100: 2 × 5, 2 × 15, 4 × 25.',
+  ex:'24 × 15 = 12 × 2 × 15 = 12 × 30 = 360',
+  qs:[['25 × 12 = ?',300,'25 × 4 × 3 = 100 × 3'],['25 × 36 = ?',900,'25 × 4 × 9'],['24 × 15 = ?',360,'12 × 30']]},
+ {ic:'↻',name:'Regroup like an engineer',tag:'Mission 20',how:'In the standard algorithm, multiply one place at a time and regroup: "42 ones = 4 tens and 2 ones."',why:'The algorithm is just partial products written compactly. Each regrouped digit has a real place value.',when:'Larger numbers with no friendly shortcut, like 2,437 × 6.',
+  ex:'1,204 × 4: 16 ones → 1 ten 6 ones; 0 tens + 1 ten = 1 ten → 4,816',
+  qs:[['324 × 3 = ?',972,'12 ones → 1 ten 2 ones; 6 tens + 1 = 7 tens; 9 hundreds.'],['2,307 × 3 = ?',6921,'21 ones → 2 tens 1 one; 0 tens + 2 = 2 tens.'],['In 36 × 24, what is the second line of the algorithm?',720,'36 × 2 tens = 72 tens.']]},
+ {ic:'≈',name:'Estimate check',tag:'Missions 18–21',how:'Round the factors to friendly tens and multiply. A correct answer must sit close to the estimate.',why:'The tens × tens part is the biggest piece of the product, so the real answer is a bit more.',when:'Before trusting ANY answer, especially your own.',
+  ex:'47 × 35 is between 40 × 30 = 1,200 and 50 × 40 = 2,000',
+  qs:[['Which answer is possible for 23 × 14?',['115','322','3,220'],'322','More than 20 × 10 = 200, less than 30 × 20 = 600.'],['Which answer is possible for 3,216 × 7?',['2,251','22,512','225,120'],'22,512','3,000 × 7 = 21,000.'],['Which answer is possible for 47 × 35?',['382','1,645','16,450'],'1,645','Between 1,200 and 2,000.']]}
+];
+const done=new Set();
+function home(){const t=$('#tiles');t.innerHTML='';T.forEach((x,i)=>{const b=document.createElement('button');b.className='tile'+(done.has(i)?' done':'');b.innerHTML='<span class="ic">'+x.ic+'</span><h3>'+x.name+'</h3><p>'+x.tag+'</p><span class="st">'+(done.has(i)?'★ Mastered':'3 practice questions')+'</span>';b.onclick=()=>open(i);t.appendChild(b);});
+  $('#pt').textContent=done.size+' of 9 tricks mastered';$('#pb').style.width=(done.size/9*100)+'%';$('#all').classList.toggle('show',done.size===9);}
+function show(v){$('#home').classList.toggle('on',v==='home');$('#actv').classList.toggle('on',v==='act');scrollTo(0,0);}
+$('#back').onclick=()=>{home();show('home');};
+function open(i){const x=T[i];let k=0;const A=$('#act');
+  A.innerHTML='<div class="top"><span class="ic">'+x.ic+'</span><div><h2>'+x.name+'</h2><div class="sub">'+x.tag+'</div></div></div><div class="how"><div><b>How it works</b>'+x.how+'</div><div><b>Why it works</b>'+x.why+'</div><div><b>When to use it</b>'+x.when+'</div></div><div class="ex">'+x.ex+'</div><div class="qbox"><div class="qhead"><h3>Practice</h3><div class="dots" id="qd"></div></div><p class="q" id="qq"></p><div class="row" id="qi"></div><div class="fb" id="qf"></div><div class="row" style="margin-top:6px"><button class="btn ghost" id="qh">Show a hint</button></div><div class="hint" id="qht"></div></div><div class="won" id="won"><span>★ '+x.name+' mastered!</span><span class="row">'+(i<8?'<button class="btn" id="nx">Next trick</button>':'')+'<button class="btn ghost" id="bk">Back to the toolkit</button></span></div>';
+  function q(){const Q=x.qs[k];$('#qd').innerHTML=x.qs.map((_,j)=>'<i class="'+(j<k?'ok':j===k?'cur':'')+'"></i>').join('');$('#qq').textContent='Question '+(k+1)+' of 3: '+Q[0];$('#qf').textContent='';$('#qf').className='fb';$('#qht').textContent=Q[Q.length-1];$('#qht').classList.remove('show');
+    const I=$('#qi');if(Array.isArray(Q[1])){I.innerHTML=Q[1].map(o=>'<button class="choice">'+o+'</button>').join('');I.querySelectorAll('.choice').forEach(c=>c.onclick=()=>check(c.textContent,c));}
+    else{I.innerHTML='<input class="ans" id="qa" inputmode="numeric" aria-label="Your answer"><button class="btn" id="qc">Check</button>';$('#qc').onclick=()=>check($('#qa').value);$('#qa').onkeydown=e=>{if(e.key==='Enter')check($('#qa').value);};$('#qa').focus();}}
+  function check(v,el){const Q=x.qs[k],f=$('#qf');const ok=Array.isArray(Q[1])?v===Q[2]:num(v)===Q[1];
+    if(ok){if(el)el.classList.add('picked');f.className='fb good';f.textContent='Correct!';k++;setTimeout(()=>{if(k<3)q();else win();},700);}
+    else{if(el)el.classList.add('wrong');f.className='fb bad';f.textContent='Not yet. Re-read "How it works" or show a hint.';}}
+  function win(){$('#qd').innerHTML='<i class="ok"></i><i class="ok"></i><i class="ok"></i>';$('#qq').textContent='All three correct.';$('#qi').innerHTML='';$('#qf').textContent='';$('#qh').style.display='none';done.add(i);$('#pt').textContent=done.size+' of 9 tricks mastered';$('#pb').style.width=(done.size/9*100)+'%';$('#won').classList.add('show');
+    const n=$('#nx');if(n)n.onclick=()=>open(i+1);$('#bk').onclick=()=>{home();show('home');};}
+  $('#qh').onclick=()=>$('#qht').classList.add('show');q();show('act');}
+home();
+})();
+</script></body></html>
