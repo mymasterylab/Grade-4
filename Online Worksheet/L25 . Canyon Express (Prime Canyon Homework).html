@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Canyon Express · Prime Canyon Homework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--ink:#1d1d1f;--muted:#5b6467;--surface:#fff;--line:#d9eef0;--pri:#00A7B2;--pri-dark:#00818a;--pri-soft:#e3f6f7;--acc:#FAA71C;--acc-soft:#fff1d6;--burnt:#D77F28;
+--ok:#047857;--ok-soft:#e1f4ec;--bad:#C92426;--bad-soft:#fde8e8;--fd:'Lilita One','Trebuchet MS',system-ui,sans-serif;--fb:'Lexend',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--fb);font-size:17px;line-height:1.45}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* Engine components. Theme supplies: --ink --muted --surface --line --pri --pri-soft --acc --acc-soft --ok --ok-soft --bad --bad-soft --fd --fb */
+.q-card{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:18px 18px 14px;margin:0 0 16px;position:relative}
+.q-card.is-right{border-color:var(--ok)}
+.q-card.is-wrong{border-color:var(--bad)}
+.q-card.is-shown{border-color:var(--acc)}
+.q-head{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.q-num{font-family:var(--fd);font-size:1rem;background:var(--pri);color:#fff;border-radius:10px;min-width:2em;height:2em;display:inline-grid;place-items:center;padding:0 .4em}
+.q-type{font-size:.78rem;color:var(--muted);letter-spacing:.02em}
+.q-prompt{font-size:1.08rem;line-height:1.5;margin-bottom:12px;color:var(--ink)}
+.q-visual{margin:4px 0 12px}
+.q-chip{display:inline-block;background:var(--pri-soft);border-radius:8px;padding:0 .4em;font-weight:600}
+.q-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.q-options.many{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+.q-options.wide{grid-template-columns:1fr}
+.q-opt{font:inherit;font-size:1.02rem;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
+.q-options.many .q-opt{text-align:center;font-family:var(--fd);font-size:1.25rem;padding:10px 6px}
+.q-opt:hover{border-color:var(--pri);transform:translateY(-1px)}
+.q-opt.on{border-color:var(--pri);background:var(--pri-soft);box-shadow:0 0 0 3px var(--pri-soft)}
+.q-opt.good{border-color:var(--ok);background:var(--ok-soft)}
+.q-opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.q-opt.missed{border-style:dashed;border-color:var(--ok)}
+.locked .q-opt{cursor:default;transform:none}
+.q-fill{font-size:1.15rem;line-height:2.4;color:var(--ink)}
+.q-blank{font:inherit;font-family:var(--fd);font-size:1.2rem;text-align:center;border:none;border-bottom:3px solid var(--pri);background:var(--pri-soft);border-radius:10px 10px 4px 4px;padding:2px 6px;margin:0 4px;color:var(--ink);outline:none;min-width:2.2em}
+.q-blank:focus{box-shadow:0 0 0 3px var(--acc-soft);border-bottom-color:var(--acc)}
+.q-blank.good{border-bottom-color:var(--ok);background:var(--ok-soft)}
+.q-blank.bad{border-bottom-color:var(--bad);background:var(--bad-soft)}
+.q-sort{display:flex;flex-direction:column;gap:12px}
+.q-tray{min-height:58px;display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:2px dashed var(--line);border-radius:14px;background:#fff;align-items:center}
+.q-sort.tray-empty .q-tray{min-height:24px;padding:4px}
+.q-bins{display:grid;gap:10px}
+.q-bins.n2{grid-template-columns:1fr 1fr}.q-bins.n3{grid-template-columns:repeat(3,1fr)}.q-bins.n4{grid-template-columns:repeat(2,1fr)}
+.q-bin{border:2px solid var(--line);border-radius:14px;background:var(--pri-soft);min-height:110px;padding:8px;transition:background .15s,border-color .15s}
+.q-bin:nth-child(2){background:var(--acc-soft)}.q-bin:nth-child(3){background:#f1f3f4}
+.q-bin.hover,.q-tray.hover{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-soft)}
+.q-bin-title{font-family:var(--fd);font-size:1rem;margin-bottom:6px;color:var(--ink)}
+.q-bin-body{display:flex;flex-wrap:wrap;gap:6px;min-height:50px}
+.q-dchip{font:inherit;font-family:var(--fd);font-size:1.15rem;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:6px 12px;cursor:grab;touch-action:none;user-select:none;color:var(--ink)}
+.q-dchip.picked{background:var(--acc);border-color:var(--acc);color:#fff;transform:scale(1.06)}
+.q-dchip.dragging{opacity:.3}
+.q-dchip.good{border-color:var(--ok);background:var(--ok-soft)}
+.q-dchip.bad{border-color:var(--bad);background:var(--bad-soft)}
+.q-ghost{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) rotate(-4deg) scale(1.08);box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.locked .q-dchip{cursor:default}
+.q-match{display:grid;grid-template-columns:1fr 24px 1fr;gap:8px;align-items:start}
+.q-mcol{display:flex;flex-direction:column;gap:8px}
+.q-mitem{font:inherit;font-size:1.02rem;background:#fff;border:2px solid var(--line);border-left:8px solid var(--pc,transparent);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;position:relative;color:var(--ink)}
+.q-mitem.r{border-left-width:2px;border-right:8px solid var(--pc,transparent)}
+.q-mitem.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.q-mitem.paired::after{content:attr(data-tag);position:absolute;top:-8px;right:-8px;background:var(--pc);color:#fff;font-family:var(--fd);font-size:.8rem;width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.q-mitem.r.paired::after{right:auto;left:-8px}
+.q-mitem.good{background:var(--ok-soft)}.q-mitem.bad{background:var(--bad-soft)}
+.q-mmid{align-self:stretch;background:repeating-linear-gradient(var(--line) 0 6px,transparent 6px 12px);width:3px;margin:auto}
+.q-actions{display:flex;gap:10px;margin-top:14px}
+.q-check,.q-show{font:inherit;font-family:var(--fd);font-size:1.05rem;border:none;border-radius:14px;padding:10px 22px;cursor:pointer}
+.q-check{background:var(--pri);color:#fff;box-shadow:0 4px 0 var(--pri-dark,#00818a)}
+.q-check:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pri-dark,#00818a)}
+.q-show{background:#fff;border:2px solid var(--acc);color:var(--ink)}
+.q-fb{min-height:1.4em;margin-top:10px;font-size:1rem;line-height:1.45}
+.q-fb .ok{color:var(--ok);font-weight:700}.q-fb .bad{color:var(--bad);font-weight:600}.q-fb .info{color:var(--ink)}
+.q-fb .why{color:var(--ink);font-weight:400;margin-top:4px;font-size:.95rem}
+.q-peek{font:inherit;font-size:.9rem;background:none;border:none;color:var(--pri);text-decoration:underline;cursor:pointer}
+.shake{animation:qshake .4s}
+@keyframes qshake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.s-panel{margin-top:14px}
+.s-row{display:flex;flex-wrap:wrap;gap:10px}
+.s-btn{font:inherit;font-family:var(--fd);font-size:1rem;text-decoration:none;color:var(--ink);background:#fff;border:2px solid var(--pri);border-radius:12px;padding:9px 16px;cursor:pointer}
+.s-btn.s-main{background:var(--pri);color:#fff}
+.s-status{min-height:1.3em;margin-top:8px;color:var(--ok);font-weight:600}
+@media (max-width:620px){.q-options{grid-template-columns:1fr}.q-options.many{grid-template-columns:repeat(4,1fr)}.q-bins.n3{grid-template-columns:1fr}.q-match{grid-template-columns:1fr 10px 1fr}.q-mitem{font-size:.92rem;padding:8px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+.chr{display:block;overflow:visible}
+.chr .bob{animation:bob 3.2s ease-in-out infinite;transform-origin:60px 140px}
+.chr .wave{animation:wave 2.4s ease-in-out infinite;transform-origin:90px 104px}
+.chr .blink{animation:blink 4.6s infinite;transform-box:fill-box;transform-origin:center}
+.chr .wiggle{animation:wiggle 2.6s ease-in-out infinite;transform-origin:70px 120px}
+.chr .sniff{animation:sniff 1.3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.chr .paw{animation:dig 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:right top}
+.chr .tilt{animation:tilt 5s ease-in-out infinite;transform-origin:60px 140px}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes wave{50%{transform:rotate(-16deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes wiggle{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes sniff{50%{transform:scale(1.15)}}
+@keyframes dig{50%{transform:rotate(-25deg)}}
+@keyframes tilt{20%{transform:rotate(-5deg)}40%{transform:rotate(0)}70%{transform:rotate(4deg)}}
+.chr.talk .bob,.chr.talk .wiggle,.chr.talk .tilt{animation-duration:.9s}
+
+.top{max-width:1060px;margin:0 auto;padding:22px 20px 0}
+.titlerow{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+h1{font-family:var(--fd);font-weight:400;font-size:clamp(2rem,5vw,3.2rem);margin:0;line-height:1}
+h1 span{display:block;font-size:.42em;color:var(--burnt);margin-top:6px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.controls input{font:inherit;border:2px solid var(--pri);border-radius:12px;padding:9px 12px;min-width:200px}
+.btn{font-family:var(--fd);font-size:1.05rem;border-radius:14px;padding:9px 18px;cursor:pointer;border:2px solid var(--pri);background:#fff;color:var(--ink)}
+.btn.main{background:var(--pri);color:#fff;box-shadow:0 4px 0 var(--pri-dark)}
+.btn.gold{background:var(--acc);border-color:var(--acc);box-shadow:0 4px 0 var(--burnt)}
+.rail{position:relative;margin:18px 0 8px;height:176px;border-radius:22px;background:linear-gradient(180deg,#d6f4f6,#fff 70%);border:3px solid var(--line);overflow:hidden}
+.rail svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.stations{position:absolute;left:6%;right:6%;bottom:10px;display:flex;justify-content:space-between}
+.st{font:inherit;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;width:20%;color:var(--ink);padding:0}
+.st .post{width:40px;height:40px;border-radius:12px;background:#fff;border:3px solid var(--burnt);font-family:var(--fd);font-size:1.3rem;display:grid;place-items:center;position:relative}
+.st small{font-size:.75rem;color:var(--ink);text-align:center;line-height:1.1;background:#fff;border-radius:8px;padding:1px 6px;margin-top:4px}
+.st.on .post{background:var(--acc);border-color:var(--burnt);transform:scale(1.12)}
+.st.done .post{background:var(--ok);color:#fff;border-color:var(--ok)}
+.st .sc{position:absolute;top:-12px;right:-22px;background:#fff;border:2px solid var(--ok);border-radius:8px;font-size:.7rem;padding:0 5px;font-family:var(--fd);color:var(--ok)}
+.cart{position:absolute;bottom:60px;left:6%;width:120px;transition:left 1s cubic-bezier(.5,0,.3,1);transform:translateX(-30%)}
+.cart .bounce{animation:cartbob .5s ease-in-out infinite alternate}
+@keyframes cartbob{to{transform:translateY(-3px)}}
+.cart.moving .bounce{animation-duration:.15s}
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px 60px}
+.stationhead{display:flex;align-items:center;gap:14px;margin:14px 0 14px;flex-wrap:wrap}
+.stationhead .badge{font-family:var(--fd);font-size:1.8rem;width:60px;height:60px;border-radius:16px;background:var(--burnt);color:#fff;display:grid;place-items:center;box-shadow:0 5px 0 #a85d17}
+.stationhead h2{font-family:var(--fd);font-weight:400;font-size:1.7rem;margin:0;line-height:1.05}
+.stationhead p{margin:2px 0 0;color:var(--muted)}
+.foot2{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:4px}
+.warn{color:var(--bad);font-weight:600}
+.ticket{border:3px dashed var(--burnt);border-radius:22px;padding:22px;background:var(--acc-soft);display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.ticket .big{font-family:var(--fd);font-size:3.2rem;line-height:1;text-align:center;background:#fff;border-radius:18px;padding:14px 18px;border:3px solid var(--burnt)}
+.ticket .big small{display:block;font-size:1rem;color:var(--muted)}
+.ticket h2{font-family:var(--fd);font-weight:400;margin:0 0 6px;font-size:1.8rem}
+.rows{display:grid;gap:6px;margin:8px 0}
+.rows div{display:grid;grid-template-columns:1fr 70px 110px;gap:10px;align-items:center}
+.rbar{height:12px;border-radius:999px;background:#fff;overflow:hidden}.rbar i{display:block;height:100%;background:var(--pri)}
+.note{display:flex;gap:10px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:16px;padding:8px 12px;margin-bottom:16px}
+.note .face{width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--pri-soft);flex:none;display:grid;place-items:center}
+.note .face svg{width:46px;margin-top:8px}.note .who{font-family:var(--fd);font-weight:400;color:var(--burnt)}
+.foot{color:var(--muted);font-size:.8rem;text-align:center;margin:20px 0}
+@media (max-width:700px){.st small{display:none}.cart{width:80px;bottom:62px}.ticket{grid-template-columns:1fr}.rows div{grid-template-columns:1fr 60px}.rows .rbar{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="top">
+ <div class="titlerow"><h1>Canyon Express<span>Prime Canyon homework run</span></h1>
+  <div class="controls"><input id="nm" placeholder="Your name" autocomplete="off" aria-label="Your name"><button class="btn" type="button" id="newSet">New set of questions</button></div></div>
+ <div class="rail" id="rail">
+  <svg class="bg" viewBox="0 0 1000 150" preserveAspectRatio="none"><path d="M0 150 L0 70 L90 40 L180 58 L260 28 L380 56 L470 30 L580 54 L670 26 L780 52 L880 30 L1000 50 L1000 150Z" fill="#F9D9B7"/><path d="M0 150 L0 96 Q250 82 500 94 T1000 90 L1000 150Z" fill="#F2B98A"/>
+   <rect x="0" y="96" width="1000" height="6" fill="#D77F28"/><g fill="#D77F28"><rect x="10" y="102" width="8" height="10"/><rect x="44" y="102" width="8" height="10"/><rect x="78" y="102" width="8" height="10"/><rect x="112" y="102" width="8" height="10"/><rect x="146" y="102" width="8" height="10"/><rect x="180" y="102" width="8" height="10"/><rect x="214" y="102" width="8" height="10"/><rect x="248" y="102" width="8" height="10"/><rect x="282" y="102" width="8" height="10"/><rect x="316" y="102" width="8" height="10"/><rect x="350" y="102" width="8" height="10"/><rect x="384" y="102" width="8" height="10"/><rect x="418" y="102" width="8" height="10"/><rect x="452" y="102" width="8" height="10"/><rect x="486" y="102" width="8" height="10"/><rect x="520" y="102" width="8" height="10"/><rect x="554" y="102" width="8" height="10"/><rect x="588" y="102" width="8" height="10"/><rect x="622" y="102" width="8" height="10"/><rect x="656" y="102" width="8" height="10"/><rect x="690" y="102" width="8" height="10"/><rect x="724" y="102" width="8" height="10"/><rect x="758" y="102" width="8" height="10"/><rect x="792" y="102" width="8" height="10"/><rect x="826" y="102" width="8" height="10"/><rect x="860" y="102" width="8" height="10"/><rect x="894" y="102" width="8" height="10"/><rect x="928" y="102" width="8" height="10"/><rect x="962" y="102" width="8" height="10"/><rect x="996" y="102" width="8" height="10"/></g></svg>
+  <div class="cart" id="cart"><div class="bounce"><svg viewBox="0 0 120 100"><svg x="28" y="0" width="64" height="60" viewBox="0 0 140 130">
+<ellipse cx="70" cy="124" rx="44" ry="5" fill="#000" opacity=".08"/>
+<g class="wiggle">
+ <path d="M24 120 Q14 70 48 44 Q70 28 94 44 Q126 70 116 120 Z" fill="#D77F28"/>
+ <path d="M44 120 Q42 84 70 78 Q98 84 96 120 Z" fill="#F6C28C"/>
+ <g class="paw"><path d="M22 96 q-14 4 -12 16 q10 2 18 -6z" fill="#F6C28C"/></g>
+ <path d="M118 96 q14 4 12 16 q-10 2 -18 -6z" fill="#F6C28C"/>
+ <ellipse cx="70" cy="76" rx="20" ry="13" fill="#F6C28C"/>
+ <g class="sniff"><ellipse cx="70" cy="70" rx="8" ry="6" fill="#ff5900"/><ellipse cx="67" cy="68" rx="2.5" ry="1.6" fill="#fff" opacity=".7"/></g>
+ <path d="M48 76 l-16 -3 M48 80 l-16 3 M92 76 l16 -3 M92 80 l16 3" stroke="#1d1d1f" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>
+ <g class="blink"><circle cx="58" cy="58" r="3.4" fill="#1d1d1f"/><circle cx="82" cy="58" r="3.4" fill="#1d1d1f"/></g>
+ <path d="M62 86 Q70 92 78 86" stroke="#1d1d1f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+ <rect x="38" y="34" width="64" height="7" rx="3.5" fill="#1d1d1f" opacity=".75"/>
+ <circle cx="56" cy="36" r="11" fill="#fff" stroke="#00A7B2" stroke-width="5"/><circle cx="84" cy="36" r="11" fill="#fff" stroke="#00A7B2" stroke-width="5"/>
+ <path d="M51 32 l6 -3 M79 32 l6 -3" stroke="#00A7B2" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+</g></svg><path d="M14 46 L106 46 L96 80 L24 80 Z" fill="#00A7B2" stroke="#00818a" stroke-width="3"/><rect x="10" y="42" width="100" height="8" rx="4" fill="#00818a"/><g class="nug" transform="translate(20 40) scale(0.8)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g><g class="nug" transform="translate(100 40) scale(0.7)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g><circle cx="38" cy="86" r="9" fill="#1d1d1f"/><circle cx="82" cy="86" r="9" fill="#1d1d1f"/><circle cx="38" cy="86" r="3" fill="#FAA71C"/><circle cx="82" cy="86" r="3" fill="#FAA71C"/></svg></div></div>
+  <div class="stations" id="stations"></div>
+ </div>
+</div>
+<main class="wrap" id="main"></main>
+<p class="foot">MyMasteryLab · Canyon Express</p>
+<script>/* MML Unit 4 question engine: mcq, multi, fill, sort (drag & drop), match.
+   Modes: "practice" (check + hints + retry), "test" (graded on submit), "diagnostic" (no feedback). */
+const MML = (() => {
+  const h = (tag, attrs = {}, ...kids) => {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'html') el.innerHTML = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat()) {
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const pick = (a, n) => shuffle(a).slice(0, n);
+  const rint = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+
+  const norm = (s) => {
+    let t = String(s ?? '').trim().toLowerCase();
+    t = t.replace(/[✗✘×]/g, (m) => (m === '×' ? 'x' : 'x'));
+    if (['-', '—', 'no', 'none', 'n', 'not', 'nope'].includes(t)) t = 'x';
+    return t.replace(/[\s,]/g, '');
+  };
+  const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
+
+  /* Rich text: **bold**, `chip` and line breaks */
+  const rich = (s) => String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/`(.+?)`/g, '<span class="q-chip">$1</span>')
+    .replace(/\n/g, '<br>');
+
+  /* ---------- individual question widgets ---------- */
+  function mcq(q, multi) {
+    const order = q.keepOrder ? q.options.map((_, i) => i) : shuffle(q.options.map((_, i) => i));
+    const sel = new Set();
+    const box = h('div', { class: 'q-options' + (q.options.length > 4 && q.options.every((o) => String(o).length <= 5) ? ' many' : '') + (q.wide ? ' wide' : '') });
+    const btns = {};
+    order.forEach((i) => {
+      const b = h('button', { class: 'q-opt', type: 'button', html: rich(q.options[i]),
+        onclick: () => {
+          if (box.classList.contains('locked')) return;
+          if (multi) { sel.has(i) ? sel.delete(i) : sel.add(i); }
+          else { sel.clear(); sel.add(i); }
+          Object.entries(btns).forEach(([k, el]) => el.classList.toggle('on', sel.has(+k)));
+          api.onChange && api.onChange();
+        } });
+      btns[i] = b; box.append(b);
+    });
+    const ans = multi ? q.answer : [q.answer];
+    const api = {
+      el: box,
+      answered: () => sel.size > 0,
+      check() {
+        const picked = [...sel];
+        if (!multi) return picked[0] === q.answer ? 1 : 0;
+        const right = picked.filter((x) => ans.includes(x)).length;
+        const wrong = picked.length - right;
+        return Math.max(0, (right - wrong) / ans.length);
+      },
+      mark() { Object.entries(btns).forEach(([k, el]) => {
+        const isAns = ans.includes(+k), on = sel.has(+k);
+        el.classList.toggle('good', isAns && on); el.classList.toggle('bad', !isAns && on); el.classList.toggle('missed', isAns && !on);
+      }); },
+      clearMarks() { Object.values(btns).forEach((el) => el.classList.remove('good', 'bad', 'missed')); },
+      reveal() { sel.clear(); ans.forEach((a) => sel.add(a)); Object.entries(btns).forEach(([k, el]) => el.classList.toggle('on', sel.has(+k))); api.mark(); },
+      lock() { box.classList.add('locked'); },
+      value: () => [...sel].map((i) => q.options[i]).join(', '),
+    };
+    return api;
+  }
+
+  function fill(q) {
+    const wrap = h('div', { class: 'q-fill' });
+    const inputs = [];
+    const parts = String(q.text).split('[]');
+    const answers = q.answers.map((a) => (Array.isArray(a) ? a : [a]).map(norm));
+    parts.forEach((p, i) => {
+      if (p) wrap.append(h('span', { html: rich(p) }));
+      if (i < parts.length - 1) {
+        const accept = answers[i] || [''];
+        const numeric = accept.every((a) => /^\d+$/.test(a) || a === 'x');
+        const w = Math.max(2.4, Math.max(...accept.map((a) => a.length)) * 0.75 + 1.4);
+        const inp = h('input', { class: 'q-blank', type: 'text', autocomplete: 'off', spellcheck: 'false',
+          inputmode: numeric && !accept.includes('x') ? 'numeric' : 'text', 'aria-label': 'answer ' + (i + 1),
+          style: `width:${q.width || w}em`, oninput: () => { inp.classList.remove('good', 'bad'); api.onChange && api.onChange(); } });
+        inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const nx = inputs[inputs.indexOf(inp) + 1]; nx ? nx.focus() : api.onEnter && api.onEnter(); } });
+        inputs.push(inp); wrap.append(inp);
+      }
+    });
+    const ok = (i) => answers[i].includes(norm(inputs[i].value));
+    const api = {
+      el: wrap,
+      answered: () => inputs.every((x) => x.value.trim() !== ''),
+      check() { if (q.anyOrder) { const vals = inputs.map((x) => norm(x.value)); const pool = answers.map((a) => a[0]); let n = 0; const used = []; vals.forEach((v) => { const k = pool.findIndex((p, j) => p === v && !used.includes(j)); if (k > -1) { used.push(k); n++; } }); return n / inputs.length; }
+        return inputs.filter((_, i) => ok(i)).length / inputs.length; },
+      mark() { if (q.anyOrder) { const pool = answers.map((a) => a[0]); const used = []; inputs.forEach((x) => { const k = pool.findIndex((p, j) => p === norm(x.value) && !used.includes(j)); if (k > -1) used.push(k); x.classList.toggle('good', k > -1); x.classList.toggle('bad', k < 0); }); return; }
+        inputs.forEach((x, i) => { x.classList.toggle('good', ok(i)); x.classList.toggle('bad', !ok(i)); }); },
+      clearMarks() { inputs.forEach((x) => x.classList.remove('good', 'bad')); },
+      reveal() { inputs.forEach((x, i) => { const raw = (Array.isArray(q.answers[i]) ? q.answers[i][0] : q.answers[i]); x.value = raw === 'x' ? '✗' : raw; }); api.mark(); },
+      lock() { inputs.forEach((x) => (x.readOnly = true)); },
+      focus() { inputs[0] && inputs[0].focus(); },
+      value: () => inputs.map((x) => x.value.trim() || '·').join(' | '),
+    };
+    return api;
+  }
+
+  /* Drag & drop sort with pointer drag + tap-to-place */
+  let dragSel = null;
+  function sort(q) {
+    const wrap = h('div', { class: 'q-sort' });
+    const tray = h('div', { class: 'q-tray', 'data-bin': '-1' });
+    const bins = q.bins.map((b, i) => h('div', { class: 'q-bin', 'data-bin': i }, h('div', { class: 'q-bin-title', html: rich(b) }), h('div', { class: 'q-bin-body' })));
+    const chips = shuffle(q.items.map((it, i) => ({ ...it, i }))).map((it) => {
+      const c = h('button', { class: 'q-dchip', type: 'button', 'data-i': it.i, html: rich(it.label) });
+      c._bin = -1; return c;
+    });
+    chips.forEach((c) => tray.append(c));
+    const binRow = h('div', { class: 'q-bins n' + q.bins.length }, ...bins);
+    wrap.append(tray, binRow);
+    const place = (chip, bi) => {
+      if (wrap.classList.contains('locked')) return;
+      chip._bin = bi; chip.classList.remove('good', 'bad', 'picked');
+      (bi < 0 ? tray : bins[bi].querySelector('.q-bin-body')).append(chip);
+      dragSel = null; wrap.querySelectorAll('.q-dchip.picked').forEach((x) => x.classList.remove('picked'));
+      api.onChange && api.onChange();
+      wrap.classList.toggle('tray-empty', chips.every((c) => c._bin >= 0));
+    };
+    [tray, ...bins].forEach((z) => z.addEventListener('click', (e) => {
+      if (e.target.closest('.q-dchip')) return;
+      if (dragSel && wrap.contains(dragSel)) place(dragSel, +z.dataset.bin);
+    }));
+    chips.forEach((c) => {
+      let sx, sy, ghost = null, moved = false;
+      c.addEventListener('pointerdown', (e) => {
+        if (wrap.classList.contains('locked')) return;
+        sx = e.clientX; sy = e.clientY; moved = false; c.setPointerCapture(e.pointerId);
+      });
+      c.addEventListener('pointermove', (e) => {
+        if (sx == null) return;
+        if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 6) {
+          moved = true; ghost = c.cloneNode(true); ghost.classList.add('q-ghost'); document.body.append(ghost); c.classList.add('dragging');
+        }
+        if (ghost) { ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+          const t = document.elementFromPoint(e.clientX, e.clientY); [tray, ...bins].forEach((z) => z.classList.toggle('hover', z.contains(t))); }
+      });
+      const end = (e) => {
+        if (sx == null) return; sx = null;
+        if (ghost) {
+          ghost.remove(); ghost = null; c.classList.remove('dragging');
+          [tray, ...bins].forEach((z) => z.classList.remove('hover'));
+          const t = document.elementFromPoint(e.clientX, e.clientY);
+          const z = t && t.closest('[data-bin]');
+          if (z && wrap.contains(z)) place(c, +z.dataset.bin);
+        } else if (!moved) {
+          if (wrap.classList.contains('locked')) return;
+          if (dragSel && dragSel !== c && wrap.contains(dragSel) && c._bin !== dragSel._bin) { place(dragSel, c._bin); return; }
+          const was = c.classList.contains('picked');
+          wrap.querySelectorAll('.q-dchip.picked').forEach((x) => x.classList.remove('picked'));
+          if (!was) { c.classList.add('picked'); dragSel = c; } else dragSel = null;
+        }
+      };
+      c.addEventListener('pointerup', end); c.addEventListener('pointercancel', () => { sx = null; if (ghost) { ghost.remove(); ghost = null; c.classList.remove('dragging'); } });
+    });
+    const api = {
+      el: wrap,
+      answered: () => chips.every((c) => c._bin >= 0),
+      check: () => chips.filter((c) => c._bin === q.items[+c.dataset.i].bin).length / chips.length,
+      mark() { chips.forEach((c) => { const ok = c._bin === q.items[+c.dataset.i].bin; c.classList.toggle('good', ok); c.classList.toggle('bad', !ok); }); },
+      clearMarks() { chips.forEach((c) => c.classList.remove('good', 'bad')); },
+      reveal() { chips.forEach((c) => place(c, q.items[+c.dataset.i].bin)); api.mark(); },
+      lock() { wrap.classList.add('locked'); },
+      value: () => q.bins.map((b, i) => b.replace(/\*|`/g, '') + ': ' + chips.filter((c) => c._bin === i).map((c) => q.items[+c.dataset.i].label).join(' ')).join('; '),
+      // for programmatic tests
+      _place: (label, bi) => { const c = chips.find((x) => q.items[+x.dataset.i].label === label); place(c, bi); },
+    };
+    return api;
+  }
+
+  const PAIR_COLORS = ['#00A7B2', '#FAA71C', '#047857', '#C92426', '#D77F28', '#66A34E', '#7a5cc4'];
+  function match(q) {
+    const wrap = h('div', { class: 'q-match' });
+    const L = h('div', { class: 'q-mcol' }), R = h('div', { class: 'q-mcol' });
+    const rOrder = shuffle(q.right.map((_, i) => i));
+    const pairs = {}; // left i -> right j
+    let selL = null;
+    const lEls = q.left.map((t, i) => h('button', { class: 'q-mitem', type: 'button', html: rich(t), onclick: () => { if (wrap.classList.contains('locked')) return; selL = selL === i ? null : i; draw(); } }));
+    const rEls = {};
+    rOrder.forEach((j) => { rEls[j] = h('button', { class: 'q-mitem r', type: 'button', html: rich(q.right[j]), onclick: () => {
+      if (wrap.classList.contains('locked')) return;
+      if (selL == null) { const owner = Object.keys(pairs).find((k) => pairs[k] === j); if (owner != null) { delete pairs[owner]; draw(); } return; }
+      Object.keys(pairs).forEach((k) => { if (pairs[k] === j) delete pairs[k]; });
+      pairs[selL] = j; selL = null; draw(); api.onChange && api.onChange(); } }); });
+    lEls.forEach((e) => L.append(e)); rOrder.forEach((j) => R.append(rEls[j]));
+    wrap.append(L, h('div', { class: 'q-mmid', 'aria-hidden': 'true' }), R);
+    function draw() {
+      lEls.forEach((e, i) => {
+        e.classList.toggle('sel', selL === i);
+        const has = pairs[i] != null; e.style.setProperty('--pc', has ? PAIR_COLORS[i % PAIR_COLORS.length] : 'transparent');
+        e.classList.toggle('paired', has); e.dataset.tag = has ? String.fromCharCode(65 + i) : '';
+      });
+      Object.entries(rEls).forEach(([j, e]) => {
+        const owner = Object.keys(pairs).find((k) => pairs[k] === +j);
+        e.style.setProperty('--pc', owner != null ? PAIR_COLORS[owner % PAIR_COLORS.length] : 'transparent');
+        e.classList.toggle('paired', owner != null); e.dataset.tag = owner != null ? String.fromCharCode(65 + +owner) : '';
+      });
+    }
+    draw();
+    const api = {
+      el: wrap,
+      answered: () => Object.keys(pairs).length === q.left.length,
+      check: () => q.left.filter((_, i) => pairs[i] === q.answer[i]).length / q.left.length,
+      mark() { lEls.forEach((e, i) => { const ok = pairs[i] === q.answer[i]; e.classList.toggle('good', ok); e.classList.toggle('bad', !ok); }); },
+      clearMarks() { lEls.forEach((e) => e.classList.remove('good', 'bad')); },
+      reveal() { q.left.forEach((_, i) => (pairs[i] = q.answer[i])); draw(); api.mark(); },
+      lock() { wrap.classList.add('locked'); },
+      value: () => q.left.map((l, i) => l + '→' + (pairs[i] != null ? q.right[pairs[i]] : '?')).join('; '),
+      _pair: (i, j) => { pairs[i] = j; draw(); },
+    };
+    return api;
+  }
+
+  function widget(q) {
+    if (q.type === 'mcq') return mcq(q, false);
+    if (q.type === 'multi') return mcq(q, true);
+    if (q.type === 'fill') return fill(q);
+    if (q.type === 'sort') return sort(q);
+    if (q.type === 'match') return match(q);
+    if (q.type === 'custom') return q.build(q);
+    throw new Error('unknown type ' + q.type);
+  }
+  const TYPE_LABEL = { mcq: 'Choose one', multi: 'Choose all that apply', fill: 'Fill in', sort: 'Drag and drop', match: 'Match the columns', custom: '' };
+
+  /* A question card. opts.mode: practice | test | diagnostic */
+  function card(q, opts = {}) {
+    const mode = opts.mode || 'practice';
+    const w = widget(q);
+    const fb = h('div', { class: 'q-fb', role: 'status', 'aria-live': 'polite' });
+    const head = h('div', { class: 'q-head' },
+      opts.num != null ? h('span', { class: 'q-num' }, opts.num) : null,
+      h('span', { class: 'q-type' }, q.typeLabel || TYPE_LABEL[q.type] || ''));
+    const prompt = q.prompt ? h('div', { class: 'q-prompt', html: rich(q.prompt) }) : null;
+    const el = h('div', { class: 'q-card t-' + q.type }, head, prompt, q.visual ? h('div', { class: 'q-visual', html: q.visual }) : null, w.el);
+    const state = { tries: 0, done: false, score: 0, firstTry: false };
+    let btn, showBtn;
+    if (mode === 'practice') {
+      btn = h('button', { class: 'q-check', type: 'button', onclick: () => doCheck() }, opts.checkLabel || 'Check');
+      showBtn = h('button', { class: 'q-show', type: 'button', hidden: true, onclick: () => { w.reveal(); w.lock(); finish(false, true); } }, 'Show me');
+      el.append(h('div', { class: 'q-actions' }, btn, showBtn), fb);
+      w.onEnter = () => doCheck();
+    } else el.append(fb);
+    function finish(ok, shown) {
+      state.done = true; btn && (btn.hidden = true); showBtn && (showBtn.hidden = true);
+      el.classList.add(ok ? 'is-right' : 'is-shown');
+      if (ok) fb.innerHTML = '<span class="ok">' + rich(q.praise || pickPraise()) + '</span>' + (q.explain ? '<div class="why">' + rich(q.explain) + '</div>' : '');
+      else if (shown) fb.innerHTML = '<span class="info">Here is the answer. ' + (q.explain ? rich(q.explain) : '') + '</span>';
+      opts.onDone && opts.onDone({ correct: ok, firstTry: ok && state.tries === 1, shown });
+    }
+    function doCheck() {
+      if (state.done) return;
+      if (!w.answered()) { fb.innerHTML = '<span class="info">' + (q.type === 'sort' ? 'Place every card first.' : q.type === 'match' ? 'Match every item first.' : 'Answer every part first.') + '</span>'; return; }
+      state.tries++;
+      const s = w.check(); w.mark();
+      if (s >= 0.999) { w.lock(); state.score = 1; finish(true); }
+      else {
+        fb.innerHTML = '<span class="bad">Not yet. ' + rich(q.hint || 'Look at the orange ones and try again.') + '</span>';
+        el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+        if (state.tries >= 2) showBtn.hidden = false;
+        setTimeout(() => w.clearMarks(), 1800);
+      }
+    }
+    return {
+      el, q, w, state,
+      grade() { const s = w.answered() ? w.check() : (w.check ? w.check() : 0); state.score = s; return s; },
+      showResult() { w.mark(); w.lock(); const s = state.score;
+        el.classList.add(s >= 0.999 ? 'is-right' : 'is-wrong');
+        fb.innerHTML = s >= 0.999 ? '<span class="ok">Correct</span>' : '<span class="bad">' + (s > 0 ? 'Partly right' : 'Not quite') + '.</span> <button class="q-peek" type="button">See answer</button>' + (q.explain ? '<div class="why">' + rich(q.explain) + '</div>' : '');
+        const pk = fb.querySelector('.q-peek'); pk && pk.addEventListener('click', () => { w.reveal(); pk.remove(); }); },
+      value: () => w.value(),
+      answered: () => w.answered(),
+    };
+  }
+  const PRAISES = ['Nailed it!', 'Spot on!', 'Gold!', 'Brilliant thinking!', 'Exactly right!', 'You cracked it!'];
+  const pickPraise = () => PRAISES[Math.floor(Math.random() * PRAISES.length)];
+
+  /* ---------- share panel ---------- */
+  function sharePanel({ title, getName, getSummary }) {
+    const status = h('div', { class: 's-status', role: 'status' });
+    const build = () => {
+      const name = (getName() || '').trim() || 'Learner';
+      return getSummary(name);
+    };
+    const say = (t) => { status.textContent = t; setTimeout(() => (status.textContent = ''), 3500); };
+    const copy = async (txt) => {
+      try { await navigator.clipboard.writeText(txt); say('Performance report copied. Paste it into a message to your mentor.'); }
+      catch (e) { const ta = h('textarea', {}); ta.value = txt; document.body.append(ta); ta.select(); try { document.execCommand('copy'); say('Copied.'); } catch (_) { say('Select the text in the box and copy it.'); } ta.remove(); }
+    };
+    const panel = h('div', { class: 's-panel' },
+      h('div', { class: 's-row' },
+        h('button', { class: 's-btn s-main', type: 'button', onclick: async () => {
+          const txt = build();
+          await copy(txt);
+          if (navigator.share) { try { await navigator.share({ title, text: txt }); } catch (e) { /* closed or blocked: report is already copied */ } }
+        } }, 'Share results')),
+      status);
+    return panel;
+  }
+
+  function fmtTime(ms) { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ' min ' + (s % 60) + ' s'; }
+
+  return { h, shuffle, pick, rint, rich, norm, card, widget, sharePanel, fmtTime, sameSet };
+})();
+
+/* ---------- number helpers for generators ---------- */
+const NT = {
+  factors(n) { const f = []; for (let i = 1; i <= n; i++) if (n % i === 0) f.push(i); return f; },
+  pairs(n) { const p = []; for (let i = 1; i * i <= n; i++) if (n % i === 0) p.push([i, n / i]); return p; },
+  isPrime(n) { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; },
+  kind(n) { return n < 2 ? 2 : NT.isPrime(n) ? 0 : 1; },
+  primesBetween(a, b) { const r = []; for (let i = a; i <= b; i++) if (NT.isPrime(i)) r.push(i); return r; },
+  smallestPF(n) { for (let i = 2; i <= n; i++) if (n % i === 0) return i; return n; },
+  digitSum(n) { return String(n).split('').reduce((s, d) => s + +d, 0); },
+};
+</script>
+<script>/* Test kit: builds graded sections, keeps scores, writes the share summary. */
+const TK = (() => {
+  const { h, card } = MML;
+  function Section(def, idx) {
+    const s = { def, idx, cards: [], graded: false, score: 0, total: def.questions.length };
+    s.render = (mount) => {
+      mount.innerHTML = '';
+      if (!s.cards.length) s.cards = def.questions.map((q, k) => card(q, { mode: 'test', num: def.key + (k + 1) }));
+      s.cards.forEach((c) => mount.append(c.el));
+    };
+    s.unanswered = () => s.cards.filter((c) => !c.answered()).length;
+    s.grade = () => {
+      s.score = 0;
+      s.cards.forEach((c) => { const v = c.grade(); if (v >= 0.999) s.score++; c.showResult(); });
+      s.graded = true; return s.score;
+    };
+    s.answers = () => s.cards.map((c, k) => def.key + (k + 1) + ' ' + (c.state.score >= 0.999 ? '✓' : '✗'));
+    return s;
+  }
+  function summary({ title, name, sections, ms, extra }) {
+    const done = sections.filter((s) => s.graded);
+    const sc = done.reduce((a, s) => a + s.score, 0), tot = sections.reduce((a, s) => a + s.total, 0);
+    const pct = tot ? Math.round((sc / tot) * 100) : 0;
+    const lines = [
+      'MyMasteryLab · ' + title,
+      'Learner: ' + name,
+      'Date: ' + new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }),
+      'Score: ' + sc + ' / ' + tot + ' (' + pct + '%)',
+      'Time: ' + MML.fmtTime(ms),
+      '',
+      ...sections.map((s) => s.def.key + '. ' + s.def.title + ': ' + (s.graded ? s.score + '/' + s.total : 'not checked')),
+      '',
+      'Question by question: ' + done.flatMap((s) => s.answers()).join(', '),
+    ];
+    if (extra) lines.push('', extra);
+    return { text: lines.join('\n'), sc, tot, pct };
+  }
+  return { Section, summary };
+})();
+</script>
+<script>/* Canyon Express homework: each section builds a pool of 20 distinct questions; 5 are drawn per attempt. */
+const HW = (() => {
+  const { pick, shuffle, rint } = MML;
+  const P = NT;
+  const uniq = (gens, n = 20) => {
+    const out = [], seen = new Set(); let guard = 0;
+    while (out.length < n && guard++ < 600) {
+      const g = out.length % gens.length; const q = gens[g](); q._g = g;
+      const key = q.prompt + '|' + (q.text || '') + '|' + (q.options || q.items || q.left || []).map((x) => (x.label ?? x)).join(',');
+      if (!seen.has(key)) { seen.add(key); out.push(q); }
+    }
+    return out;
+  };
+  const kindName = ['Prime', 'Composite', 'Neither'];
+  const why = (n) => n < 2 ? (n === 1 ? '1 has only one factor, so it is neither prime nor composite.' : '0 is a special case: it is neither prime nor composite.') :
+    P.isPrime(n) ? 'Its only factors are 1 and ' + n + '.' : n + ' = ' + P.smallestPF(n) + ' × ' + n / P.smallestPF(n) + '.';
+  const PRIMES = P.primesBetween(2, 100);
+  const SNEAKY = [9, 15, 21, 25, 27, 33, 35, 39, 45, 49, 51, 55, 57, 63, 65, 69, 77, 81, 85, 87, 91, 93, 95, 99];
+  const EVENC = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 26, 28, 32, 34, 38, 44, 46, 52, 58, 62, 68, 74, 76, 82, 86, 94, 98, 100];
+
+  /* ---------- A: factor pairs ---------- */
+  const A_NUMS = [12, 16, 18, 20, 24, 25, 28, 30, 32, 36, 40, 42, 44, 45, 48, 49, 50, 54, 56, 60, 63, 64, 72, 75, 80, 81, 84, 90, 96, 100, 37, 53];
+  function A() {
+    const gens = [
+      () => { const n = pick(A_NUMS.filter((x) => Math.floor(Math.sqrt(x)) <= 7 && !P.isPrime(x)), 1)[0]; const k = Math.floor(Math.sqrt(n));
+        const rows = []; const ans = []; for (let i = 1; i <= k; i++) { rows.push(i + ' × [] = ' + n); ans.push(n % i ? 'x' : String(n / i)); }
+        return { type: 'fill', prompt: 'Test the rows for **' + n + '**. Write the partner, or type x if it does not work.', text: rows.join('\n'), answers: ans, explain: 'Pairs: ' + P.pairs(n).map((p) => p.join(' × ')).join(', ') + '.' }; },
+      () => { const n = pick(A_NUMS.concat([1, 2, 7, 97]), 1)[0]; const f = P.factors(n).length;
+        return { type: 'fill', prompt: 'How many factors does **' + n + '** have?', text: '[] factors', answers: [String(f)], explain: P.factors(n).join(', ') + (Number.isInteger(Math.sqrt(n)) && n > 1 ? '. A square number has an odd count.' : '.') }; },
+      () => { const n = pick(A_NUMS.filter((x) => P.pairs(x).length >= 3), 1)[0]; const real = pick(P.pairs(n), 3); const [a, b] = pick(P.pairs(n), 1)[0];
+        let fake = [a, b + 1]; if (a * (b + 1) === n || fake[0] === fake[1]) fake = [a + 1, b];
+        const opts = shuffle([...real.map((p) => p.join(' × ')), fake.join(' × ')]);
+        return { type: 'mcq', prompt: 'Which is **not** a factor pair of ' + n + '?', options: opts, answer: opts.indexOf(fake.join(' × ')), keepOrder: true, explain: fake.join(' × ') + ' = ' + fake[0] * fake[1] + ', not ' + n + '.' }; },
+      () => { const n = pick([12, 18, 20, 24, 28, 30, 36, 40, 42, 45, 48, 50, 54, 56, 60], 1)[0]; const f = P.factors(n).filter((x) => x <= 15);
+        const non = shuffle([...Array(15).keys()].map((x) => x + 1).filter((x) => n % x)).slice(0, Math.max(2, 8 - f.length));
+        const opts = [...f, ...non].sort((a, b) => a - b).map(String);
+        return { type: 'multi', prompt: 'Select **all** the factors of ' + n + ' shown.', options: opts, answer: opts.map((o, i) => (n % +o ? -1 : i)).filter((i) => i > -1), keepOrder: true, explain: 'Factors of ' + n + ': ' + P.factors(n).join(', ') + '.' }; },
+      () => { const n = pick(A_NUMS.filter((x) => !P.isPrime(x)), 1)[0]; const k = pick(P.factors(n).filter((x) => x > 1 && x < n), 1)[0];
+        return { type: 'fill', prompt: 'Find the missing partner.', text: n + ' = [] × ' + k, answers: [String(n / k)] }; },
+      () => { const n = pick([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97], 1)[0];
+        return { type: 'mcq', prompt: 'How many factor pairs does **' + n + '** have?', options: ['1', '2', '3', '4'], answer: 0, keepOrder: true, explain: 'Only 1 × ' + n + '. One pair means ' + n + ' is prime.' }; },
+    ];
+    return uniq(gens);
+  }
+
+  /* ---------- B: prime or composite ---------- */
+  function B() {
+    const gens = [
+      () => { const n = pick([...pick(PRIMES, 6), ...pick(SNEAKY, 6), 1, 0, 2], 1)[0]; const k = P.kind(n);
+        return { type: 'mcq', prompt: 'Is **' + n + '** prime, composite or neither?', options: kindName, answer: k, keepOrder: true, explain: why(n) }; },
+      () => { const nums = shuffle([...pick(PRIMES.filter((x) => x > 10), 3), ...pick(SNEAKY, 2), pick([1, 2], 1)[0]]);
+        return { type: 'sort', prompt: 'Sort the nuggets into the bins.', bins: ['Gold: prime', 'Rock: composite', 'Neither'], items: nums.map((n) => ({ label: String(n), bin: P.kind(n) })), explain: nums.filter((n) => P.kind(n) === 1).map(why).join(' ') }; },
+      () => { const pr = pick(PRIMES.filter((x) => x > 10), rint(2, 3)); const co = pick(SNEAKY, 6 - pr.length); const opts = shuffle([...pr, ...co]).map(String);
+        return { type: 'multi', prompt: 'Tap **every** prime.', options: opts, answer: opts.map((o, i) => (P.isPrime(+o) ? i : -1)).filter((i) => i > -1), keepOrder: true, explain: 'Composites: ' + co.map(why).join(' ') }; },
+      () => { const n = rint(10, 95); let m = n + 1; while (!P.isPrime(m)) m++;
+        return { type: 'fill', prompt: 'What is the next prime after **' + n + '**?', text: '[]', answers: [String(m)], explain: 'Check each number after ' + n + ' until one has exactly two factors.' }; },
+      () => { const s = pick(SNEAKY.filter((x) => x % 2), 1)[0]; const pr = pick(PRIMES.filter((x) => x > 10), 3); const opts = shuffle([s, ...pr]).map(String);
+        return { type: 'mcq', prompt: 'Three of these are gold. Which one is a **rock** (composite)?', options: opts, answer: opts.indexOf(String(s)), keepOrder: true, explain: why(s) }; },
+    ];
+    return uniq(gens);
+  }
+
+  /* ---------- C: smart checks ---------- */
+  const DS3 = [51, 57, 69, 87, 93, 39, 33, 81, 63, 27, 111, 123];
+  function C() {
+    const gens = [
+      () => { const n = pick([...DS3, 41, 43, 61, 67, 71, 73, 79, 83, 89, 97, 53, 59], 1)[0]; const s = P.digitSum(n); const yes = s % 3 === 0;
+        return { type: 'fill', prompt: 'Use the digit-sum trick on **' + n + '**. Is 3 a factor? (type yes or no)', text: 'Digit sum = []   3 is a factor: []', answers: [String(s), yes ? 'yes' : 'no'], explain: s + (yes ? ' is in the 3 times table, so ' + n + ' = 3 × ' + n / 3 + '.' : ' is not in the 3 times table, so 3 is not a factor.') }; },
+      () => { const opts = ['Even check (2)', 'Digit sum (3)', 'Ends in 0 or 5 (5)', 'Sneaky seven (7)'];
+        const pools = [[58, 74, 82, 94, 98, 62, 86, 46, 34, 38], [51, 57, 87, 93, 69, 39, 21, 33], [55, 65, 85, 95, 25, 35], [49, 77, 91]];
+        const k = rint(0, 3); const n = pick(pools[k], 1)[0];
+        return { type: 'mcq', prompt: 'Which trick shows fastest that **' + n + '** is composite?', options: opts, answer: k, keepOrder: true, explain: why(n) }; },
+      () => { const nums = shuffle([pick([58, 74, 82, 94, 62, 86], 1)[0], pick([51, 57, 87, 93, 69, 39], 1)[0], pick([55, 65, 85, 95, 25, 35], 1)[0], pick([49, 77, 91], 1)[0]]);
+        const right = ['2', '3', '5', '7'];
+        return { type: 'match', prompt: 'Match each number to its **smallest** prime factor.', left: nums.map(String), right, answer: nums.map((n) => right.indexOf(String(P.smallestPF(n)))), explain: nums.map(why).join(' ') }; },
+      () => { const n = pick([23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 26, 34, 50, 77, 91, 85], 1)[0]; const k = Math.floor(Math.sqrt(n));
+        const opts = [...new Set([k, Math.floor(n / 2), n - 1, k + 3])].map(String);
+        return { type: 'mcq', prompt: 'Testing **' + n + '** for factors, the Turnaround Stop says you can stop after testing…', options: opts, answer: 0, keepOrder: false, explain: k + ' × ' + k + ' = ' + k * k + ' and ' + (k + 1) + ' × ' + (k + 1) + ' = ' + (k + 1) ** 2 + ', which is past ' + n + '.' }; },
+      () => { const n = pick([51, 57, 69, 87, 93, 39, 85, 95, 65, 55, 91, 77, 49, 74, 98, 62], 1)[0]; const s = P.smallestPF(n);
+        return { type: 'fill', prompt: 'Break the rock.', text: n + ' = ' + s + ' × []', answers: [String(n / s)] }; },
+    ];
+    return uniq(gens);
+  }
+
+  /* ---------- D: sieve & patterns ---------- */
+  const RANGES = [[1, 10], [10, 20], [20, 30], [30, 40], [40, 50], [50, 60], [60, 70], [70, 80], [80, 90], [90, 100]];
+  function D() {
+    const gens = [
+      () => { const [a, b] = pick(RANGES, 1)[0]; const pr = P.primesBetween(a, b);
+        return { type: 'fill', prompt: 'How many primes are there from **' + a + ' to ' + b + '**?', text: '[] primes', answers: [String(pr.length)], explain: pr.join(', ') + '.' }; },
+      () => { const cand = [9, 15, 21, 27, 33, 39, 45, 51, 57, 63, 69, 75, 81, 87, 93, 99, 12, 18, 24, 30, 25, 35, 49, 11, 13, 17]; const opts = pick(cand, 6).sort((x, y) => x - y).map(String);
+        const ans = opts.map((o, i) => (+o % 3 === 0 && +o % 2 && +o !== 3 ? i : -1)).filter((i) => i > -1);
+        if (!ans.length) return gens[0]();
+        return { type: 'multi', prompt: 'On the 3 shake, which of these numbers get washed out? (The 2 shake has already happened.)', options: opts, answer: ans, keepOrder: true, explain: 'Odd multiples of 3 wash out on the 3 shake. Even ones were already gone with 2.' }; },
+      () => { const s = pick([49, 77, 91], 1)[0]; const pr = pick(PRIMES.filter((x) => x > 40 && Math.abs(x - s) < 30), 3); const opts = shuffle([s, ...pr]).map(String);
+        return { type: 'mcq', prompt: 'Which number survives the 2, 3 and 5 shakes but is **not** prime?', options: opts, answer: opts.indexOf(String(s)), keepOrder: true, explain: s + ' = 7 × ' + s / 7 + '. It washes out on the 7 shake.' }; },
+      () => { const twins = [[3, 5], [5, 7], [11, 13], [17, 19], [29, 31], [41, 43], [59, 61], [71, 73]]; const t = pick(twins, 1)[0];
+        const fakes = shuffle([[23, 25], [13, 15], [31, 33], [47, 49], [37, 39], [89, 91], [53, 55], [7, 9]]).slice(0, 3);
+        const opts = shuffle([t, ...fakes]).map((p) => p.join(' and '));
+        return { type: 'mcq', prompt: 'Which pair are **twin primes**?', options: opts, answer: opts.indexOf(t.join(' and ')), keepOrder: true, explain: 'Twin primes are two primes with one number between them. In the others, one number is composite.' }; },
+      () => { const v = pick([
+          { prompt: 'A prime bigger than 5 can **never** end in which digit?', options: ['1', '3', '5', '9'], answer: 2, explain: 'Ending in 5 means 5 is a factor.' },
+          { prompt: 'A prime bigger than 2 can **never** end in which digit?', options: ['1', '4', '7', '9'], answer: 1, explain: 'Ending in an even digit means 2 is a factor.' },
+          { prompt: 'Which is the only **even** prime?', options: ['0', '2', '4', '10'], answer: 1, explain: 'Every other even number has 2 as a factor.' },
+          { prompt: 'Which number is **neither** prime nor composite?', options: ['1', '2', '9', '11'], answer: 0, explain: '1 has only one factor.' },
+          { prompt: 'How many primes are there from 1 to 50?', options: ['10', '15', '20', '25'], answer: 1, explain: '2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47.' },
+          { prompt: 'The sieve up to 100 only needs shakes for 2, 3, 5 and 7. Why not 11?', options: ['11 × 11 = 121 is past 100', '11 is not prime', '11 is too big to divide', '11 is odd'], answer: 0, explain: 'Every multiple of 11 below 100 has a smaller factor that already washed it out.' },
+        ], 1)[0]; return { type: 'mcq', ...v, keepOrder: true }; },
+    ];
+    return uniq(gens);
+  }
+
+  /* ---------- E: reasoning ---------- */
+  const CLAIMS = [
+    ['1 is prime because only 1 divides it.', false, '1 has only one factor; primes need exactly two.'],
+    ['Every odd number is prime.', false, '9, 15, 21 and 25 are odd and composite.'],
+    ['2 is prime.', true, 'Its only factors are 1 and 2.'],
+    ['Every even number bigger than 2 is composite.', true, '2 is always a factor, as well as 1 and itself.'],
+    ['51 is prime because it ends in 1.', false, '5 + 1 = 6, so 51 = 3 × 17.'],
+    ['A square number has an odd number of factors.', true, 'Its middle factor pairs with itself, like 6 × 6 = 36.'],
+    ['If 2, 3, 5 and 7 do not divide a number under 100, it is prime (if it is bigger than 1).', true, 'That is exactly what the sieve to 100 does.'],
+    ['4 × 6 and 6 × 4 are two different factor pairs of 24.', false, 'It is the same rectangle turned around.'],
+    ['91 is prime.', false, '91 = 7 × 13, a sneaky seven.'],
+    ['0 is composite.', false, '0 is neither prime nor composite.'],
+    ['A composite number has more than two factors.', true, 'That is the meaning of composite.'],
+  ];
+  function E() {
+    const gens = [
+      () => { const [c, t, w] = pick(CLAIMS, 1)[0];
+        return { type: 'mcq', prompt: 'Dig claims: **"' + c + '"**', options: ['True', 'False'], answer: t ? 0 : 1, keepOrder: true, explain: w }; },
+      () => { const sets = [[30, 36, 40, 48], [24, 25, 28, 29], [60, 64, 66, 70], [12, 13, 16, 17], [36, 42, 45, 49], [72, 75, 77, 81], [84, 85, 87, 89], [90, 91, 94, 97]];
+        const s = pick(sets, 1)[0]; const best = s.reduce((a, b) => (P.factors(b).length > P.factors(a).length ? b : a)); const opts = s.map(String);
+        return { type: 'mcq', prompt: 'Which number has the **most** factors?', options: opts, answer: opts.indexOf(String(best)), keepOrder: true, explain: s.map((n) => n + ': ' + P.factors(n).length).join(', ') + '.' }; },
+      () => { const ev = pick([10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 40, 42, 44, 48], 1)[0];
+        const ps = PRIMES.filter((p) => p < ev && P.isPrime(ev - p) && p <= ev - p); const p = pick(ps, 1)[0];
+        return { type: 'fill', prompt: 'Write **' + ev + '** as the sum of two primes.', text: ev + ' = ' + p + ' + []', answers: [String(ev - p)] }; },
+      () => { const n = pick([12, 18, 20, 24, 28, 30, 36, 40, 42, 45, 50, 60, 72, 63, 44, 98], 1)[0];
+        const fs = []; let m = n; for (let d = 2; m > 1; ) { if (m % d === 0) { fs.push(d); m /= d; } else d++; }
+        return { type: 'fill', prompt: 'Break **' + n + '** into primes only.', text: n + ' = ' + fs.slice(0, -1).join(' × ') + ' × []', answers: [String(fs[fs.length - 1])], explain: n + ' = ' + fs.join(' × ') + '.' }; },
+      () => { const sq = pick([16, 25, 36, 49, 64, 81, 100, 9], 1)[0]; const non = pick([12, 18, 20, 24, 28, 30, 40, 45, 50, 60, 72], 3); const opts = shuffle([sq, ...non]).map(String);
+        return { type: 'mcq', prompt: 'Which number has an **odd** number of factors?', options: opts, answer: opts.indexOf(String(sq)), keepOrder: true, explain: sq + ' is a square number: ' + Math.sqrt(sq) + ' × ' + Math.sqrt(sq) + '. Its middle factor pairs with itself.' }; },
+    ];
+    return uniq(gens);
+  }
+
+  const SECTIONS = [
+    { key: 'A', title: 'Factor Pairs', station: 'Rainbow Ridge', make: A },
+    { key: 'B', title: 'Gold or Rock?', station: 'Nugget Narrows', make: B },
+    { key: 'C', title: 'Smart Checks', station: 'Trick Tunnel', make: C },
+    { key: 'D', title: 'The Sieve', station: 'Sieve Falls', make: D },
+    { key: 'E', title: 'Prospector Thinking', station: 'Vault Junction', make: E },
+  ];
+  /* draw n questions, one per question style first, then any */
+  function draw(pool, n = 5) {
+    const sh = MML.shuffle(pool), out = [], seen = new Set();
+    sh.forEach((q) => { if (out.length < n && !seen.has(q._g)) { seen.add(q._g); out.push(q); } });
+    sh.forEach((q) => { if (out.length < n && !out.includes(q)) out.push(q); });
+    return MML.shuffle(out);
+  }
+  return { SECTIONS, A, B, C, D, E, draw };
+})();
+</script>
+<script>
+const ART = {"nova": "<svg class=\"chr nova\" viewBox=\"0 0 120 150\" role=\"img\" aria-label=\"Nova the prospector\">\n<ellipse cx=\"60\" cy=\"144\" rx=\"34\" ry=\"5\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"bob\">\n <path d=\"M34 104 Q60 92 86 104 L90 140 L30 140 Z\" fill=\"#00A7B2\"/>\n <path d=\"M44 100 L60 120 L76 100 Z\" fill=\"#FAA71C\"/>\n <rect x=\"22\" y=\"104\" width=\"12\" height=\"30\" rx=\"6\" fill=\"#00A7B2\" transform=\"rotate(14 28 104)\"/>\n <g class=\"wave\"><rect x=\"86\" y=\"96\" width=\"12\" height=\"30\" rx=\"6\" fill=\"#00A7B2\" transform=\"rotate(-30 92 100)\"/><circle cx=\"104\" cy=\"88\" r=\"7\" fill=\"#FCD6A4\"/></g>\n <circle cx=\"60\" cy=\"68\" r=\"30\" fill=\"#FCD6A4\"/>\n <path d=\"M31 62 Q34 46 50 44 L46 58 Z M89 62 Q86 46 70 44 L74 58 Z\" fill=\"#1d1d1f\"/>\n <g class=\"blink\"><ellipse cx=\"49\" cy=\"70\" rx=\"4\" ry=\"5.5\" fill=\"#1d1d1f\"/><ellipse cx=\"71\" cy=\"70\" rx=\"4\" ry=\"5.5\" fill=\"#1d1d1f\"/>\n  <circle cx=\"50.5\" cy=\"68\" r=\"1.5\" fill=\"#fff\"/><circle cx=\"72.5\" cy=\"68\" r=\"1.5\" fill=\"#fff\"/></g>\n <ellipse cx=\"41\" cy=\"80\" rx=\"5\" ry=\"3\" fill=\"#F7A9A0\" opacity=\".8\"/><ellipse cx=\"79\" cy=\"80\" rx=\"5\" ry=\"3\" fill=\"#F7A9A0\" opacity=\".8\"/>\n <path d=\"M51 84 Q60 92 69 84\" stroke=\"#1d1d1f\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/>\n <ellipse cx=\"60\" cy=\"44\" rx=\"48\" ry=\"9\" fill=\"#D77F28\"/>\n <path d=\"M36 44 Q38 16 60 16 Q82 16 84 44 Z\" fill=\"#D77F28\"/>\n <rect x=\"37\" y=\"34\" width=\"46\" height=\"7\" fill=\"#FAA71C\"/>\n <path d=\"M40 98 Q60 108 80 98 L76 92 Q60 100 44 92 Z\" fill=\"#00A7B2\"/>\n</g></svg>", "dig": "<svg class=\"chr dig\" viewBox=\"0 0 140 130\" role=\"img\" aria-label=\"Dig the mole\">\n<ellipse cx=\"70\" cy=\"124\" rx=\"44\" ry=\"5\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"wiggle\">\n <path d=\"M24 120 Q14 70 48 44 Q70 28 94 44 Q126 70 116 120 Z\" fill=\"#D77F28\"/>\n <path d=\"M44 120 Q42 84 70 78 Q98 84 96 120 Z\" fill=\"#F6C28C\"/>\n <g class=\"paw\"><path d=\"M22 96 q-14 4 -12 16 q10 2 18 -6z\" fill=\"#F6C28C\"/></g>\n <path d=\"M118 96 q14 4 12 16 q-10 2 -18 -6z\" fill=\"#F6C28C\"/>\n <ellipse cx=\"70\" cy=\"76\" rx=\"20\" ry=\"13\" fill=\"#F6C28C\"/>\n <g class=\"sniff\"><ellipse cx=\"70\" cy=\"70\" rx=\"8\" ry=\"6\" fill=\"#ff5900\"/><ellipse cx=\"67\" cy=\"68\" rx=\"2.5\" ry=\"1.6\" fill=\"#fff\" opacity=\".7\"/></g>\n <path d=\"M48 76 l-16 -3 M48 80 l-16 3 M92 76 l16 -3 M92 80 l16 3\" stroke=\"#1d1d1f\" stroke-width=\"1.6\" stroke-linecap=\"round\" opacity=\".55\"/>\n <g class=\"blink\"><circle cx=\"58\" cy=\"58\" r=\"3.4\" fill=\"#1d1d1f\"/><circle cx=\"82\" cy=\"58\" r=\"3.4\" fill=\"#1d1d1f\"/></g>\n <path d=\"M62 86 Q70 92 78 86\" stroke=\"#1d1d1f\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/>\n <rect x=\"38\" y=\"34\" width=\"64\" height=\"7\" rx=\"3.5\" fill=\"#1d1d1f\" opacity=\".75\"/>\n <circle cx=\"56\" cy=\"36\" r=\"11\" fill=\"#fff\" stroke=\"#00A7B2\" stroke-width=\"5\"/><circle cx=\"84\" cy=\"36\" r=\"11\" fill=\"#fff\" stroke=\"#00A7B2\" stroke-width=\"5\"/>\n <path d=\"M51 32 l6 -3 M79 32 l6 -3\" stroke=\"#00A7B2\" stroke-width=\"2\" stroke-linecap=\"round\" opacity=\".6\"/>\n</g></svg>", "eratos": "<svg class=\"chr eratos\" viewBox=\"0 0 120 150\" role=\"img\" aria-label=\"Eratos the owl\">\n<ellipse cx=\"60\" cy=\"145\" rx=\"32\" ry=\"5\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"tilt\">\n <path d=\"M24 70 Q22 30 40 22 L46 36 Q60 30 74 36 L80 22 Q98 30 96 70 Q100 132 60 140 Q20 132 24 70 Z\" fill=\"#00A7B2\"/>\n <path d=\"M38 92 Q60 76 82 92 Q84 128 60 134 Q36 128 38 92 Z\" fill=\"#C9F0F2\"/>\n <path d=\"M46 100 q4 4 8 0 M58 100 q4 4 8 0 M70 100 q4 4 8 0 M52 112 q4 4 8 0 M64 112 q4 4 8 0\" stroke=\"#00A7B2\" stroke-width=\"2\" fill=\"none\" opacity=\".6\"/>\n <path d=\"M24 80 Q10 100 22 122 Q30 104 32 86 Z M96 80 Q110 100 98 122 Q90 104 88 86 Z\" fill=\"#00928e\"/>\n <circle cx=\"44\" cy=\"62\" r=\"15\" fill=\"#fff\" stroke=\"#FAA71C\" stroke-width=\"4\"/><circle cx=\"76\" cy=\"62\" r=\"15\" fill=\"#fff\" stroke=\"#FAA71C\" stroke-width=\"4\"/>\n <g class=\"blink\"><circle cx=\"46\" cy=\"63\" r=\"6\" fill=\"#1d1d1f\"/><circle cx=\"74\" cy=\"63\" r=\"6\" fill=\"#1d1d1f\"/><circle cx=\"48\" cy=\"60\" r=\"2\" fill=\"#fff\"/><circle cx=\"76\" cy=\"60\" r=\"2\" fill=\"#fff\"/></g>\n <path d=\"M59 62 h2\" stroke=\"#FAA71C\" stroke-width=\"3\"/>\n <path d=\"M54 76 L60 88 L66 76 Z\" fill=\"#D77F28\"/>\n <path d=\"M48 140 l-4 6 M52 140 v7 M68 140 v7 M72 140 l4 6\" stroke=\"#D77F28\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n</g></svg>", "nug": "<g class=\"n\" transform=\"translate(0 0) scale(1)\"><path d=\"M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z\" fill=\"#FAA71C\" stroke=\"#D77F28\" stroke-width=\"1.5\"/><path d=\"M-4 -4 L2 -6 L4 -2\" stroke=\"#fff\" stroke-width=\"2\" fill=\"none\" opacity=\".8\" stroke-linecap=\"round\"/></g>"};
+const { h } = MML;
+let T0 = Date.now(), secs = [], cur = 0;
+const main = document.getElementById('main'), stEl = document.getElementById('stations'), cart = document.getElementById('cart');
+const SAY = {
+  A: ['nova', 'Rainbow Ridge: test each factor in order and stop at the turnaround.'],
+  B: ['dig', 'Nugget Narrows: is it gold, rock, or neither? Careful, some rocks look shiny!'],
+  C: ['eratos', 'Trick Tunnel: use the digit sum for 3, the last digit for 2 and 5, and watch for sneaky 7s.'],
+  D: ['eratos', 'Sieve Falls: think about which shake washes each number out.'],
+  E: ['nova', 'Vault Junction: prove your answer like a real prospector.'],
+};
+const NAMES = { nova: 'Nova', dig: 'Dig', eratos: 'Eratos' };
+function newSet() {
+  secs = HW.SECTIONS.map((s, i) => TK.Section({ key: s.key, title: s.title, station: s.station, questions: HW.draw(s.make(), 5) }, i));
+  T0 = Date.now(); go(0);
+}
+function moveCart(i) {
+  const pos = 6 + (88 * (i + 0.5)) / 5 - 88 / 10;
+  cart.classList.add('moving'); cart.style.left = (i >= 5 ? 86 : pos + 88 / 10) + '%';
+  setTimeout(() => cart.classList.remove('moving'), 1000);
+}
+function drawStations() {
+  stEl.innerHTML = '';
+  secs.forEach((s, i) => stEl.append(h('button', { class: 'st' + (i === cur ? ' on' : '') + (s.graded ? ' done' : ''), type: 'button', onclick: () => go(i), 'aria-label': 'Station ' + s.def.key + ': ' + s.def.station },
+    h('span', { class: 'post' }, s.def.key, s.graded ? h('span', { class: 'sc' }, s.score + '/5') : null), h('small', {}, s.def.station))));
+}
+function go(i) { cur = i; moveCart(i); drawStations(); i >= 5 ? ticket() : station(); }
+function station() {
+  const s = secs[cur], d = s.def, [who, line] = SAY[d.key];
+  main.innerHTML = '';
+  main.append(h('div', { class: 'stationhead' }, h('div', { class: 'badge' }, d.key), h('div', {}, h('h2', {}, d.station + ': ' + d.title), h('p', {}, 'Station ' + (cur + 1) + ' of 5 · 5 questions picked at random'))));
+  main.append(h('div', { class: 'note' }, h('span', { class: 'face', html: ART[who] }), h('div', {}, h('b', { class: 'who' }, NAMES[who] + ' '), line)));
+  const mount = h('div'); main.append(mount); s.render(mount);
+  const msg = h('span'); const foot = h('div', { class: 'foot2' });
+  if (!s.graded) foot.append(h('button', { class: 'btn main', type: 'button', onclick: (e) => {
+    const un = s.unanswered();
+    if (un && !e.currentTarget.dataset.sure) { e.currentTarget.dataset.sure = 1; msg.className = 'warn'; msg.textContent = un + (un > 1 ? ' questions are' : ' question is') + ' not finished. Press again to check anyway.'; return; }
+    s.grade(); drawStations(); station(); } }, 'Check this station'), msg);
+  else foot.append(h('b', { style: 'font-family:var(--fd);font-weight:400;font-size:1.3rem;color:var(--ok)' }, 'Station score: ' + s.score + ' / 5'));
+  foot.append(h('button', { class: 'btn gold', type: 'button', onclick: () => go(cur + 1) }, cur === 4 ? 'Get my ticket' : 'Ride to the next station'));
+  main.append(foot);
+}
+function ticket() {
+  const name = document.getElementById('nm').value.trim() || 'Prospector';
+  const sum = TK.summary({ title: 'Prime Canyon · Canyon Express homework', name, sections: secs, ms: Date.now() - T0 });
+  main.innerHTML = '';
+  const unchecked = secs.filter((s) => !s.graded).length;
+  main.append(h('div', { class: 'ticket' },
+    h('div', { class: 'big' }, sum.sc + '/' + sum.tot, h('small', {}, sum.pct + '%')),
+    h('div', {}, h('h2', {}, name + "'s Canyon Express ticket"),
+      h('p', {}, unchecked ? unchecked + ' station(s) not checked yet; they count as 0.' : 'All five stations checked. Time: ' + MML.fmtTime(Date.now() - T0) + '.'),
+      h('div', { class: 'rows' }, ...secs.map((s) => h('div', {}, h('span', {}, s.def.key + '. ' + s.def.station), h('b', {}, s.graded ? s.score + '/5' : '—'), h('div', { class: 'rbar' }, h('i', { style: 'width:' + (s.graded ? s.score * 20 : 0) + '%' }))))),
+      MML.sharePanel({ title: 'Canyon Express homework results', getName: () => name, getSummary: () => TK.summary({ title: 'Prime Canyon · Canyon Express homework', name, sections: secs, ms: Date.now() - T0 }).text }),
+      h('div', { class: 'foot2', style: 'margin-top:14px' }, h('button', { class: 'btn', type: 'button', onclick: () => { if (confirm('Start a fresh set of 25 questions?')) newSet(); } }, 'Try a new set')))));
+}
+document.getElementById('newSet').onclick = () => { if (secs.some((s) => s.graded) && !confirm('Start a fresh set? Your current answers will be cleared.')) return; newSet(); };
+newSet();
+
+</script>
+</body>
+</html>

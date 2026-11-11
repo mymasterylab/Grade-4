@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prime Canyon: The Lost Mine of Eratos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--ink:#1d1d1f;--muted:#5b6467;--surface:#fff;--line:#d9eef0;--pri:#00A7B2;--pri-dark:#00818a;--pri-soft:#e3f6f7;--acc:#FAA71C;--acc-soft:#fff1d6;--burnt:#D77F28;
+--ok:#047857;--ok-soft:#e1f4ec;--bad:#C92426;--bad-soft:#fde8e8;--fd:'Lilita One','Trebuchet MS',system-ui,sans-serif;--fb:'Lexend',system-ui,sans-serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--fb);font-size:17px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#fff}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* Engine components. Theme supplies: --ink --muted --surface --line --pri --pri-soft --acc --acc-soft --ok --ok-soft --bad --bad-soft --fd --fb */
+.q-card{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:18px 18px 14px;margin:0 0 16px;position:relative}
+.q-card.is-right{border-color:var(--ok)}
+.q-card.is-wrong{border-color:var(--bad)}
+.q-card.is-shown{border-color:var(--acc)}
+.q-head{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.q-num{font-family:var(--fd);font-size:1rem;background:var(--pri);color:#fff;border-radius:10px;min-width:2em;height:2em;display:inline-grid;place-items:center;padding:0 .4em}
+.q-type{font-size:.78rem;color:var(--muted);letter-spacing:.02em}
+.q-prompt{font-size:1.08rem;line-height:1.5;margin-bottom:12px;color:var(--ink)}
+.q-visual{margin:4px 0 12px}
+.q-chip{display:inline-block;background:var(--pri-soft);border-radius:8px;padding:0 .4em;font-weight:600}
+.q-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.q-options.many{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+.q-options.wide{grid-template-columns:1fr}
+.q-opt{font:inherit;font-size:1.02rem;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
+.q-options.many .q-opt{text-align:center;font-family:var(--fd);font-size:1.25rem;padding:10px 6px}
+.q-opt:hover{border-color:var(--pri);transform:translateY(-1px)}
+.q-opt.on{border-color:var(--pri);background:var(--pri-soft);box-shadow:0 0 0 3px var(--pri-soft)}
+.q-opt.good{border-color:var(--ok);background:var(--ok-soft)}
+.q-opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.q-opt.missed{border-style:dashed;border-color:var(--ok)}
+.locked .q-opt{cursor:default;transform:none}
+.q-fill{font-size:1.15rem;line-height:2.4;color:var(--ink)}
+.q-blank{font:inherit;font-family:var(--fd);font-size:1.2rem;text-align:center;border:none;border-bottom:3px solid var(--pri);background:var(--pri-soft);border-radius:10px 10px 4px 4px;padding:2px 6px;margin:0 4px;color:var(--ink);outline:none;min-width:2.2em}
+.q-blank:focus{box-shadow:0 0 0 3px var(--acc-soft);border-bottom-color:var(--acc)}
+.q-blank.good{border-bottom-color:var(--ok);background:var(--ok-soft)}
+.q-blank.bad{border-bottom-color:var(--bad);background:var(--bad-soft)}
+.q-sort{display:flex;flex-direction:column;gap:12px}
+.q-tray{min-height:58px;display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:2px dashed var(--line);border-radius:14px;background:#fff;align-items:center}
+.q-sort.tray-empty .q-tray{min-height:24px;padding:4px}
+.q-bins{display:grid;gap:10px}
+.q-bins.n2{grid-template-columns:1fr 1fr}.q-bins.n3{grid-template-columns:repeat(3,1fr)}.q-bins.n4{grid-template-columns:repeat(2,1fr)}
+.q-bin{border:2px solid var(--line);border-radius:14px;background:var(--pri-soft);min-height:110px;padding:8px;transition:background .15s,border-color .15s}
+.q-bin:nth-child(2){background:var(--acc-soft)}.q-bin:nth-child(3){background:#f1f3f4}
+.q-bin.hover,.q-tray.hover{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-soft)}
+.q-bin-title{font-family:var(--fd);font-size:1rem;margin-bottom:6px;color:var(--ink)}
+.q-bin-body{display:flex;flex-wrap:wrap;gap:6px;min-height:50px}
+.q-dchip{font:inherit;font-family:var(--fd);font-size:1.15rem;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:6px 12px;cursor:grab;touch-action:none;user-select:none;color:var(--ink)}
+.q-dchip.picked{background:var(--acc);border-color:var(--acc);color:#fff;transform:scale(1.06)}
+.q-dchip.dragging{opacity:.3}
+.q-dchip.good{border-color:var(--ok);background:var(--ok-soft)}
+.q-dchip.bad{border-color:var(--bad);background:var(--bad-soft)}
+.q-ghost{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) rotate(-4deg) scale(1.08);box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.locked .q-dchip{cursor:default}
+.q-match{display:grid;grid-template-columns:1fr 24px 1fr;gap:8px;align-items:start}
+.q-mcol{display:flex;flex-direction:column;gap:8px}
+.q-mitem{font:inherit;font-size:1.02rem;background:#fff;border:2px solid var(--line);border-left:8px solid var(--pc,transparent);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;position:relative;color:var(--ink)}
+.q-mitem.r{border-left-width:2px;border-right:8px solid var(--pc,transparent)}
+.q-mitem.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.q-mitem.paired::after{content:attr(data-tag);position:absolute;top:-8px;right:-8px;background:var(--pc);color:#fff;font-family:var(--fd);font-size:.8rem;width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.q-mitem.r.paired::after{right:auto;left:-8px}
+.q-mitem.good{background:var(--ok-soft)}.q-mitem.bad{background:var(--bad-soft)}
+.q-mmid{align-self:stretch;background:repeating-linear-gradient(var(--line) 0 6px,transparent 6px 12px);width:3px;margin:auto}
+.q-actions{display:flex;gap:10px;margin-top:14px}
+.q-check,.q-show{font:inherit;font-family:var(--fd);font-size:1.05rem;border:none;border-radius:14px;padding:10px 22px;cursor:pointer}
+.q-check{background:var(--pri);color:#fff;box-shadow:0 4px 0 var(--pri-dark,#00818a)}
+.q-check:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pri-dark,#00818a)}
+.q-show{background:#fff;border:2px solid var(--acc);color:var(--ink)}
+.q-fb{min-height:1.4em;margin-top:10px;font-size:1rem;line-height:1.45}
+.q-fb .ok{color:var(--ok);font-weight:700}.q-fb .bad{color:var(--bad);font-weight:600}.q-fb .info{color:var(--ink)}
+.q-fb .why{color:var(--ink);font-weight:400;margin-top:4px;font-size:.95rem}
+.q-peek{font:inherit;font-size:.9rem;background:none;border:none;color:var(--pri);text-decoration:underline;cursor:pointer}
+.shake{animation:qshake .4s}
+@keyframes qshake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.s-panel{margin-top:14px}
+.s-row{display:flex;flex-wrap:wrap;gap:10px}
+.s-btn{font:inherit;font-family:var(--fd);font-size:1rem;text-decoration:none;color:var(--ink);background:#fff;border:2px solid var(--pri);border-radius:12px;padding:9px 16px;cursor:pointer}
+.s-btn.s-main{background:var(--pri);color:#fff}
+.s-status{min-height:1.3em;margin-top:8px;color:var(--ok);font-weight:600}
+@media (max-width:620px){.q-options{grid-template-columns:1fr}.q-options.many{grid-template-columns:repeat(4,1fr)}.q-bins.n3{grid-template-columns:1fr}.q-match{grid-template-columns:1fr 10px 1fr}.q-mitem{font-size:.92rem;padding:8px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+.chr{display:block;overflow:visible}
+.chr .bob{animation:bob 3.2s ease-in-out infinite;transform-origin:60px 140px}
+.chr .wave{animation:wave 2.4s ease-in-out infinite;transform-origin:90px 104px}
+.chr .blink{animation:blink 4.6s infinite;transform-box:fill-box;transform-origin:center}
+.chr .wiggle{animation:wiggle 2.6s ease-in-out infinite;transform-origin:70px 120px}
+.chr .sniff{animation:sniff 1.3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.chr .paw{animation:dig 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:right top}
+.chr .tilt{animation:tilt 5s ease-in-out infinite;transform-origin:60px 140px}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes wave{50%{transform:rotate(-16deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes wiggle{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes sniff{50%{transform:scale(1.15)}}
+@keyframes dig{50%{transform:rotate(-25deg)}}
+@keyframes tilt{20%{transform:rotate(-5deg)}40%{transform:rotate(0)}70%{transform:rotate(4deg)}}
+.chr.talk .bob,.chr.talk .wiggle,.chr.talk .tilt{animation-duration:.9s}
+
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:#fff;border-bottom:3px solid var(--pri);display:flex;align-items:center;gap:14px;padding:10px 18px}
+.hud .title{font-family:var(--fd);font-size:1.35rem;color:var(--ink);margin-right:auto;cursor:pointer;background:none;border:none;padding:0}
+.stat{display:flex;align-items:center;gap:6px;font-family:var(--fd);font-size:1.15rem;background:var(--acc-soft);border-radius:999px;padding:4px 12px 4px 6px}
+.stat svg{width:26px;height:26px}
+.stat.lan{background:var(--pri-soft)}
+.hud .reset{border:2px solid var(--line);background:#fff;border-radius:10px;padding:6px 10px;font-size:.85rem;cursor:pointer;color:var(--muted)}
+.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.25)}}
+main{max-width:1080px;margin:0 auto;padding:18px 18px 60px}
+#home .intro{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:end;margin-bottom:6px}
+#home .intro .chr{width:110px}
+#home h1{font-family:var(--fd);font-size:clamp(2rem,4.4vw,3.2rem);line-height:1;margin:0 0 6px;color:var(--ink);font-weight:400}
+#home h1 small{display:block;font-size:.45em;color:var(--burnt);margin-top:6px}
+#home .lead{margin:0;max-width:58ch;color:var(--ink)}
+.mapwrap{position:relative;border-radius:22px;overflow:hidden;border:3px solid var(--line);margin-top:10px}
+.map{display:block;width:100%;height:auto}
+.map .bn{font-family:var(--fd);font-size:14px;fill:var(--ink)}
+.map .shaft{cursor:pointer}
+.map .shaft:hover>path:first-child,.map .shaft:focus>path:first-child{fill:var(--acc)}
+.map .shaft.lit .lamp{fill:var(--acc)}
+.map .shaft.lit .glow{opacity:.35;animation:glow 2s ease-in-out infinite}
+.map .shaft.lit .tick{opacity:1}
+.map .shaft.next .badge circle{fill:var(--acc);animation:pulse 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes glow{50%{opacity:.12}}
+@keyframes pulse{50%{transform:scale(1.18)}}
+.map .cloud{animation:drift 40s linear infinite}.map .c2{animation-duration:55s}
+@keyframes drift{from{transform:translateX(-120px)}to{transform:translateX(1100px)}}
+.map .pulse{animation:sun 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes sun{50%{transform:scale(1.12)}}
+.map .twinkle{animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.35}}
+.map .vault.open .vault-wheel{animation:spin 2s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.legend button{border:2px solid var(--line);background:#fff;border-radius:14px;padding:8px 12px;font-size:.92rem;cursor:pointer;display:flex;gap:8px;align-items:center;color:var(--ink)}
+.legend button b{font-family:var(--fd);font-weight:400;background:var(--pri);color:#fff;border-radius:8px;min-width:1.7em;text-align:center}
+.legend button.lit b{background:var(--ok)}
+.legend button small{color:var(--muted)}
+/* mission */
+#mission{display:none}
+body.in-mission #home{display:none}
+body.in-mission #mission{display:block}
+.mhead{display:flex;align-items:center;gap:16px;background:linear-gradient(180deg,#d6f4f6,#fff);border:3px solid var(--line);border-radius:22px;padding:14px 18px;position:relative;overflow:hidden}
+.mhead .num{font-family:var(--fd);font-size:2.6rem;color:#fff;background:var(--burnt);border-radius:16px;width:64px;height:64px;display:grid;place-items:center;flex:none;box-shadow:0 5px 0 #a85d17}
+.mhead h2{font-family:var(--fd);font-weight:400;font-size:clamp(1.4rem,3vw,2rem);margin:0;line-height:1.05}
+.mhead p{margin:4px 0 0;color:var(--muted)}
+.mhead .ridge{position:absolute;right:0;bottom:0;width:280px;height:60px;opacity:.7}
+.scene{display:grid;grid-template-columns:170px 1fr;gap:18px;margin:18px 0}
+.cast{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cast .chr{width:150px;transition:transform .3s}
+.cast .who{font-family:var(--fd);font-size:1.05rem;color:var(--burnt)}
+.talk{display:flex;flex-direction:column;gap:10px;justify-content:center}
+.bubble{display:flex;gap:10px;align-items:flex-start;animation:pop .35s both}
+.bubble .face{width:44px;height:44px;flex:none;border-radius:50%;background:var(--pri-soft);display:grid;place-items:center;overflow:hidden}
+.bubble .face svg{width:46px;margin-top:8px}
+.bubble .txt{background:#fff;border:2px solid var(--line);border-radius:4px 18px 18px 18px;padding:10px 14px;max-width:62ch}
+.bubble .txt b.name{font-family:var(--fd);font-weight:400;color:var(--pri-dark);margin-right:6px}
+.bubble.dig .txt{border-color:#f6c28c;background:#fff8ee}
+.bubble.dig .txt b.name{color:var(--burnt)}
+.bubble.eratos .txt b.name{color:var(--ok)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.work{display:flex;flex-direction:column}
+.step-locked{opacity:.35;pointer-events:none;filter:grayscale(.6)}
+.mfoot{display:flex;gap:10px;justify-content:space-between;margin-top:8px}
+.navbtn{font-family:var(--fd);font-size:1.05rem;border-radius:14px;padding:10px 20px;cursor:pointer;border:2px solid var(--pri);background:#fff;color:var(--ink)}
+.navbtn.go{background:var(--acc);border-color:var(--acc);color:var(--ink);box-shadow:0 4px 0 var(--burnt)}
+.navbtn[disabled]{opacity:.4;cursor:default}
+.floatnug{position:fixed;font-family:var(--fd);color:var(--burnt);font-size:1.4rem;pointer-events:none;z-index:50;animation:floatup 1.1s ease-out forwards}
+@keyframes floatup{to{transform:translateY(-60px);opacity:0}}
+.done-banner{display:flex;align-items:center;gap:14px;background:var(--ok-soft);border:2px solid var(--ok);border-radius:16px;padding:12px 16px;margin:6px 0 14px;animation:pop .4s both}
+.done-banner b{font-family:var(--fd);font-weight:400;font-size:1.2rem;color:var(--ok)}
+/* custom widgets */
+.panel{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;margin-bottom:16px}
+.panel h3{font-family:var(--fd);font-weight:400;font-size:1.25rem;margin:0 0 4px}
+.panel .sub{margin:0 0 10px;color:var(--muted);font-size:.95rem}
+.rowbtns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.rowbtns button{font-family:var(--fd);font-size:1.05rem;border:2px solid var(--pri);background:#fff;border-radius:12px;padding:6px 12px;cursor:pointer;color:var(--ink)}
+.rowbtns button.tried{background:var(--bad-soft);border-color:var(--bad)}
+.rowbtns button.found{background:var(--ok-soft);border-color:var(--ok)}
+.rowbtns button.cur{box-shadow:0 0 0 3px var(--acc)}
+.numswitch{display:flex;gap:8px;margin-bottom:6px}
+.numswitch button{font-family:var(--fd);font-size:1.1rem;border:2px solid var(--line);background:#fff;border-radius:12px;padding:6px 16px;cursor:pointer}
+.numswitch button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.arraybox{min-height:150px;display:grid;place-items:center;background:repeating-linear-gradient(0deg,#f4fbfc 0 22px,#fff 22px 23px);border-radius:14px;padding:14px;overflow-x:auto}
+.tiles{display:grid;gap:4px}
+.tile{width:22px;height:22px;border-radius:5px;background:var(--pri);animation:tilein .25s both}
+.tile.left{background:var(--acc);box-shadow:0 0 0 2px var(--burnt) inset;animation:tilein .25s both,jig 1s .3s ease-in-out infinite}
+@keyframes tilein{from{transform:scale(0)}}
+@keyframes jig{50%{transform:translateY(-3px)}}
+.arraynote{margin-top:8px;min-height:1.5em;font-weight:600}
+.arraynote.ok{color:var(--ok)}.arraynote.no{color:var(--bad)}.arraynote.turn{color:var(--burnt)}
+.foundlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.foundlist span{font-family:var(--fd);background:var(--ok-soft);border:2px solid var(--ok);border-radius:10px;padding:2px 10px}
+.rainbow{width:100%;max-width:560px;display:block;margin:6px auto 0}
+.rainbow text{font-family:var(--fd);font-size:18px;fill:var(--ink)}
+.rainbow path{stroke-dasharray:600;stroke-dashoffset:600;animation:draw 1s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sieve{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;max-width:560px}
+.sieve button{aspect-ratio:1;font-family:var(--fd);font-size:clamp(.9rem,2.4vw,1.2rem);border:2px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;color:var(--ink);position:relative;padding:0}
+.sieve button.washed{color:#b9c3c5;background:#f3f5f5;border-color:#eef1f1;text-decoration:line-through}
+.sieve button.washing{animation:wash .6s forwards}
+@keyframes wash{50%{transform:translateY(6px) scale(.9);background:#d6f4f6}}
+.sieve button.gold{background:var(--acc);border-color:var(--burnt);color:var(--ink);animation:shine 1.8s ease-in-out infinite}
+@keyframes shine{50%{box-shadow:0 0 0 4px var(--acc-soft)}}
+.sieve button.miss{animation:qshake .4s;border-color:var(--bad)}
+.sievebar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px}
+.sievebar .instr{font-weight:600;flex:1;min-width:220px;background:var(--pri-soft);border-radius:12px;padding:8px 12px}
+.sievebar .left{font-family:var(--fd);background:var(--acc-soft);border-radius:999px;padding:4px 12px}
+.pan{width:120px}
+.pan .shake{animation:panshake .5s ease-in-out infinite}
+@keyframes panshake{25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+.zap .q-tray{background:repeating-linear-gradient(90deg,#f4fbfc 0 26px,#e3f6f7 26px 52px);background-size:52px 100%;animation:belt 1.2s linear infinite;border-style:solid}
+@keyframes belt{to{background-position:52px 0}}
+.zap .q-dchip{background:var(--acc-soft);border-color:var(--burnt);border-radius:16px 9px 18px 11px}
+.zap .q-bin:nth-child(1){background:var(--acc-soft)}.zap .q-bin:nth-child(2){background:#f6e3d1}.zap .q-bin:nth-child(3){background:#eef1f1}
+.timer{align-self:flex-start;font-family:var(--fd);font-size:1.4rem;background:var(--pri-soft);border-radius:12px;padding:4px 14px;display:inline-block;margin-bottom:10px}
+.timer.low{background:var(--bad-soft);color:var(--bad)}
+.diag-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--line)}
+.dots i.cur{background:var(--acc)}.dots i.done{background:var(--pri)}
+.readout{display:grid;gap:10px}
+.rrow{display:grid;grid-template-columns:200px 1fr 90px;gap:10px;align-items:center}
+.rbar{height:16px;border-radius:999px;background:var(--line);overflow:hidden}
+.rbar i{display:block;height:100%;background:var(--pri);border-radius:999px;transition:width 1s}
+.rtag{font-family:var(--fd);font-size:.95rem}
+/* celebration */
+#party{position:fixed;inset:0;background:rgba(255,255,255,.94);z-index:40;display:none;place-items:center;text-align:center;padding:20px}
+#party.on{display:grid}
+#party h2{font-family:var(--fd);font-weight:400;font-size:clamp(2rem,6vw,3.4rem);margin:10px 0 4px}
+#party .medal{width:180px;animation:medal 1s both}
+@keyframes medal{from{transform:scale(0) rotate(-30deg)}}
+#party .row{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.confetti{position:fixed;top:-30px;width:22px;z-index:41;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.foot{color:var(--muted);font-size:.8rem;text-align:center;margin-top:30px}
+@media (max-width:760px){.scene{grid-template-columns:1fr}.cast{flex-direction:row;justify-content:center}.cast .chr{width:96px}#home .intro{grid-template-columns:1fr}#home .intro .chr{display:none}.rrow{grid-template-columns:1fr 70px}.rrow .rbar{grid-column:1/-1;order:3}.hud .title{font-size:1.05rem}.stat{font-size:1rem}.mhead .ridge{display:none}}
+</style>
+</head>
+<body>
+<header class="hud">
+ <button class="title" type="button" id="goHome">Prime Canyon</button>
+ <div class="stat" id="nugStat" title="Gold nuggets"><svg viewBox="-12 -12 24 24"><g class="n" transform="translate(0 0) scale(1)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g></svg><span id="nugCount">0</span></div>
+ <div class="stat lan" id="lanStat" title="Lanterns lit"><svg viewBox="-12 -16 24 30"><rect x="-7" y="-9" width="14" height="18" rx="4" fill="#FAA71C"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></svg><span id="lanCount">0/8</span></div>
+ <button class="reset" type="button" id="resetBtn">Restart</button>
+</header>
+<main>
+ <section id="home">
+  <div class="intro">
+   <div><svg class="chr nova" viewBox="0 0 120 150" role="img" aria-label="Nova the prospector">
+<ellipse cx="60" cy="144" rx="34" ry="5" fill="#000" opacity=".08"/>
+<g class="bob">
+ <path d="M34 104 Q60 92 86 104 L90 140 L30 140 Z" fill="#00A7B2"/>
+ <path d="M44 100 L60 120 L76 100 Z" fill="#FAA71C"/>
+ <rect x="22" y="104" width="12" height="30" rx="6" fill="#00A7B2" transform="rotate(14 28 104)"/>
+ <g class="wave"><rect x="86" y="96" width="12" height="30" rx="6" fill="#00A7B2" transform="rotate(-30 92 100)"/><circle cx="104" cy="88" r="7" fill="#FCD6A4"/></g>
+ <circle cx="60" cy="68" r="30" fill="#FCD6A4"/>
+ <path d="M31 62 Q34 46 50 44 L46 58 Z M89 62 Q86 46 70 44 L74 58 Z" fill="#1d1d1f"/>
+ <g class="blink"><ellipse cx="49" cy="70" rx="4" ry="5.5" fill="#1d1d1f"/><ellipse cx="71" cy="70" rx="4" ry="5.5" fill="#1d1d1f"/>
+  <circle cx="50.5" cy="68" r="1.5" fill="#fff"/><circle cx="72.5" cy="68" r="1.5" fill="#fff"/></g>
+ <ellipse cx="41" cy="80" rx="5" ry="3" fill="#F7A9A0" opacity=".8"/><ellipse cx="79" cy="80" rx="5" ry="3" fill="#F7A9A0" opacity=".8"/>
+ <path d="M51 84 Q60 92 69 84" stroke="#1d1d1f" stroke-width="3" fill="none" stroke-linecap="round"/>
+ <ellipse cx="60" cy="44" rx="48" ry="9" fill="#D77F28"/>
+ <path d="M36 44 Q38 16 60 16 Q82 16 84 44 Z" fill="#D77F28"/>
+ <rect x="37" y="34" width="46" height="7" fill="#FAA71C"/>
+ <path d="M40 98 Q60 108 80 98 L76 92 Q60 100 44 92 Z" fill="#00A7B2"/>
+</g></svg></div>
+   <div><h1>Prime Canyon<small>The Lost Mine of Eratos</small></h1>
+    <p class="lead">Dig has mixed the gold and the rocks in the mine! Light all 8 shaft lanterns to open the vault. Tap a shaft to start.</p></div>
+   <div><svg class="chr dig" viewBox="0 0 140 130" role="img" aria-label="Dig the mole">
+<ellipse cx="70" cy="124" rx="44" ry="5" fill="#000" opacity=".08"/>
+<g class="wiggle">
+ <path d="M24 120 Q14 70 48 44 Q70 28 94 44 Q126 70 116 120 Z" fill="#D77F28"/>
+ <path d="M44 120 Q42 84 70 78 Q98 84 96 120 Z" fill="#F6C28C"/>
+ <g class="paw"><path d="M22 96 q-14 4 -12 16 q10 2 18 -6z" fill="#F6C28C"/></g>
+ <path d="M118 96 q14 4 12 16 q-10 2 -18 -6z" fill="#F6C28C"/>
+ <ellipse cx="70" cy="76" rx="20" ry="13" fill="#F6C28C"/>
+ <g class="sniff"><ellipse cx="70" cy="70" rx="8" ry="6" fill="#ff5900"/><ellipse cx="67" cy="68" rx="2.5" ry="1.6" fill="#fff" opacity=".7"/></g>
+ <path d="M48 76 l-16 -3 M48 80 l-16 3 M92 76 l16 -3 M92 80 l16 3" stroke="#1d1d1f" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>
+ <g class="blink"><circle cx="58" cy="58" r="3.4" fill="#1d1d1f"/><circle cx="82" cy="58" r="3.4" fill="#1d1d1f"/></g>
+ <path d="M62 86 Q70 92 78 86" stroke="#1d1d1f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+ <rect x="38" y="34" width="64" height="7" rx="3.5" fill="#1d1d1f" opacity=".75"/>
+ <circle cx="56" cy="36" r="11" fill="#fff" stroke="#00A7B2" stroke-width="5"/><circle cx="84" cy="36" r="11" fill="#fff" stroke="#00A7B2" stroke-width="5"/>
+ <path d="M51 32 l6 -3 M79 32 l6 -3" stroke="#00A7B2" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+</g></svg></div>
+  </div>
+  <div class="mapwrap"><svg class="map" viewBox="0 0 1000 420" preserveAspectRatio="xMidYMid meet" aria-label="Prime Canyon map">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6f4f6"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+<linearGradient id="river" x1="0" x2="1"><stop offset="0" stop-color="#42bcb8"/><stop offset="1" stop-color="#00A7B2"/></linearGradient></defs>
+<rect width="1000" height="420" fill="url(#sky)"/>
+<circle cx="860" cy="70" r="38" fill="#FAA71C" opacity=".9"/><circle cx="860" cy="70" r="56" fill="#FAA71C" opacity=".18" class="pulse"/>
+<g class="cloud c1"><ellipse cx="160" cy="70" rx="46" ry="14" fill="#fff"/><ellipse cx="186" cy="60" rx="26" ry="14" fill="#fff"/></g>
+<g class="cloud c2"><ellipse cx="560" cy="48" rx="56" ry="13" fill="#fff"/><ellipse cx="530" cy="40" rx="24" ry="12" fill="#fff"/></g>
+<path d="M0 200 L60 150 L140 150 L170 120 L260 120 L300 170 L420 168 L450 130 L560 130 L600 176 L720 172 L760 120 L860 122 L900 160 L1000 158 L1000 420 L0 420 Z" fill="#F9D9B7"/>
+<path d="M0 250 L80 210 L150 222 L230 190 L330 214 L420 186 L520 214 L620 184 L720 212 L820 182 L920 206 L1000 190 L1000 420 L0 420 Z" fill="#F2B98A"/>
+<path d="M0 290 Q120 262 240 280 T480 270 T720 276 T1000 262 L1000 420 L0 420 Z" fill="#E8A066"/>
+<path d="M0 360 Q250 330 500 352 T1000 344 L1000 420 L0 420 Z" fill="url(#river)" opacity=".85"/>
+<path class="ripple" d="M60 380 q20 -6 40 0 M300 392 q20 -6 40 0 M560 378 q20 -6 40 0 M800 390 q20 -6 40 0" stroke="#fff" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+<g class="nug twinkle" transform="translate(150 372) scale(0.7)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g><g class="nug twinkle" transform="translate(420 380) scale(0.7)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g><g class="nug twinkle" transform="translate(640 366) scale(0.7)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g><g class="nug twinkle" transform="translate(880 378) scale(0.7)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g><g class="nug twinkle" transform="translate(260 394) scale(0.7)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g>
+<path id="track" d="M30 330 C 90 330, 120 250, 205 250 S 300 310, 330 306 S 410 232, 455 228 S 540 300, 575 298 S 650 222, 690 220 S 770 286, 810 284 S 880 214, 940 210 L 985 206" fill="none" stroke="#D77F28" stroke-width="10" stroke-linecap="round"/>
+<path d="M30 330 C 90 330, 120 250, 205 250 S 300 310, 330 306 S 410 232, 455 228 S 540 300, 575 298 S 650 222, 690 220 S 770 286, 810 284 S 880 214, 940 210 L 985 206" fill="none" stroke="#FAA71C" stroke-width="3" stroke-dasharray="2 14" opacity=".9"/>
+<g class="shaft" data-m="0" tabindex="0" role="button" aria-label="Shaft 1" transform="translate(90 262)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">1</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g><g class="shaft" data-m="1" tabindex="0" role="button" aria-label="Shaft 2" transform="translate(205 202)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">2</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g><g class="shaft" data-m="2" tabindex="0" role="button" aria-label="Shaft 3" transform="translate(330 258)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">3</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g><g class="shaft" data-m="3" tabindex="0" role="button" aria-label="Shaft 4" transform="translate(455 180)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">4</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g><g class="shaft" data-m="4" tabindex="0" role="button" aria-label="Shaft 5" transform="translate(575 250)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">5</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g><g class="shaft" data-m="5" tabindex="0" role="button" aria-label="Shaft 6" transform="translate(690 172)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">6</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g><g class="shaft" data-m="6" tabindex="0" role="button" aria-label="Shaft 7" transform="translate(810 236)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">7</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g><g class="shaft" data-m="7" tabindex="0" role="button" aria-label="Shaft 8" transform="translate(893 188)">
+ <path d="M-30 50 L-30 6 Q0 -22 30 6 L30 50 Z" fill="#D77F28"/>
+ <path d="M-22 50 L-22 10 Q0 -10 22 10 L22 50 Z" fill="#1d1d1f"/>
+ <rect x="-34" y="2" width="68" height="8" rx="3" fill="#D77F28"/>
+ <rect x="-30" y="2" width="6" height="48" fill="#D77F28"/><rect x="24" y="2" width="6" height="48" fill="#D77F28"/>
+ <g class="lantern" transform="translate(0 -12)"><circle class="glow" r="16" fill="#FAA71C" opacity="0"/>
+  <rect x="-7" y="-9" width="14" height="18" rx="4" fill="#c9c9c9" class="lamp"/><rect x="-4" y="-13" width="8" height="5" rx="2" fill="#1d1d1f"/></g>
+ <g class="badge" transform="translate(0 34)"><circle r="12" fill="#fff" stroke="#00A7B2" stroke-width="3"/><text y="5" text-anchor="middle" class="bn">8</text></g>
+ <g class="tick" transform="translate(22 -22)" opacity="0"><circle r="10" fill="#047857"/><path d="M-5 0 l3 4 l6 -7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+</g>
+<g class="cart"><g transform="translate(0 -18)">
+ <path d="M-22 -14 L22 -14 L17 8 L-17 8 Z" fill="#00A7B2" stroke="#00818a" stroke-width="2"/>
+ <g class="nug" transform="translate(-8 -16) scale(0.8)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g><g class="nug" transform="translate(7 -18) scale(0.9)"><path d="M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z" fill="#FAA71C" stroke="#D77F28" stroke-width="1.5"/><path d="M-4 -4 L2 -6 L4 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/></g>
+ <circle cx="-11" cy="11" r="5" fill="#1d1d1f"/><circle cx="11" cy="11" r="5" fill="#1d1d1f"/></g>
+ <animateMotion dur="16s" repeatCount="indefinite" rotate="auto"><mpath href="#track"/></animateMotion></g>
+<g class="vault" transform="translate(968 140)"><rect x="-26" y="-36" width="52" height="56" rx="8" fill="#D77F28"/><rect x="-18" y="-28" width="36" height="40" rx="5" fill="#fff"/>
+ <circle class="vault-wheel" r="10" cy="-8" fill="none" stroke="#00A7B2" stroke-width="4"/><path d="M-10 -8 h20 M0 -18 v20" stroke="#00A7B2" stroke-width="3" class="vault-wheel"/></g>
+</svg></div>
+  <div class="legend" id="legend"></div>
+ </section>
+ <section id="mission">
+  <div class="mhead"><div class="num" id="mNum">1</div><div><h2 id="mTitle"></h2><p id="mSub"></p></div>
+   <svg class="ridge" viewBox="0 0 280 60" preserveAspectRatio="none"><path d="M0 60 L0 40 L40 22 L80 30 L120 10 L170 26 L210 14 L250 30 L280 20 L280 60Z" fill="#F2B98A"/><path d="M0 60 L0 50 Q70 36 140 48 T280 44 L280 60Z" fill="#E8A066"/></svg></div>
+  <div class="scene"><div class="cast" id="cast"></div><div class="talk" id="talk"></div></div>
+  <div class="work" id="work"></div>
+  <div class="mfoot"><button class="navbtn" id="backBtn" type="button">Back to the map</button><button class="navbtn go" id="nextBtn" type="button" disabled>Next shaft</button></div>
+ </section>
+ <p class="foot">MyMasteryLab · Prime Canyon</p>
+</main>
+<div id="party" role="dialog" aria-modal="true" aria-label="Vault opened"><div>
+ <svg class="medal" viewBox="0 0 200 220"><path d="M60 0 L100 70 L140 0 L120 0 L100 36 L80 0Z" fill="#00A7B2"/><path d="M60 0 L80 0 L100 36 L90 54Z" fill="#00818a"/>
+ <circle cx="100" cy="135" r="72" fill="#FAA71C" stroke="#D77F28" stroke-width="8"/><circle cx="100" cy="135" r="54" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 6"/>
+ <path d="M70 140 L84 112 L106 106 L126 120 L122 150 L96 160Z" fill="#fff" opacity=".9"/><text x="100" y="146" text-anchor="middle" font-family="Lilita One" font-size="30" fill="#D77F28">P</text></svg>
+ <h2>Gold Prospector!</h2><p id="partyMsg"></p>
+ <div class="row"><button class="navbtn go" type="button" id="partyClose">Back to the canyon</button></div></div></div>
+<script>
+/* MML Unit 4 question engine: mcq, multi, fill, sort (drag & drop), match.
+   Modes: "practice" (check + hints + retry), "test" (graded on submit), "diagnostic" (no feedback). */
+const MML = (() => {
+  const h = (tag, attrs = {}, ...kids) => {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'html') el.innerHTML = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat()) {
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const pick = (a, n) => shuffle(a).slice(0, n);
+  const rint = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+
+  const norm = (s) => {
+    let t = String(s ?? '').trim().toLowerCase();
+    t = t.replace(/[✗✘×]/g, (m) => (m === '×' ? 'x' : 'x'));
+    if (['-', '—', 'no', 'none', 'n', 'not', 'nope'].includes(t)) t = 'x';
+    return t.replace(/[\s,]/g, '');
+  };
+  const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
+
+  /* Rich text: **bold**, `chip` and line breaks */
+  const rich = (s) => String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/`(.+?)`/g, '<span class="q-chip">$1</span>')
+    .replace(/\n/g, '<br>');
+
+  /* ---------- individual question widgets ---------- */
+  function mcq(q, multi) {
+    const order = q.keepOrder ? q.options.map((_, i) => i) : shuffle(q.options.map((_, i) => i));
+    const sel = new Set();
+    const box = h('div', { class: 'q-options' + (q.options.length > 4 && q.options.every((o) => String(o).length <= 5) ? ' many' : '') + (q.wide ? ' wide' : '') });
+    const btns = {};
+    order.forEach((i) => {
+      const b = h('button', { class: 'q-opt', type: 'button', html: rich(q.options[i]),
+        onclick: () => {
+          if (box.classList.contains('locked')) return;
+          if (multi) { sel.has(i) ? sel.delete(i) : sel.add(i); }
+          else { sel.clear(); sel.add(i); }
+          Object.entries(btns).forEach(([k, el]) => el.classList.toggle('on', sel.has(+k)));
+          api.onChange && api.onChange();
+        } });
+      btns[i] = b; box.append(b);
+    });
+    const ans = multi ? q.answer : [q.answer];
+    const api = {
+      el: box,
+      answered: () => sel.size > 0,
+      check() {
+        const picked = [...sel];
+        if (!multi) return picked[0] === q.answer ? 1 : 0;
+        const right = picked.filter((x) => ans.includes(x)).length;
+        const wrong = picked.length - right;
+        return Math.max(0, (right - wrong) / ans.length);
+      },
+      mark() { Object.entries(btns).forEach(([k, el]) => {
+        const isAns = ans.includes(+k), on = sel.has(+k);
+        el.classList.toggle('good', isAns && on); el.classList.toggle('bad', !isAns && on); el.classList.toggle('missed', isAns && !on);
+      }); },
+      clearMarks() { Object.values(btns).forEach((el) => el.classList.remove('good', 'bad', 'missed')); },
+      reveal() { sel.clear(); ans.forEach((a) => sel.add(a)); Object.entries(btns).forEach(([k, el]) => el.classList.toggle('on', sel.has(+k))); api.mark(); },
+      lock() { box.classList.add('locked'); },
+      value: () => [...sel].map((i) => q.options[i]).join(', '),
+    };
+    return api;
+  }
+
+  function fill(q) {
+    const wrap = h('div', { class: 'q-fill' });
+    const inputs = [];
+    const parts = String(q.text).split('[]');
+    const answers = q.answers.map((a) => (Array.isArray(a) ? a : [a]).map(norm));
+    parts.forEach((p, i) => {
+      if (p) wrap.append(h('span', { html: rich(p) }));
+      if (i < parts.length - 1) {
+        const accept = answers[i] || [''];
+        const numeric = accept.every((a) => /^\d+$/.test(a) || a === 'x');
+        const w = Math.max(2.4, Math.max(...accept.map((a) => a.length)) * 0.75 + 1.4);
+        const inp = h('input', { class: 'q-blank', type: 'text', autocomplete: 'off', spellcheck: 'false',
+          inputmode: numeric && !accept.includes('x') ? 'numeric' : 'text', 'aria-label': 'answer ' + (i + 1),
+          style: `width:${q.width || w}em`, oninput: () => { inp.classList.remove('good', 'bad'); api.onChange && api.onChange(); } });
+        inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const nx = inputs[inputs.indexOf(inp) + 1]; nx ? nx.focus() : api.onEnter && api.onEnter(); } });
+        inputs.push(inp); wrap.append(inp);
+      }
+    });
+    const ok = (i) => answers[i].includes(norm(inputs[i].value));
+    const api = {
+      el: wrap,
+      answered: () => inputs.every((x) => x.value.trim() !== ''),
+      check() { if (q.anyOrder) { const vals = inputs.map((x) => norm(x.value)); const pool = answers.map((a) => a[0]); let n = 0; const used = []; vals.forEach((v) => { const k = pool.findIndex((p, j) => p === v && !used.includes(j)); if (k > -1) { used.push(k); n++; } }); return n / inputs.length; }
+        return inputs.filter((_, i) => ok(i)).length / inputs.length; },
+      mark() { if (q.anyOrder) { const pool = answers.map((a) => a[0]); const used = []; inputs.forEach((x) => { const k = pool.findIndex((p, j) => p === norm(x.value) && !used.includes(j)); if (k > -1) used.push(k); x.classList.toggle('good', k > -1); x.classList.toggle('bad', k < 0); }); return; }
+        inputs.forEach((x, i) => { x.classList.toggle('good', ok(i)); x.classList.toggle('bad', !ok(i)); }); },
+      clearMarks() { inputs.forEach((x) => x.classList.remove('good', 'bad')); },
+      reveal() { inputs.forEach((x, i) => { const raw = (Array.isArray(q.answers[i]) ? q.answers[i][0] : q.answers[i]); x.value = raw === 'x' ? '✗' : raw; }); api.mark(); },
+      lock() { inputs.forEach((x) => (x.readOnly = true)); },
+      focus() { inputs[0] && inputs[0].focus(); },
+      value: () => inputs.map((x) => x.value.trim() || '·').join(' | '),
+    };
+    return api;
+  }
+
+  /* Drag & drop sort with pointer drag + tap-to-place */
+  let dragSel = null;
+  function sort(q) {
+    const wrap = h('div', { class: 'q-sort' });
+    const tray = h('div', { class: 'q-tray', 'data-bin': '-1' });
+    const bins = q.bins.map((b, i) => h('div', { class: 'q-bin', 'data-bin': i }, h('div', { class: 'q-bin-title', html: rich(b) }), h('div', { class: 'q-bin-body' })));
+    const chips = shuffle(q.items.map((it, i) => ({ ...it, i }))).map((it) => {
+      const c = h('button', { class: 'q-dchip', type: 'button', 'data-i': it.i, html: rich(it.label) });
+      c._bin = -1; return c;
+    });
+    chips.forEach((c) => tray.append(c));
+    const binRow = h('div', { class: 'q-bins n' + q.bins.length }, ...bins);
+    wrap.append(tray, binRow);
+    const place = (chip, bi) => {
+      if (wrap.classList.contains('locked')) return;
+      chip._bin = bi; chip.classList.remove('good', 'bad', 'picked');
+      (bi < 0 ? tray : bins[bi].querySelector('.q-bin-body')).append(chip);
+      dragSel = null; wrap.querySelectorAll('.q-dchip.picked').forEach((x) => x.classList.remove('picked'));
+      api.onChange && api.onChange();
+      wrap.classList.toggle('tray-empty', chips.every((c) => c._bin >= 0));
+    };
+    [tray, ...bins].forEach((z) => z.addEventListener('click', (e) => {
+      if (e.target.closest('.q-dchip')) return;
+      if (dragSel && wrap.contains(dragSel)) place(dragSel, +z.dataset.bin);
+    }));
+    chips.forEach((c) => {
+      let sx, sy, ghost = null, moved = false;
+      c.addEventListener('pointerdown', (e) => {
+        if (wrap.classList.contains('locked')) return;
+        sx = e.clientX; sy = e.clientY; moved = false; c.setPointerCapture(e.pointerId);
+      });
+      c.addEventListener('pointermove', (e) => {
+        if (sx == null) return;
+        if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 6) {
+          moved = true; ghost = c.cloneNode(true); ghost.classList.add('q-ghost'); document.body.append(ghost); c.classList.add('dragging');
+        }
+        if (ghost) { ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+          const t = document.elementFromPoint(e.clientX, e.clientY); [tray, ...bins].forEach((z) => z.classList.toggle('hover', z.contains(t))); }
+      });
+      const end = (e) => {
+        if (sx == null) return; sx = null;
+        if (ghost) {
+          ghost.remove(); ghost = null; c.classList.remove('dragging');
+          [tray, ...bins].forEach((z) => z.classList.remove('hover'));
+          const t = document.elementFromPoint(e.clientX, e.clientY);
+          const z = t && t.closest('[data-bin]');
+          if (z && wrap.contains(z)) place(c, +z.dataset.bin);
+        } else if (!moved) {
+          if (wrap.classList.contains('locked')) return;
+          if (dragSel && dragSel !== c && wrap.contains(dragSel) && c._bin !== dragSel._bin) { place(dragSel, c._bin); return; }
+          const was = c.classList.contains('picked');
+          wrap.querySelectorAll('.q-dchip.picked').forEach((x) => x.classList.remove('picked'));
+          if (!was) { c.classList.add('picked'); dragSel = c; } else dragSel = null;
+        }
+      };
+      c.addEventListener('pointerup', end); c.addEventListener('pointercancel', () => { sx = null; if (ghost) { ghost.remove(); ghost = null; c.classList.remove('dragging'); } });
+    });
+    const api = {
+      el: wrap,
+      answered: () => chips.every((c) => c._bin >= 0),
+      check: () => chips.filter((c) => c._bin === q.items[+c.dataset.i].bin).length / chips.length,
+      mark() { chips.forEach((c) => { const ok = c._bin === q.items[+c.dataset.i].bin; c.classList.toggle('good', ok); c.classList.toggle('bad', !ok); }); },
+      clearMarks() { chips.forEach((c) => c.classList.remove('good', 'bad')); },
+      reveal() { chips.forEach((c) => place(c, q.items[+c.dataset.i].bin)); api.mark(); },
+      lock() { wrap.classList.add('locked'); },
+      value: () => q.bins.map((b, i) => b.replace(/\*|`/g, '') + ': ' + chips.filter((c) => c._bin === i).map((c) => q.items[+c.dataset.i].label).join(' ')).join('; '),
+      // for programmatic tests
+      _place: (label, bi) => { const c = chips.find((x) => q.items[+x.dataset.i].label === label); place(c, bi); },
+    };
+    return api;
+  }
+
+  const PAIR_COLORS = ['#00A7B2', '#FAA71C', '#047857', '#C92426', '#D77F28', '#66A34E', '#7a5cc4'];
+  function match(q) {
+    const wrap = h('div', { class: 'q-match' });
+    const L = h('div', { class: 'q-mcol' }), R = h('div', { class: 'q-mcol' });
+    const rOrder = shuffle(q.right.map((_, i) => i));
+    const pairs = {}; // left i -> right j
+    let selL = null;
+    const lEls = q.left.map((t, i) => h('button', { class: 'q-mitem', type: 'button', html: rich(t), onclick: () => { if (wrap.classList.contains('locked')) return; selL = selL === i ? null : i; draw(); } }));
+    const rEls = {};
+    rOrder.forEach((j) => { rEls[j] = h('button', { class: 'q-mitem r', type: 'button', html: rich(q.right[j]), onclick: () => {
+      if (wrap.classList.contains('locked')) return;
+      if (selL == null) { const owner = Object.keys(pairs).find((k) => pairs[k] === j); if (owner != null) { delete pairs[owner]; draw(); } return; }
+      Object.keys(pairs).forEach((k) => { if (pairs[k] === j) delete pairs[k]; });
+      pairs[selL] = j; selL = null; draw(); api.onChange && api.onChange(); } }); });
+    lEls.forEach((e) => L.append(e)); rOrder.forEach((j) => R.append(rEls[j]));
+    wrap.append(L, h('div', { class: 'q-mmid', 'aria-hidden': 'true' }), R);
+    function draw() {
+      lEls.forEach((e, i) => {
+        e.classList.toggle('sel', selL === i);
+        const has = pairs[i] != null; e.style.setProperty('--pc', has ? PAIR_COLORS[i % PAIR_COLORS.length] : 'transparent');
+        e.classList.toggle('paired', has); e.dataset.tag = has ? String.fromCharCode(65 + i) : '';
+      });
+      Object.entries(rEls).forEach(([j, e]) => {
+        const owner = Object.keys(pairs).find((k) => pairs[k] === +j);
+        e.style.setProperty('--pc', owner != null ? PAIR_COLORS[owner % PAIR_COLORS.length] : 'transparent');
+        e.classList.toggle('paired', owner != null); e.dataset.tag = owner != null ? String.fromCharCode(65 + +owner) : '';
+      });
+    }
+    draw();
+    const api = {
+      el: wrap,
+      answered: () => Object.keys(pairs).length === q.left.length,
+      check: () => q.left.filter((_, i) => pairs[i] === q.answer[i]).length / q.left.length,
+      mark() { lEls.forEach((e, i) => { const ok = pairs[i] === q.answer[i]; e.classList.toggle('good', ok); e.classList.toggle('bad', !ok); }); },
+      clearMarks() { lEls.forEach((e) => e.classList.remove('good', 'bad')); },
+      reveal() { q.left.forEach((_, i) => (pairs[i] = q.answer[i])); draw(); api.mark(); },
+      lock() { wrap.classList.add('locked'); },
+      value: () => q.left.map((l, i) => l + '→' + (pairs[i] != null ? q.right[pairs[i]] : '?')).join('; '),
+      _pair: (i, j) => { pairs[i] = j; draw(); },
+    };
+    return api;
+  }
+
+  function widget(q) {
+    if (q.type === 'mcq') return mcq(q, false);
+    if (q.type === 'multi') return mcq(q, true);
+    if (q.type === 'fill') return fill(q);
+    if (q.type === 'sort') return sort(q);
+    if (q.type === 'match') return match(q);
+    if (q.type === 'custom') return q.build(q);
+    throw new Error('unknown type ' + q.type);
+  }
+  const TYPE_LABEL = { mcq: 'Choose one', multi: 'Choose all that apply', fill: 'Fill in', sort: 'Drag and drop', match: 'Match the columns', custom: '' };
+
+  /* A question card. opts.mode: practice | test | diagnostic */
+  function card(q, opts = {}) {
+    const mode = opts.mode || 'practice';
+    const w = widget(q);
+    const fb = h('div', { class: 'q-fb', role: 'status', 'aria-live': 'polite' });
+    const head = h('div', { class: 'q-head' },
+      opts.num != null ? h('span', { class: 'q-num' }, opts.num) : null,
+      h('span', { class: 'q-type' }, q.typeLabel || TYPE_LABEL[q.type] || ''));
+    const prompt = q.prompt ? h('div', { class: 'q-prompt', html: rich(q.prompt) }) : null;
+    const el = h('div', { class: 'q-card t-' + q.type }, head, prompt, q.visual ? h('div', { class: 'q-visual', html: q.visual }) : null, w.el);
+    const state = { tries: 0, done: false, score: 0, firstTry: false };
+    let btn, showBtn;
+    if (mode === 'practice') {
+      btn = h('button', { class: 'q-check', type: 'button', onclick: () => doCheck() }, opts.checkLabel || 'Check');
+      showBtn = h('button', { class: 'q-show', type: 'button', hidden: true, onclick: () => { w.reveal(); w.lock(); finish(false, true); } }, 'Show me');
+      el.append(h('div', { class: 'q-actions' }, btn, showBtn), fb);
+      w.onEnter = () => doCheck();
+    } else el.append(fb);
+    function finish(ok, shown) {
+      state.done = true; btn && (btn.hidden = true); showBtn && (showBtn.hidden = true);
+      el.classList.add(ok ? 'is-right' : 'is-shown');
+      if (ok) fb.innerHTML = '<span class="ok">' + rich(q.praise || pickPraise()) + '</span>' + (q.explain ? '<div class="why">' + rich(q.explain) + '</div>' : '');
+      else if (shown) fb.innerHTML = '<span class="info">Here is the answer. ' + (q.explain ? rich(q.explain) : '') + '</span>';
+      opts.onDone && opts.onDone({ correct: ok, firstTry: ok && state.tries === 1, shown });
+    }
+    function doCheck() {
+      if (state.done) return;
+      if (!w.answered()) { fb.innerHTML = '<span class="info">' + (q.type === 'sort' ? 'Place every card first.' : q.type === 'match' ? 'Match every item first.' : 'Answer every part first.') + '</span>'; return; }
+      state.tries++;
+      const s = w.check(); w.mark();
+      if (s >= 0.999) { w.lock(); state.score = 1; finish(true); }
+      else {
+        fb.innerHTML = '<span class="bad">Not yet. ' + rich(q.hint || 'Look at the orange ones and try again.') + '</span>';
+        el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+        if (state.tries >= 2) showBtn.hidden = false;
+        setTimeout(() => w.clearMarks(), 1800);
+      }
+    }
+    return {
+      el, q, w, state,
+      grade() { const s = w.answered() ? w.check() : (w.check ? w.check() : 0); state.score = s; return s; },
+      showResult() { w.mark(); w.lock(); const s = state.score;
+        el.classList.add(s >= 0.999 ? 'is-right' : 'is-wrong');
+        fb.innerHTML = s >= 0.999 ? '<span class="ok">Correct</span>' : '<span class="bad">' + (s > 0 ? 'Partly right' : 'Not quite') + '.</span> <button class="q-peek" type="button">See answer</button>' + (q.explain ? '<div class="why">' + rich(q.explain) + '</div>' : '');
+        const pk = fb.querySelector('.q-peek'); pk && pk.addEventListener('click', () => { w.reveal(); pk.remove(); }); },
+      value: () => w.value(),
+      answered: () => w.answered(),
+    };
+  }
+  const PRAISES = ['Nailed it!', 'Spot on!', 'Gold!', 'Brilliant thinking!', 'Exactly right!', 'You cracked it!'];
+  const pickPraise = () => PRAISES[Math.floor(Math.random() * PRAISES.length)];
+
+  /* ---------- share panel ---------- */
+  function sharePanel({ title, getName, getSummary }) {
+    const status = h('div', { class: 's-status', role: 'status' });
+    const build = () => {
+      const name = (getName() || '').trim() || 'Learner';
+      return getSummary(name);
+    };
+    const say = (t) => { status.textContent = t; setTimeout(() => (status.textContent = ''), 3500); };
+    const copy = async (txt) => {
+      try { await navigator.clipboard.writeText(txt); say('Copied. Paste it into a message to your mentor.'); }
+      catch (e) { const ta = h('textarea', {}); ta.value = txt; document.body.append(ta); ta.select(); try { document.execCommand('copy'); say('Copied.'); } catch (_) { say('Select the text in the box and copy it.'); } ta.remove(); }
+    };
+    const panel = h('div', { class: 's-panel' },
+      h('div', { class: 's-row' },
+        h('button', { class: 's-btn s-main', type: 'button', onclick: async () => {
+          const txt = build();
+          if (navigator.share) { try { await navigator.share({ title, text: txt }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+          copy(txt); } }, 'Share results'),
+        h('a', { class: 's-btn', target: '_blank', rel: 'noopener', href: '#', onclick: (e) => { e.currentTarget.href = 'https://wa.me/?text=' + encodeURIComponent(build()); } }, 'WhatsApp'),
+        h('a', { class: 's-btn', target: '_blank', rel: 'noopener', href: '#', onclick: (e) => { e.currentTarget.href = 'mailto:learnerconnect@mymasterylab.org?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(build()); } }, 'Email mentor'),
+        h('button', { class: 's-btn', type: 'button', onclick: () => copy(build()) }, 'Copy')),
+      status);
+    return panel;
+  }
+
+  function fmtTime(ms) { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ' min ' + (s % 60) + ' s'; }
+
+  return { h, shuffle, pick, rint, rich, norm, card, widget, sharePanel, fmtTime, sameSet };
+})();
+
+/* ---------- number helpers for generators ---------- */
+const NT = {
+  factors(n) { const f = []; for (let i = 1; i <= n; i++) if (n % i === 0) f.push(i); return f; },
+  pairs(n) { const p = []; for (let i = 1; i * i <= n; i++) if (n % i === 0) p.push([i, n / i]); return p; },
+  isPrime(n) { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; },
+  kind(n) { return n < 2 ? 2 : NT.isPrime(n) ? 0 : 1; },
+  primesBetween(a, b) { const r = []; for (let i = a; i <= b; i++) if (NT.isPrime(i)) r.push(i); return r; },
+  smallestPF(n) { for (let i = 2; i <= n; i++) if (n % i === 0) return i; return n; },
+  digitSum(n) { return String(n).split('').reduce((s, d) => s + +d, 0); },
+};
+
+</script>
+<script>
+const ART = {"nova": "<svg class=\"chr nova\" viewBox=\"0 0 120 150\" role=\"img\" aria-label=\"Nova the prospector\">\n<ellipse cx=\"60\" cy=\"144\" rx=\"34\" ry=\"5\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"bob\">\n <path d=\"M34 104 Q60 92 86 104 L90 140 L30 140 Z\" fill=\"#00A7B2\"/>\n <path d=\"M44 100 L60 120 L76 100 Z\" fill=\"#FAA71C\"/>\n <rect x=\"22\" y=\"104\" width=\"12\" height=\"30\" rx=\"6\" fill=\"#00A7B2\" transform=\"rotate(14 28 104)\"/>\n <g class=\"wave\"><rect x=\"86\" y=\"96\" width=\"12\" height=\"30\" rx=\"6\" fill=\"#00A7B2\" transform=\"rotate(-30 92 100)\"/><circle cx=\"104\" cy=\"88\" r=\"7\" fill=\"#FCD6A4\"/></g>\n <circle cx=\"60\" cy=\"68\" r=\"30\" fill=\"#FCD6A4\"/>\n <path d=\"M31 62 Q34 46 50 44 L46 58 Z M89 62 Q86 46 70 44 L74 58 Z\" fill=\"#1d1d1f\"/>\n <g class=\"blink\"><ellipse cx=\"49\" cy=\"70\" rx=\"4\" ry=\"5.5\" fill=\"#1d1d1f\"/><ellipse cx=\"71\" cy=\"70\" rx=\"4\" ry=\"5.5\" fill=\"#1d1d1f\"/>\n  <circle cx=\"50.5\" cy=\"68\" r=\"1.5\" fill=\"#fff\"/><circle cx=\"72.5\" cy=\"68\" r=\"1.5\" fill=\"#fff\"/></g>\n <ellipse cx=\"41\" cy=\"80\" rx=\"5\" ry=\"3\" fill=\"#F7A9A0\" opacity=\".8\"/><ellipse cx=\"79\" cy=\"80\" rx=\"5\" ry=\"3\" fill=\"#F7A9A0\" opacity=\".8\"/>\n <path d=\"M51 84 Q60 92 69 84\" stroke=\"#1d1d1f\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/>\n <ellipse cx=\"60\" cy=\"44\" rx=\"48\" ry=\"9\" fill=\"#D77F28\"/>\n <path d=\"M36 44 Q38 16 60 16 Q82 16 84 44 Z\" fill=\"#D77F28\"/>\n <rect x=\"37\" y=\"34\" width=\"46\" height=\"7\" fill=\"#FAA71C\"/>\n <path d=\"M40 98 Q60 108 80 98 L76 92 Q60 100 44 92 Z\" fill=\"#00A7B2\"/>\n</g></svg>", "dig": "<svg class=\"chr dig\" viewBox=\"0 0 140 130\" role=\"img\" aria-label=\"Dig the mole\">\n<ellipse cx=\"70\" cy=\"124\" rx=\"44\" ry=\"5\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"wiggle\">\n <path d=\"M24 120 Q14 70 48 44 Q70 28 94 44 Q126 70 116 120 Z\" fill=\"#D77F28\"/>\n <path d=\"M44 120 Q42 84 70 78 Q98 84 96 120 Z\" fill=\"#F6C28C\"/>\n <g class=\"paw\"><path d=\"M22 96 q-14 4 -12 16 q10 2 18 -6z\" fill=\"#F6C28C\"/></g>\n <path d=\"M118 96 q14 4 12 16 q-10 2 -18 -6z\" fill=\"#F6C28C\"/>\n <ellipse cx=\"70\" cy=\"76\" rx=\"20\" ry=\"13\" fill=\"#F6C28C\"/>\n <g class=\"sniff\"><ellipse cx=\"70\" cy=\"70\" rx=\"8\" ry=\"6\" fill=\"#ff5900\"/><ellipse cx=\"67\" cy=\"68\" rx=\"2.5\" ry=\"1.6\" fill=\"#fff\" opacity=\".7\"/></g>\n <path d=\"M48 76 l-16 -3 M48 80 l-16 3 M92 76 l16 -3 M92 80 l16 3\" stroke=\"#1d1d1f\" stroke-width=\"1.6\" stroke-linecap=\"round\" opacity=\".55\"/>\n <g class=\"blink\"><circle cx=\"58\" cy=\"58\" r=\"3.4\" fill=\"#1d1d1f\"/><circle cx=\"82\" cy=\"58\" r=\"3.4\" fill=\"#1d1d1f\"/></g>\n <path d=\"M62 86 Q70 92 78 86\" stroke=\"#1d1d1f\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/>\n <rect x=\"38\" y=\"34\" width=\"64\" height=\"7\" rx=\"3.5\" fill=\"#1d1d1f\" opacity=\".75\"/>\n <circle cx=\"56\" cy=\"36\" r=\"11\" fill=\"#fff\" stroke=\"#00A7B2\" stroke-width=\"5\"/><circle cx=\"84\" cy=\"36\" r=\"11\" fill=\"#fff\" stroke=\"#00A7B2\" stroke-width=\"5\"/>\n <path d=\"M51 32 l6 -3 M79 32 l6 -3\" stroke=\"#00A7B2\" stroke-width=\"2\" stroke-linecap=\"round\" opacity=\".6\"/>\n</g></svg>", "eratos": "<svg class=\"chr eratos\" viewBox=\"0 0 120 150\" role=\"img\" aria-label=\"Eratos the owl\">\n<ellipse cx=\"60\" cy=\"145\" rx=\"32\" ry=\"5\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"tilt\">\n <path d=\"M24 70 Q22 30 40 22 L46 36 Q60 30 74 36 L80 22 Q98 30 96 70 Q100 132 60 140 Q20 132 24 70 Z\" fill=\"#00A7B2\"/>\n <path d=\"M38 92 Q60 76 82 92 Q84 128 60 134 Q36 128 38 92 Z\" fill=\"#C9F0F2\"/>\n <path d=\"M46 100 q4 4 8 0 M58 100 q4 4 8 0 M70 100 q4 4 8 0 M52 112 q4 4 8 0 M64 112 q4 4 8 0\" stroke=\"#00A7B2\" stroke-width=\"2\" fill=\"none\" opacity=\".6\"/>\n <path d=\"M24 80 Q10 100 22 122 Q30 104 32 86 Z M96 80 Q110 100 98 122 Q90 104 88 86 Z\" fill=\"#00928e\"/>\n <circle cx=\"44\" cy=\"62\" r=\"15\" fill=\"#fff\" stroke=\"#FAA71C\" stroke-width=\"4\"/><circle cx=\"76\" cy=\"62\" r=\"15\" fill=\"#fff\" stroke=\"#FAA71C\" stroke-width=\"4\"/>\n <g class=\"blink\"><circle cx=\"46\" cy=\"63\" r=\"6\" fill=\"#1d1d1f\"/><circle cx=\"74\" cy=\"63\" r=\"6\" fill=\"#1d1d1f\"/><circle cx=\"48\" cy=\"60\" r=\"2\" fill=\"#fff\"/><circle cx=\"76\" cy=\"60\" r=\"2\" fill=\"#fff\"/></g>\n <path d=\"M59 62 h2\" stroke=\"#FAA71C\" stroke-width=\"3\"/>\n <path d=\"M54 76 L60 88 L66 76 Z\" fill=\"#D77F28\"/>\n <path d=\"M48 140 l-4 6 M52 140 v7 M68 140 v7 M72 140 l4 6\" stroke=\"#D77F28\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n</g></svg>", "nug": "<g class=\"n\" transform=\"translate(0 0) scale(1)\"><path d=\"M-10 4 L-6 -7 L4 -9 L11 -2 L8 8 L-4 10 Z\" fill=\"#FAA71C\" stroke=\"#D77F28\" stroke-width=\"1.5\"/><path d=\"M-4 -4 L2 -6 L4 -2\" stroke=\"#fff\" stroke-width=\"2\" fill=\"none\" opacity=\".8\" stroke-linecap=\"round\"/></g>"};
+const { h, card, shuffle } = MML;
+const $ = (s) => document.querySelector(s);
+const S = { nug: 0, lit: new Set(), cur: null };
+
+const MISSIONS = [
+  { title: 'Lantern Check', sub: 'Wake up your times tables', cast: ['nova', 'dig'],
+    lines: [['nova', 'Morning, prospector! Our lanterns run on multiplication sparks. Find the factor pairs to light them.'],
+            ['dig', 'I already know every factor pair of 24. Well… most of them. Maybe.']], build: mLantern },
+  { title: 'Canyon Survey', sub: '12 survey questions, no hints', cast: ['eratos'],
+    lines: [['eratos', 'Before we dig, we survey. Answer each question as well as you can. Some are from later in our journey, so skipping is fine.'],
+            ['eratos', 'There are no right or wrong signals here. At the end you will see your starting map.']], build: mSurvey },
+  { title: 'Rectangle Rocks', sub: 'Build every rectangle', cast: ['eratos', 'dig'],
+    lines: [['eratos', 'Long ago I built a gold pan. Numbers that break into equal rows are rocks. Numbers that only make one long row are gold: the primes.'],
+            ['nova', 'Pick a number of rows. If tiles are left over, that rectangle cracks!']], build: mRect },
+  { title: 'Factor Rainbow', sub: 'Pair up the factors', cast: ['nova', 'dig'],
+    lines: [['nova', 'Every factor has a partner. Draw a rainbow from each factor to its partner.'],
+            ['dig', 'Is 4 × 6 different from 6 × 4? I counted them twice…']], build: mRainbow },
+  { title: 'Sieve of Eratos', sub: 'Pan for the primes up to 50', cast: ['eratos', 'dig'],
+    lines: [['eratos', 'My sieve! Wash out the multiples and the gold stays behind.'],
+            ['dig', 'I will hold the pan. You do the tapping.']], build: mSieve },
+  { title: 'Zap Belt', sub: 'Sort the nuggets fast', cast: ['dig', 'nova'],
+    lines: [['dig', 'Uh-oh, the sorting belt is running and everything is mixed up!'],
+            ['nova', 'Drag each number into Gold (prime), Rock (composite) or Neither. Beat the clock for bonus nuggets!']], build: mZap },
+  { title: "Dig's Claims", sub: 'Catch the mistakes', cast: ['dig', 'eratos'],
+    lines: [['dig', 'I have written some rules in my notebook. They all sound right to me!'],
+            ['eratos', 'Read each claim carefully. Is it true? Pick the best reason.']], build: mClaims },
+  { title: 'Stake Your Claim', sub: 'Show what you can do', cast: ['nova', 'eratos'],
+    lines: [['nova', 'Last shaft! Stake your claim and the vault opens.'],
+            ['eratos', 'No help from Dig this time. You have got this.']], build: mExit },
+];
+const NAMES = { nova: 'Nova', dig: 'Dig', eratos: 'Eratos' };
+
+/* ---------- HUD ---------- */
+function addNug(n, from) {
+  if (!n) return;
+  S.nug += n; $('#nugCount').textContent = S.nug;
+  const st = $('#nugStat'); st.classList.remove('bump'); void st.offsetWidth; st.classList.add('bump');
+  if (from) { const r = from.getBoundingClientRect(); const f = h('div', { class: 'floatnug', style: `left:${r.left + r.width / 2}px;top:${r.top}px` }, '+' + n); document.body.append(f); setTimeout(() => f.remove(), 1200); }
+}
+function refreshMap() {
+  document.querySelectorAll('.map .shaft').forEach((g) => {
+    const i = +g.dataset.m; g.classList.toggle('lit', S.lit.has(i));
+    g.classList.toggle('next', !S.lit.has(i) && i === firstOpen());
+  });
+  $('#lanCount').textContent = S.lit.size + '/8';
+  const leg = $('#legend'); leg.innerHTML = '';
+  MISSIONS.forEach((m, i) => leg.append(h('button', { type: 'button', class: S.lit.has(i) ? 'lit' : '', onclick: () => openMission(i) }, h('b', {}, i + 1), m.title, h('small', {}, S.lit.has(i) ? 'lit' : ''))));
+  document.querySelector('.map .vault').classList.toggle('open', S.lit.size === 8);
+}
+const firstOpen = () => MISSIONS.findIndex((_, i) => !S.lit.has(i));
+
+function face(k) { return h('span', { class: 'face', html: ART[k] }); }
+
+function openMission(i) {
+  S.cur = i; const m = MISSIONS[i];
+  document.body.classList.add('in-mission'); window.scrollTo(0, 0);
+  $('#mNum').textContent = i + 1; $('#mTitle').textContent = m.title; $('#mSub').textContent = m.sub;
+  const cast = $('#cast'); cast.innerHTML = '';
+  m.cast.slice(0, 1).forEach((k) => { cast.append(h('div', { html: ART[k] }), h('div', { class: 'who' }, NAMES[k])); });
+  const talk = $('#talk'); talk.innerHTML = '';
+  m.lines.forEach(([k, t], j) => { const b = h('div', { class: 'bubble ' + k, style: `animation-delay:${j * 0.35}s` }, face(k), h('div', { class: 'txt' }, h('b', { class: 'name' }, NAMES[k]), t)); talk.append(b); });
+  const work = $('#work'); work.innerHTML = '';
+  $('#nextBtn').disabled = !S.lit.has(i);
+  $('#nextBtn').textContent = i === 7 ? 'Open the vault' : 'Next shaft';
+  m.build(work, () => complete(i));
+}
+function say(k, t) {
+  const talk = $('#talk');
+  const b = h('div', { class: 'bubble ' + k }, face(k), h('div', { class: 'txt' }, h('b', { class: 'name' }, NAMES[k]), t));
+  talk.append(b); if (talk.children.length > 3) talk.firstElementChild.remove();
+  const c = $('#cast .chr'); if (c) { c.classList.add('talk'); setTimeout(() => c.classList.remove('talk'), 1500); }
+}
+function complete(i) {
+  const first = !S.lit.has(i);
+  S.lit.add(i); refreshMap();
+  $('#nextBtn').disabled = false;
+  const work = $('#work');
+  if (first) work.prepend(h('div', { class: 'done-banner' }, h('b', {}, 'Lantern lit!'), h('span', {}, i === 7 ? 'Every shaft is glowing. Head to the vault!' : 'Shaft ' + (i + 1) + ' is glowing. On to the next one!')));
+  if (S.lit.size === 8 && first) setTimeout(party, 900);
+}
+function party() {
+  $('#partyMsg').textContent = 'You lit all 8 lanterns and collected ' + S.nug + ' gold nuggets. The vault is open!';
+  $('#party').classList.add('on');
+  for (let k = 0; k < 28; k++) { const c = h('div', { class: 'confetti', style: `left:${Math.random() * 100}vw;animation-duration:${2 + Math.random() * 2.5}s;animation-delay:${Math.random()}s`, html: `<svg viewBox="-12 -12 24 24">${ART.nug}</svg>` }); document.body.append(c); setTimeout(() => c.remove(), 5200); }
+}
+
+/* sequential cards helper: reveals next card when previous is done */
+function seq(work, qs, done, opts = {}) {
+  const cards = qs.map((q, k) => card(q, { mode: 'practice', num: (opts.prefix || '') + (k + 1), onDone: (r) => {
+    addNug(r.firstTry ? 10 : r.shown ? 0 : 5, cards[k].el.querySelector('.q-fb'));
+    if (q.after) q.after(r);
+    const nx = cards[k + 1]; if (nx) { nx.el.classList.remove('step-locked'); }
+    else done();
+  } }));
+  cards.forEach((c, k) => { if (k > 0) c.el.classList.add('step-locked'); work.append(c.el); });
+  return cards;
+}
+
+/* ---------- Mission 1 ---------- */
+function mLantern(work, done) {
+  seq(work, [
+    { type: 'multi', prompt: 'Lantern one needs **24** sparks. Which are factor pairs of 24?', options: ['1 × 24', '2 × 12', '3 × 8', '4 × 6', '5 × 5', '2 × 10'], answer: [0, 1, 2, 3], hint: 'Multiply each pair. Does it make exactly 24?', explain: '1 × 24, 2 × 12, 3 × 8 and 4 × 6 all make 24.' },
+    { type: 'fill', prompt: 'Lantern two: find the missing factor.', text: '15 = 3 × []', answers: ['5'], hint: 'Count up in 3s to 15. How many jumps?' },
+    { type: 'mcq', prompt: 'Lantern three: does **15** have factors other than 1 and 15?', options: ['Yes: 3 and 5', 'No, only 1 and 15', 'Yes: 2 and 7', 'Yes: 4 and 4'], answer: 0, hint: 'You just found one of its factor pairs!', explain: '15 = 3 × 5, so 15 has four factors: 1, 3, 5, 15.' },
+  ], done);
+}
+
+/* ---------- Mission 2: diagnostic ---------- */
+function mSurvey(work, done) {
+  const Q = [
+    { type: 'fill', prompt: 'Divide.', text: '48 ÷ 6 = []', answers: ['8'] },
+    { type: 'fill', prompt: 'Divide.', text: '72 ÷ 8 = []', answers: ['9'] },
+    { type: 'multi', prompt: 'Select **all** the factors of 18.', options: ['1', '2', '3', '4', '5', '6', '8', '9', '12', '18'], answer: [0, 1, 2, 5, 7, 9], keepOrder: true },
+    { type: 'mcq', prompt: 'Is **29** prime or composite?', options: ['Prime: its only factors are 1 and 29', 'Composite: it is an odd number', 'Composite: 29 = 3 × 9', 'Neither prime nor composite'], answer: 0, keepOrder: true },
+    { type: 'fill', prompt: 'Continue the pattern and write the rule.', text: '4, 7, 10, 13, [], [], []\nRule: add []', answers: ['16', '19', '22', '3'] },
+    { type: 'fill', prompt: 'Divide.', text: '3,600 ÷ 6 = []', answers: ['600'] },
+    { type: 'fill', prompt: 'Divide and write the remainder.', text: '27 ÷ 4 = [] R []', answers: ['6', '3'] },
+    { type: 'fill', prompt: 'A hall seats **125** guests at tables of **6**. How many tables are needed so everyone has a seat?', text: '[] tables', answers: ['21'] },
+    { type: 'fill', prompt: 'Divide. You can use partial quotients.', text: '456 ÷ 3 = []', answers: ['152'] },
+    { type: 'fill', prompt: 'Divide. Watch the zeros!', text: '8,024 ÷ 4 = []', answers: ['2006'] },
+    { type: 'mcq', prompt: 'In: 2, 3, 4, 5 → Out: 7, 10, 13, 16. What is the rule?', options: ['Multiply by 3, then add 1', 'Add 5', 'Add 3', 'Multiply by 4, then subtract 1'], answer: 0 },
+    { type: 'mcq', prompt: 'Why is **1** neither prime nor composite?', options: ['It has only one factor', 'It is an odd number', 'It is too small to divide', 'It has exactly two factors'], answer: 0 },
+  ];
+  const SK = [['Times tables & division facts', [0, 1]], ['Factors & primes', [2, 3, 11]], ['Patterns & rules', [4, 10]], ['Dividing bigger numbers', [5, 6, 8, 9]], ['Remainders in stories', [7]]];
+  const res = new Array(Q.length).fill(0); let k = 0;
+  const t0 = Date.now();
+  const top = h('div', { class: 'diag-top' }, h('span', { class: 'timer', id: 'dq' }, ''), h('div', { class: 'dots' }, ...Q.map(() => h('i'))));
+  const slot = h('div');
+  const nav = h('div', { class: 'q-actions' },
+    h('button', { class: 'q-check', type: 'button', onclick: () => next(true) }, 'Log answer'),
+    h('button', { class: 'q-show', type: 'button', onclick: () => next(false) }, 'Skip'));
+  work.append(top, slot, nav);
+  let cur;
+  function show() {
+    slot.innerHTML = ''; cur = card(Q[k], { mode: 'diagnostic', num: k + 1 }); slot.append(cur.el);
+    cur.w.onEnter = () => next(true);
+    top.querySelector('#dq').textContent = 'Question ' + (k + 1) + ' of 12';
+    top.querySelectorAll('.dots i').forEach((d, j) => { d.className = j < k ? 'done' : j === k ? 'cur' : ''; });
+    cur.w.focus && setTimeout(() => cur.w.focus(), 50);
+  }
+  function next(logIt) {
+    if (logIt && !cur.answered()) { cur.el.querySelector('.q-fb').innerHTML = '<span class="info">Write an answer, or press Skip.</span>'; return; }
+    res[k] = logIt ? (cur.grade() >= 0.999 ? 1 : 0) : 0;
+    if (logIt) addNug(5, nav);
+    k++; if (k < Q.length) show(); else finish();
+  }
+  function finish() {
+    nav.remove(); top.remove(); slot.innerHTML = '';
+    const total = res.reduce((a, b) => a + b, 0);
+    const rows = SK.map(([name, idx]) => {
+      const got = idx.filter((j) => res[j]).length, pct = got / idx.length;
+      const tag = pct === 1 ? 'Strong' : pct > 0 ? 'Growing' : 'New to me';
+      return h('div', { class: 'rrow' }, h('div', {}, name), h('div', { class: 'rbar' }, h('i', { style: 'width:0%', 'data-w': Math.max(4, pct * 100) + '%' })), h('div', { class: 'rtag' }, tag + ' ' + got + '/' + idx.length));
+    });
+    slot.append(h('div', { class: 'panel' }, h('h3', {}, 'Your starting map'), h('p', { class: 'sub' }, 'Survey logged: ' + total + ' of 12 in ' + MML.fmtTime(Date.now() - t0) + '. "New to me" topics are coming up in the next shafts and sessions.'), h('div', { class: 'readout' }, ...rows),
+      h('p', { class: 'sub', style: 'margin-top:10px' }, 'Answers logged: ' + res.map((r, j) => (j + 1) + (r ? '✓' : '·')).join('  '))));
+    setTimeout(() => slot.querySelectorAll('.rbar i').forEach((b) => (b.style.width = b.dataset.w)), 60);
+    say('eratos', 'Survey complete! Now we know where to dig.');
+    done();
+  }
+  show();
+}
+
+/* ---------- Mission 3: Rectangle Rocks ---------- */
+function mRect(work, done) {
+  const st = { n: 16, found: { 16: new Set(), 17: new Set() }, tried: { 16: new Set(), 17: new Set() } };
+  const need = { 16: [1, 2, 4], 17: [1] };
+  const sw = h('div', { class: 'numswitch' });
+  [16, 17].forEach((n) => sw.append(h('button', { type: 'button', 'data-n': n, onclick: () => { st.n = n; draw(0); } }, n + ' tiles')));
+  const btns = h('div', { class: 'rowbtns' });
+  const box = h('div', { class: 'arraybox' }); const note = h('div', { class: 'arraynote' }); const list = h('div', { class: 'foundlist' });
+  const panel = h('div', { class: 'panel' }, h('h3', {}, 'Rectangle builder'), h('p', { class: 'sub' }, 'Choose how many rows. Teal tiles fill the rows; orange tiles are left over.'), sw, btns, box, note, h('div', { class: 'sub', style: 'margin-top:8px' }, 'Rectangles found:'), list);
+  work.append(panel);
+  for (let r = 1; r <= 8; r++) btns.append(h('button', { type: 'button', 'data-r': r, onclick: () => draw(r) }, r + (r === 1 ? ' row' : ' rows')));
+  const qwrap = h('div'); work.append(qwrap);
+  let cards = null;
+  function draw(r) {
+    const n = st.n;
+    sw.querySelectorAll('button').forEach((b) => b.classList.toggle('on', +b.dataset.n === n));
+    btns.querySelectorAll('button').forEach((b) => { const rr = +b.dataset.r; b.classList.toggle('found', st.found[n].has(rr) || (n % rr === 0 && st.found[n].has(n / rr))); b.classList.toggle('tried', st.tried[n].has(rr) && n % rr !== 0); b.classList.toggle('cur', rr === r); });
+    box.innerHTML = ''; note.className = 'arraynote'; note.textContent = '';
+    if (!r) { box.append(h('div', { class: 'sub' }, 'Pick a number of rows to start building ' + n + '.')); renderList(); return; }
+    const cols = Math.floor(n / r), left = n % r;
+    const grid = h('div', { class: 'tiles', style: `grid-template-columns:repeat(${Math.max(cols, left)},22px)` });
+    let d = 0;
+    for (let i = 0; i < r * cols; i++) grid.append(h('i', { class: 'tile', style: `animation-delay:${(d++) * 12}ms` }));
+    for (let i = 0; i < left; i++) grid.append(h('i', { class: 'tile left', style: `animation-delay:${(d++) * 12}ms` }));
+    box.append(grid);
+    st.tried[n].add(r);
+    if (left === 0) {
+      const a = Math.min(r, cols), b = Math.max(r, cols);
+      if (r > cols) { note.className = 'arraynote turn'; note.textContent = 'Turnaround! ' + r + ' × ' + cols + ' is the ' + a + ' × ' + b + ' rectangle turned on its side. No new pairs from here on.'; }
+      else { note.className = 'arraynote ok'; note.textContent = 'Rectangle! ' + r + ' rows of ' + cols + ': ' + r + ' × ' + cols + ' = ' + n + '.';
+        if (!st.found[n].has(r)) { st.found[n].add(r); addNug(5, note); } }
+    } else { note.className = 'arraynote no'; note.textContent = r + ' rows of ' + cols + ' leaves ' + left + ' tile' + (left > 1 ? 's' : '') + ' over. ' + n + ' ÷ ' + r + ' = ' + cols + ' R ' + left + '. Cracked!'; }
+    if (r === 5 && n === 16) say('eratos', 'Notice: 5 rows already gives fewer tiles per row than rows. The turnaround has started, so we can stop testing.');
+    if (n === 17 && [2, 3, 4].every((x) => st.tried[17].has(x)) && !st.said17) { st.said17 = true; say('eratos', '4 × 4 = 16, and 5 × 5 = 25 is past 17. We can stop: 17 only makes one long row.'); }
+    btns.querySelectorAll('button').forEach((b) => { const rr = +b.dataset.r; b.classList.toggle('found', n % rr === 0 && rr <= n / rr && st.found[n].has(rr)); b.classList.toggle('tried', st.tried[n].has(rr) && n % rr !== 0); });
+    renderList(); maybeQuestions();
+  }
+  function renderList() { list.innerHTML = ''; [16, 17].forEach((n) => [...st.found[n]].sort((a, b) => a - b).forEach((r) => list.append(h('span', {}, r + ' × ' + n / r)))); }
+  function maybeQuestions() {
+    if (cards) return;
+    if (!need[16].every((r) => st.found[16].has(r))) return;
+    say('nova', 'You found every rectangle for 16! Now answer Eratos.');
+    cards = seq(qwrap, [
+      { type: 'mcq', prompt: 'The rectangles for 16 are 1 × 16, 2 × 8 and 4 × 4. How many **factors** does 16 have?', options: ['3', '4', '5', '6'], answer: 2, hint: 'List them: 1, 2, 4, 8, 16. The 4 only counts once.', explain: 'Factors of 16: 1, 2, 4, 8, 16. Five factors, so 16 is composite.' },
+      { type: 'mcq', prompt: 'Now switch to **17 tiles** and try 2, 3 and 4 rows. What is 17?', options: ['Prime: only one rectangle, 1 × 17', 'Composite: it makes several rectangles', 'Neither prime nor composite', 'Composite: 17 is odd'], answer: 0, keepOrder: true, hint: 'Try 2, 3 and 4 rows for 17. Do any work?', explain: '17 makes only 1 × 17. Exactly two factors, 1 and 17: prime, a gold number!' },
+    ], done);
+  }
+  draw(0);
+}
+
+/* ---------- Mission 4: Factor Rainbow ---------- */
+function rainbowSVG(n) {
+  const f = NT.factors(n); const W = 560, pad = 30, step = (W - 2 * pad) / Math.max(1, f.length - 1);
+  const X = (i) => pad + i * step; const base = 150;
+  const cols = ['#00A7B2', '#FAA71C', '#047857', '#D77F28', '#C92426', '#66A34E'];
+  let arcs = '';
+  for (let i = 0; i < Math.floor(f.length / 2); i++) {
+    const a = X(i), b = X(f.length - 1 - i), r = (b - a) / 2;
+    arcs += `<path d="M${a} ${base - 14} A ${r} ${Math.min(r, 120)} 0 0 1 ${b} ${base - 14}" fill="none" stroke="${cols[i % cols.length]}" stroke-width="6" stroke-linecap="round" style="animation-delay:${i * 0.3}s"/>`;
+  }
+  let mid = '';
+  if (f.length % 2) { const m = X((f.length - 1) / 2); mid = `<g transform="translate(${m} ${base - 34})"><path d="M0 -11 L3 -3 L11 -3 L5 2 L7 10 L0 5 L-7 10 L-5 2 L-11 -3 L-3 -3Z" fill="#FAA71C" stroke="#D77F28"/></g>`; }
+  const labels = f.map((v, i) => `<text x="${X(i)}" y="${base + 8}" text-anchor="middle">${v}</text>`).join('');
+  return `<svg class="rainbow" viewBox="0 0 ${W} 170">${arcs}${mid}${labels}</svg>`;
+}
+function mRainbow(work, done) {
+  const rb1 = h('div'), rb2 = h('div'), rb3 = h('div');
+  const qs = [
+    { type: 'fill', prompt: 'Find the partner for each factor of **24**.', text: '1 × [] = 24\n2 × [] = 24\n3 × [] = 24\n4 × [] = 24', answers: ['24', '12', '8', '6'], hint: 'Ask: what times this number makes 24?', explain: 'Next would be 5 (no) and then 6 × 4, a turnaround. So 24 has 8 factors.', after: () => { rb1.innerHTML = rainbowSVG(24); say('dig', 'Oh! 6 × 4 is the same pair as 4 × 6. I did count it twice.'); } },
+    { type: 'sort', prompt: 'Pan for the factors of **31**. Drag each number into the pan or wash it away.', bins: ['In the pan: factors of 31', 'Wash away: not factors'], items: [{ label: '1', bin: 0 }, { label: '31', bin: 0 }, { label: '2', bin: 1 }, { label: '3', bin: 1 }, { label: '5', bin: 1 }, { label: '7', bin: 1 }], hint: '31 is odd, its digits add to 4, and it ends in 1. Which numbers can divide it?', explain: '31 ÷ 2, 3, 5 all leave remainders, and 6 × 6 = 36 is past 31, so we can stop. Only 1 and 31.', after: () => { rb2.innerHTML = rainbowSVG(31); } },
+    { type: 'mcq', prompt: 'So what is **31**?', options: ['Prime', 'Composite', 'Neither'], answer: 0, keepOrder: true, hint: 'How many factors did you keep in the pan?', explain: 'Exactly two factors: 31 is prime.' },
+    { type: 'fill', prompt: 'Rainbow for **36**: fill the partners, then count the factors.', text: '1 × [] = 36\n2 × [] = 36\n3 × [] = 36\n4 × [] = 36\n6 × [] = 36\n36 has [] factors.', answers: ['36', '18', '12', '9', '6', '9'], hint: '6 × 6: the 6 partners with itself, so count it once.', explain: '1, 2, 3, 4, 6, 9, 12, 18, 36: nine factors. The middle 6 has no separate partner.', after: () => { rb3.innerHTML = rainbowSVG(36); say('eratos', 'See the star in the middle? 6 pairs with itself, so 36 has an odd number of factors. That happens for square numbers.'); } },
+  ];
+  const cards = seq(work, qs, done);
+  cards[0].el.after(rb1); cards[1].el.after(rb2); cards[3].el.after(rb3);
+}
+
+/* ---------- Mission 5: Sieve ---------- */
+function mSieve(work, done) {
+  const N = 50; const state = Array(N + 1).fill('');
+  const steps = [
+    { say: 'Tap **1**. It is neither prime nor composite, so wash it out.', tap: [1], mode: 'wash' },
+    { say: 'Tap **2** to keep it as gold. The pan will wash out the other multiples of 2.', tap: [2], mode: 'keep', auto: 2 },
+    { say: 'Tap **3** to keep it as gold.', tap: [3], mode: 'keep' },
+    { say: 'Now tap every multiple of **3** that is still in the pan.', targets: 3 },
+    { say: 'Tap **5** to keep it as gold.', tap: [5], mode: 'keep' },
+    { say: 'Tap every multiple of **5** still in the pan.', targets: 5 },
+    { say: 'Tap **7** to keep it as gold.', tap: [7], mode: 'keep' },
+    { say: 'Tap every multiple of **7** still in the pan.', targets: 7 },
+  ];
+  let si = 0, left = [];
+  const instr = h('div', { class: 'instr' }); const leftEl = h('span', { class: 'left' });
+  const grid = h('div', { class: 'sieve' });
+  const btn = {};
+  for (let n = 1; n <= N; n++) { btn[n] = h('button', { type: 'button', 'aria-label': String(n), onclick: () => tap(n) }, n); grid.append(btn[n]); }
+  const pan = h('div', { html: `<svg class="pan" viewBox="0 0 120 60"><g class="shake"><ellipse cx="60" cy="30" rx="54" ry="18" fill="#D77F28"/><ellipse cx="60" cy="26" rx="46" ry="12" fill="#FAA71C"/>${ART.nug.replace('<g', '<g transform="translate(46 24) scale(.7)"')}<rect x="104" y="24" width="16" height="6" rx="3" fill="#1d1d1f"/></g></svg>` });
+  const panel = h('div', { class: 'panel' }, h('div', { class: 'sievebar' }, pan, instr, leftEl), grid);
+  const qwrap = h('div');
+  work.append(panel, qwrap);
+  function setStep() {
+    const s = steps[si];
+    if (!s) return finish();
+    instr.innerHTML = MML.rich(s.say);
+    if (s.targets) { left = []; for (let m = s.targets * 2; m <= N; m += s.targets) if (!state[m]) left.push(m); leftEl.textContent = left.length + ' left'; leftEl.hidden = false; }
+    else leftEl.hidden = true;
+  }
+  function wash(n, delay = 0) { state[n] = 'washed'; setTimeout(() => { btn[n].classList.add('washing'); setTimeout(() => { btn[n].classList.remove('washing'); btn[n].classList.add('washed'); }, 300); }, delay); }
+  function miss(n, msg) { btn[n].classList.remove('miss'); void btn[n].offsetWidth; btn[n].classList.add('miss'); setTimeout(() => btn[n].classList.remove('miss'), 500); say('dig', msg); }
+  function tap(n) {
+    const s = steps[si]; if (!s) return;
+    if (s.tap) {
+      if (!s.tap.includes(n)) return miss(n, 'Not that one yet! ' + s.say.replace(/\*\*/g, ''));
+      if (s.mode === 'wash') wash(n);
+      else { state[n] = 'gold'; btn[n].classList.add('gold'); addNug(5, btn[n]); }
+      if (s.auto) { let d = 0; for (let m = s.auto * 2; m <= N; m += s.auto) if (!state[m]) wash(m, (d++) * 40); say('eratos', 'Whoosh! Every even number except 2 washed away like gravel.'); }
+      si++; setStep(); return;
+    }
+    if (s.targets) {
+      if (state[n] === 'washed') return miss(n, n + ' is already washed away. It was a multiple of a smaller number!');
+      if (state[n] === 'gold') return miss(n, 'Keep ' + n + '! It is gold.');
+      if (n % s.targets) return miss(n, n + ' is not in the ' + s.targets + ' times table. Count on in ' + s.targets + 's.');
+      wash(n); left = left.filter((x) => x !== n); leftEl.textContent = left.length + ' left';
+      if (!left.length) { addNug(10, leftEl); si++; if (s.targets === 7) say('eratos', 'Only 49 was left for 7. Why not shake for 11? 11 × 2, 11 × 3 and 11 × 4 are already gone, and 11 × 5 = 55 is past 50.'); setStep(); }
+    }
+  }
+  function finish() {
+    instr.innerHTML = 'Everything left in the pan turns to gold!'; leftEl.hidden = true;
+    let d = 0; for (let n = 2; n <= N; n++) if (!state[n]) { state[n] = 'gold'; const b = btn[n]; setTimeout(() => b.classList.add('gold'), (d++) * 90); }
+    setTimeout(() => seq(qwrap, [
+      { type: 'fill', prompt: 'Count the gold. How many primes are there from 1 to 50?', text: '[] primes', answers: ['15'], hint: 'Count the gold squares row by row.', explain: '2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47.' },
+      { type: 'multi', prompt: 'Which of these are **twin primes**: two primes with just one number between them?', options: ['11 and 13', '17 and 19', '23 and 25', '41 and 43', '29 and 31', '13 and 15'], answer: [0, 1, 3, 4], hint: '25 and 15 are not prime: 25 = 5 × 5, 15 = 3 × 5.', explain: 'Twin primes in the pan: 3 & 5, 5 & 7, 11 & 13, 17 & 19, 29 & 31, 41 & 43.' },
+    ], done), 1500);
+  }
+  setStep();
+}
+
+/* ---------- Mission 6: Zap Belt ---------- */
+function mZap(work, done) {
+  const items = [[19, 0], [21, 1], [37, 0], [49, 1], [1, 2], [2, 0], [51, 1], [91, 1], [23, 0], [9, 1]].map(([n, b]) => ({ label: String(n), bin: b }));
+  const timer = h('div', { class: 'timer' }, '60 s');
+  work.append(timer);
+  let t = 60, iv = null, started = false;
+  const c = card({ type: 'sort', prompt: 'Sort every nugget. Gold = prime, Rock = composite.', bins: ['Gold: prime', 'Rock: composite', 'Neither'], items, hint: 'Rocks break into rectangles: try 3 × 7, 7 × 7, 3 × 17, 7 × 13.', explain: 'Gold: 2, 19, 23, 37. Rock: 9 (3 × 3), 21 (3 × 7), 49 (7 × 7), 51 (3 × 17), 91 (7 × 13). Neither: 1.' },
+    { mode: 'practice', num: '⚡', checkLabel: 'Zap!', onDone: (r) => { clearInterval(iv); addNug(r.firstTry ? 10 : r.shown ? 0 : 5, c.el);
+      if (r.correct && t > 0) { addNug(Math.ceil(t / 6), timer); timer.textContent = 'Beat the clock with ' + t + ' s to spare!'; say('nova', 'Lightning fast! Bonus nuggets for you.'); }
+      done(); } });
+  c.el.classList.add('zap'); work.append(c.el);
+  c.w.onChange = () => { if (started) return; started = true; iv = setInterval(() => { t--; timer.textContent = t + ' s'; timer.classList.toggle('low', t <= 10); if (t <= 0) { clearInterval(iv); timer.textContent = 'Time! Keep sorting, no rush.'; } }, 1000); };
+}
+
+/* ---------- Mission 7: Dig's Claims ---------- */
+function mClaims(work, done) {
+  seq(work, [
+    { type: 'mcq', prompt: 'Dig says: **"1 is prime, because only 1 divides it."**', options: ['False: a prime needs exactly two different factors, and 1 has only one', 'True: 1 is the smallest prime', 'True: nothing else divides 1', 'False: 1 is an even number'], answer: 0, hint: 'Count the factors of 1. How many different ones?', explain: '1 is neither prime nor composite.' },
+    { type: 'mcq', prompt: 'Dig says: **"9 is prime, because it is odd."**', options: ['False: 9 = 3 × 3, so it has three factors', 'True: all odd numbers are prime', 'True: 2 does not divide 9', 'False: 9 is even'], answer: 0, hint: 'Can you build 9 as a square?', explain: 'Factors of 9: 1, 3, 9. Composite.' },
+    { type: 'mcq', prompt: 'Dig says: **"2 cannot be prime, because it is even."**', options: ['False: its only factors are 1 and 2', 'True: even numbers are never prime', 'True: 2 = 1 + 1', 'False: 2 is odd'], answer: 0, hint: 'List the factors of 2.', explain: '2 is the only even prime.' },
+    { type: 'mcq', prompt: 'Dig says: **"Testing 23, I can stop after 4, because 5 × 5 = 25 is past 23."**', options: ['True: any bigger factor would pair with a smaller one I already tested', 'False: you must test every number up to 23', 'False: you must test up to 11', 'True: 23 is odd so you never need to test'], answer: 0, hint: 'Think about the turnaround in Rectangle Rocks.', explain: 'This is the Turnaround Stop. 23 is prime.' },
+    { type: 'match', prompt: 'Match each number to **how many factors** it has.', left: ['7', '16', '1', '12'], right: ['2 factors', '5 factors', '1 factor', '6 factors'], answer: [0, 1, 2, 3], hint: 'List the factors: 12 → 1, 2, 3, 4, 6, 12.', explain: '7: 1, 7. 16: 1, 2, 4, 8, 16. 1: just 1. 12: 1, 2, 3, 4, 6, 12.' },
+  ], done);
+  setTimeout(() => say('dig', 'Hmm… maybe my notebook needs an eraser.'), 1500);
+}
+
+/* ---------- Mission 8: Exit ---------- */
+function mExit(work, done) {
+  seq(work, [
+    { type: 'fill', prompt: 'Test each row for **42**. Write the partner, or ✗ (type x) if it does not work.', text: '1 × [] = 42\n2 × [] = 42\n3 × [] = 42\n4 × [] = 42\n5 × [] = 42\n6 × [] = 42', answers: ['42', '21', '14', 'x', 'x', '7'], hint: '42 ÷ 4 and 42 ÷ 5 leave remainders.', explain: 'Factor pairs of 42: 1 × 42, 2 × 21, 3 × 14, 6 × 7. 7 × 7 = 49 is past 42, so stop.' },
+    { type: 'mcq', prompt: 'Is **47** prime or composite?', options: ['Prime: 2, 3 and 5 do not divide it, and 7 × 7 = 49 is past 47', 'Composite: 47 = 7 × 7', 'Composite: it is odd', 'Prime: it ends in 7'], answer: 0, hint: 'Use the Turnaround Stop. Which numbers do you need to test?', explain: '47 is gold!' },
+    { type: 'mcq', prompt: 'Finish the sentence: **1 is neither prime nor composite because…**', options: ['it has only one factor', 'it is odd', 'it is the first number', 'you cannot multiply it'], answer: 0, hint: 'Primes have exactly two different factors.' },
+  ], done);
+}
+
+/* ---------- boot ---------- */
+document.querySelectorAll('.map .shaft').forEach((g) => { g.addEventListener('click', () => openMission(+g.dataset.m)); g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMission(+g.dataset.m); } }); });
+$('#backBtn').onclick = () => { document.body.classList.remove('in-mission'); refreshMap(); };
+$('#goHome').onclick = $('#backBtn').onclick;
+$('#nextBtn').onclick = () => { if (S.cur === 7) { document.body.classList.remove('in-mission'); refreshMap(); if (S.lit.size === 8) party(); return; } openMission(S.cur + 1); };
+$('#partyClose').onclick = () => { $('#party').classList.remove('on'); document.body.classList.remove('in-mission'); refreshMap(); };
+$('#resetBtn').onclick = () => { if (!confirm('Restart the whole canyon? Progress will be cleared.')) return; S.nug = 0; S.lit.clear(); $('#nugCount').textContent = 0; document.body.classList.remove('in-mission'); refreshMap(); };
+refreshMap();
+
+</script>
+</body>
+</html>

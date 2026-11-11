@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Remainder Carnival · Booth Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--ink:#1d1d1f;--muted:#5b6467;--surface:#fff;--line:#d9eef0;--pri:#00A7B2;--pri-dark:#00818a;--pri-soft:#e3f6f7;--acc:#FAA71C;--acc-soft:#fff1d6;--burnt:#D77F28;
+--ok:#047857;--ok-soft:#e1f4ec;--bad:#C92426;--bad-soft:#fde8e8;--fd:'Bangers','Impact',system-ui,sans-serif;--fb:'Lexend',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--fb);font-size:17px;line-height:1.45}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* Engine components. Theme supplies: --ink --muted --surface --line --pri --pri-soft --acc --acc-soft --ok --ok-soft --bad --bad-soft --fd --fb */
+.q-card{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:18px 18px 14px;margin:0 0 16px;position:relative}
+.q-card.is-right{border-color:var(--ok)}
+.q-card.is-wrong{border-color:var(--bad)}
+.q-card.is-shown{border-color:var(--acc)}
+.q-head{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.q-num{font-family:var(--fd);font-size:1rem;background:var(--pri);color:#fff;border-radius:10px;min-width:2em;height:2em;display:inline-grid;place-items:center;padding:0 .4em}
+.q-type{font-size:.78rem;color:var(--muted);letter-spacing:.02em}
+.q-prompt{font-size:1.08rem;line-height:1.5;margin-bottom:12px;color:var(--ink)}
+.q-visual{margin:4px 0 12px}
+.q-chip{display:inline-block;background:var(--pri-soft);border-radius:8px;padding:0 .4em;font-weight:600}
+.q-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.q-options.many{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+.q-options.wide{grid-template-columns:1fr}
+.q-opt{font:inherit;font-size:1.02rem;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
+.q-options.many .q-opt{text-align:center;font-family:var(--fd);font-size:1.25rem;padding:10px 6px}
+.q-opt:hover{border-color:var(--pri);transform:translateY(-1px)}
+.q-opt.on{border-color:var(--pri);background:var(--pri-soft);box-shadow:0 0 0 3px var(--pri-soft)}
+.q-opt.good{border-color:var(--ok);background:var(--ok-soft)}
+.q-opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.q-opt.missed{border-style:dashed;border-color:var(--ok)}
+.locked .q-opt{cursor:default;transform:none}
+.q-fill{font-size:1.15rem;line-height:2.4;color:var(--ink)}
+.q-blank{font:inherit;font-family:var(--fd);font-size:1.2rem;text-align:center;border:none;border-bottom:3px solid var(--pri);background:var(--pri-soft);border-radius:10px 10px 4px 4px;padding:2px 6px;margin:0 4px;color:var(--ink);outline:none;min-width:2.2em}
+.q-blank:focus{box-shadow:0 0 0 3px var(--acc-soft);border-bottom-color:var(--acc)}
+.q-blank.good{border-bottom-color:var(--ok);background:var(--ok-soft)}
+.q-blank.bad{border-bottom-color:var(--bad);background:var(--bad-soft)}
+.q-sort{display:flex;flex-direction:column;gap:12px}
+.q-tray{min-height:58px;display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:2px dashed var(--line);border-radius:14px;background:#fff;align-items:center}
+.q-sort.tray-empty .q-tray{min-height:24px;padding:4px}
+.q-bins{display:grid;gap:10px}
+.q-bins.n2{grid-template-columns:1fr 1fr}.q-bins.n3{grid-template-columns:repeat(3,1fr)}.q-bins.n4{grid-template-columns:repeat(2,1fr)}
+.q-bin{border:2px solid var(--line);border-radius:14px;background:var(--pri-soft);min-height:110px;padding:8px;transition:background .15s,border-color .15s}
+.q-bin:nth-child(2){background:var(--acc-soft)}.q-bin:nth-child(3){background:#f1f3f4}
+.q-bin.hover,.q-tray.hover{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-soft)}
+.q-bin-title{font-family:var(--fd);font-size:1rem;margin-bottom:6px;color:var(--ink)}
+.q-bin-body{display:flex;flex-wrap:wrap;gap:6px;min-height:50px}
+.q-dchip{font:inherit;font-family:var(--fd);font-size:1.15rem;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:6px 12px;cursor:grab;touch-action:none;user-select:none;color:var(--ink)}
+.q-dchip.picked{background:var(--acc);border-color:var(--acc);color:#fff;transform:scale(1.06)}
+.q-dchip.dragging{opacity:.3}
+.q-dchip.good{border-color:var(--ok);background:var(--ok-soft)}
+.q-dchip.bad{border-color:var(--bad);background:var(--bad-soft)}
+.q-ghost{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) rotate(-4deg) scale(1.08);box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.locked .q-dchip{cursor:default}
+.q-match{display:grid;grid-template-columns:1fr 24px 1fr;gap:8px;align-items:start}
+.q-mcol{display:flex;flex-direction:column;gap:8px}
+.q-mitem{font:inherit;font-size:1.02rem;background:#fff;border:2px solid var(--line);border-left:8px solid var(--pc,transparent);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;position:relative;color:var(--ink)}
+.q-mitem.r{border-left-width:2px;border-right:8px solid var(--pc,transparent)}
+.q-mitem.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.q-mitem.paired::after{content:attr(data-tag);position:absolute;top:-8px;right:-8px;background:var(--pc);color:#fff;font-family:var(--fd);font-size:.8rem;width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.q-mitem.r.paired::after{right:auto;left:-8px}
+.q-mitem.good{background:var(--ok-soft)}.q-mitem.bad{background:var(--bad-soft)}
+.q-mmid{align-self:stretch;background:repeating-linear-gradient(var(--line) 0 6px,transparent 6px 12px);width:3px;margin:auto}
+.q-actions{display:flex;gap:10px;margin-top:14px}
+.q-check,.q-show{font:inherit;font-family:var(--fd);font-size:1.05rem;border:none;border-radius:14px;padding:10px 22px;cursor:pointer}
+.q-check{background:var(--pri);color:#fff;box-shadow:0 4px 0 var(--pri-dark,#00818a)}
+.q-check:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pri-dark,#00818a)}
+.q-show{background:#fff;border:2px solid var(--acc);color:var(--ink)}
+.q-fb{min-height:1.4em;margin-top:10px;font-size:1rem;line-height:1.45}
+.q-fb .ok{color:var(--ok);font-weight:700}.q-fb .bad{color:var(--bad);font-weight:600}.q-fb .info{color:var(--ink)}
+.q-fb .why{color:var(--ink);font-weight:400;margin-top:4px;font-size:.95rem}
+.q-peek{font:inherit;font-size:.9rem;background:none;border:none;color:var(--pri);text-decoration:underline;cursor:pointer}
+.shake{animation:qshake .4s}
+@keyframes qshake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.s-panel{margin-top:14px}
+.s-row{display:flex;flex-wrap:wrap;gap:10px}
+.s-btn{font:inherit;font-family:var(--fd);font-size:1rem;text-decoration:none;color:var(--ink);background:#fff;border:2px solid var(--pri);border-radius:12px;padding:9px 16px;cursor:pointer}
+.s-btn.s-main{background:var(--pri);color:#fff}
+.s-status{min-height:1.3em;margin-top:8px;color:var(--ok);font-weight:600}
+@media (max-width:620px){.q-options{grid-template-columns:1fr}.q-options.many{grid-template-columns:repeat(4,1fr)}.q-bins.n3{grid-template-columns:1fr}.q-match{grid-template-columns:1fr 10px 1fr}.q-mitem{font-size:.92rem;padding:8px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+.chr{display:block;overflow:visible}
+.chr .bob{animation:bob 3s ease-in-out infinite}
+.chr .juggle{animation:jig 1.2s ease-in-out infinite}
+.chr .blink{animation:blink 4.2s infinite;transform-box:fill-box;transform-origin:center}
+.chr .wave{animation:wave 2s ease-in-out infinite;transform-box:fill-box;transform-origin:left bottom}
+.chr .balls{animation:balls 1.2s linear infinite;transform-box:fill-box;transform-origin:center}
+.chr .orb{animation:orb 2s ease-in-out infinite}
+.chr .nose{animation:honk 1.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes jig{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes wave{50%{transform:rotate(-14deg)}}
+@keyframes balls{to{transform:rotate(20deg) translateY(-4px)}}
+@keyframes orb{50%{opacity:.75}}
+@keyframes honk{50%{transform:scale(1.2)}}
+.chr.talk .bob,.chr.talk .juggle{animation-duration:.7s}
+
+.cover{background:linear-gradient(180deg,#d6f4f6 0%,#fff 100%);border-bottom:6px solid var(--burnt);position:relative;overflow:hidden}
+.cover .in{max-width:1060px;margin:0 auto;padding:26px 20px 22px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end}
+.cover h1{font-family:var(--fd);font-weight:400;font-size:clamp(2rem,5vw,3.3rem);line-height:1;margin:0}
+.cover p{margin:8px 0 14px;max-width:52ch}
+.cover .chars{display:flex;align-items:flex-end;gap:4px}.cover .chars .chr{width:110px}.cover .chars .dig{width:120px}
+.namebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.namebar label{font-weight:600}
+.namebar input{font:inherit;border:2px solid var(--pri);border-radius:12px;padding:9px 12px;min-width:220px;background:#fff}
+.ridge{position:absolute;left:0;right:0;bottom:0;height:46px;width:100%;opacity:.55;pointer-events:none}
+.book{max-width:1060px;margin:22px auto 60px;padding:0 20px;display:grid;grid-template-columns:120px 1fr;gap:0}
+.tabs{display:flex;flex-direction:column;gap:8px;padding-top:24px;position:sticky;top:12px;align-self:start}
+.tab{font:inherit;text-align:left;border:2px solid var(--line);border-right:none;border-radius:14px 0 0 14px;padding:10px 10px 10px 12px;background:#fff;cursor:pointer;position:relative;color:var(--ink)}
+.tab b{font-family:var(--fd);font-weight:400;font-size:1.5rem;display:block;line-height:1}
+.tab small{font-size:.72rem;color:var(--muted);display:block}
+.tab.on{background:var(--acc-soft);border-color:var(--acc);margin-right:-3px;z-index:2}
+.tab .stamp{position:absolute;right:6px;top:6px;font-family:var(--fd);font-size:.78rem;color:#fff;background:var(--ok);border-radius:8px;padding:1px 6px;transform:rotate(6deg)}
+.tab .stamp.mid{background:var(--acc);color:var(--ink)}.tab .stamp.low{background:var(--bad)}
+.page{border:3px solid var(--acc);border-radius:0 24px 24px 24px;background:#fff;background-image:repeating-linear-gradient(transparent 0 33px,#e7f5f6 33px 34px);padding:26px 26px 22px 40px;position:relative;min-height:520px}
+.page::before{content:"";position:absolute;left:22px;top:0;bottom:0;width:2px;background:#f7c3c3}
+.phead{display:flex;gap:16px;align-items:center;margin-bottom:14px}
+.phead .let{font-family:var(--fd);font-size:3rem;line-height:1;color:var(--burnt);width:64px;height:64px;border:3px dashed var(--burnt);border-radius:50%;display:grid;place-items:center;transform:rotate(-6deg);flex:none;background:#fff}
+.phead h2{font-family:var(--fd);font-weight:400;font-size:1.8rem;margin:0;line-height:1.05}
+.phead p{margin:4px 0 0;color:var(--muted)}
+.note{display:flex;gap:10px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:16px;padding:8px 12px;margin-bottom:16px}
+.note .face{width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--pri-soft);flex:none;display:grid;place-items:center}
+.note .face svg{width:46px;margin-top:8px}
+.pfoot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px}
+.btn{font-family:var(--fd);font-size:1.08rem;border-radius:14px;padding:10px 20px;cursor:pointer;border:2px solid var(--pri);background:#fff;color:var(--ink)}
+.btn.main{background:var(--pri);color:#fff;box-shadow:0 4px 0 var(--pri-dark)}
+.btn.gold{background:var(--acc);border-color:var(--acc);box-shadow:0 4px 0 var(--burnt)}
+.warn{color:var(--bad);font-weight:600}
+.pscore{font-family:var(--fd);font-size:1.3rem;color:var(--ok)}
+.results .seal{width:170px;height:170px;border-radius:50%;background:var(--acc);border:8px double var(--burnt);display:grid;place-items:center;text-align:center;font-family:var(--fd);color:var(--ink);transform:rotate(-8deg);margin:6px auto 14px;animation:stamp .5s both}
+.results .seal b{display:block;font-size:2.6rem;font-weight:400;line-height:1}
+@keyframes stamp{from{transform:scale(2) rotate(-20deg);opacity:0}}
+.rtable{width:100%;border-collapse:collapse;margin:10px 0 6px;background:#fff}
+.rtable td,.rtable th{border-bottom:2px solid var(--line);padding:8px 6px;text-align:left}
+.rtable th{font-family:var(--fd);font-weight:400}
+.bar{height:12px;background:var(--line);border-radius:999px;overflow:hidden;min-width:80px}.bar i{display:block;height:100%;background:var(--pri)}
+.foot{color:var(--muted);font-size:.8rem;text-align:center;margin:20px 0}
+@media (max-width:760px){.cover .in{grid-template-columns:1fr}.cover .chars{display:none}.book{grid-template-columns:1fr}.tabs{flex-direction:row;overflow-x:auto;position:static;padding-top:0;gap:6px}.tab{border-radius:14px 14px 0 0;border-right:2px solid var(--line);border-bottom:none;min-width:64px}.tab small{display:none}.tab.on{margin-right:0;margin-bottom:-3px}.page{border-radius:0 0 22px 22px;padding:20px 14px 18px 26px}.page::before{left:12px}}
+:root{--pri:#e65200;--pri-dark:#a63b00;--pri-soft:#ffeadb;--acc:#FAA71C;--acc-soft:#fff1d6;--burnt:#00A7B2;--line:#f8dcc8;--fd:'Bangers','Impact',system-ui,sans-serif}.note .who,.who{font-family:var(--fd);font-weight:400;color:var(--burnt)}
+
+.cover{background:#fff;border-bottom:6px solid #C92426}.cover .ridge{top:0;bottom:auto}.cover h1{font-family:var(--fd);color:#C92426;letter-spacing:.05em}.cover .chars .chr{width:110px}
+.tab b{letter-spacing:.05em}.tab.on{background:#FAA71C;border-color:#C92426}
+.page{border:5px solid #C92426;border-radius:0 26px 26px 26px;background-image:radial-gradient(#ffeadb 1.5px,transparent 1.5px);background-size:22px 22px}
+.page::before{display:none}
+.phead .let{border:4px solid #00A7B2;color:#00A7B2;border-radius:14px;transform:rotate(-6deg)}
+.btn.main{background:#C92426;border-color:#C92426;box-shadow:0 4px 0 #8f1a1b}.btn.gold{background:#FAA71C;border-color:#FAA71C}
+.results .seal{background:#FAA71C;border-color:#C92426}
+
+</style>
+</head>
+<body>
+<header class="cover"><div class="in">
+ <div><h1>Booth Book</h1>
+  <p>Five pages of carnival stories. Divide, then decide what the remainder means. Answer everything on a page, then press <b>Check this page</b>. Share your results at the end.</p>
+  <div class="namebar"><label for="nm">Your name</label><input id="nm" autocomplete="off" placeholder="Type your name"></div></div>
+ <div class="chars"><svg class="chr rosa" viewBox="0 0 120 150" role="img" aria-label="Ringmaster Rosa">
+<ellipse cx="60" cy="146" rx="32" ry="4" fill="#000" opacity=".08"/>
+<g class="bob">
+ <path d="M30 100 Q60 90 90 100 L96 142 L24 142Z" fill="#C92426"/><path d="M54 98 L60 142 L66 98Z" fill="#fff"/>
+ <circle cx="44" cy="112" r="3" fill="#FAA71C"/><circle cx="76" cy="112" r="3" fill="#FAA71C"/><circle cx="44" cy="126" r="3" fill="#FAA71C"/><circle cx="76" cy="126" r="3" fill="#FAA71C"/>
+ <g class="wave"><rect x="88" y="98" width="11" height="28" rx="5" fill="#C92426" transform="rotate(-40 94 102)"/><path d="M106 86 l12 -20" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"/><circle cx="118" cy="66" r="4" fill="#fff"/><circle cx="104" cy="88" r="6" fill="#c98a5c"/></g>
+ <circle cx="60" cy="68" r="28" fill="#c98a5c"/>
+ <path d="M32 66 Q30 40 60 38 Q90 40 88 66 Q86 50 60 50 Q34 50 32 66Z" fill="#1d1d1f"/>
+ <g class="blink"><ellipse cx="50" cy="70" rx="4" ry="5" fill="#1d1d1f"/><ellipse cx="70" cy="70" rx="4" ry="5" fill="#1d1d1f"/><circle cx="51.3" cy="68.5" r="1.4" fill="#fff"/><circle cx="71.3" cy="68.5" r="1.4" fill="#fff"/></g>
+ <path d="M50 84 Q60 92 70 84" stroke="#1d1d1f" stroke-width="3" fill="none" stroke-linecap="round"/>
+ <rect x="40" y="12" width="40" height="30" rx="3" fill="#1d1d1f"/><rect x="40" y="30" width="40" height="6" fill="#C92426"/><ellipse cx="60" cy="42" rx="32" ry="6" fill="#1d1d1f"/>
+</g></svg><svg class="chr marbles" viewBox="0 0 130 150" role="img" aria-label="Madame Marbles">
+<ellipse cx="65" cy="146" rx="40" ry="4" fill="#000" opacity=".08"/>
+<g class="bob">
+ <path d="M28 108 Q65 90 102 108 L110 144 L20 144Z" fill="#047857"/><path d="M28 108 Q65 126 102 108" stroke="#FAA71C" stroke-width="4" fill="none"/>
+ <circle cx="65" cy="66" r="26" fill="#f2c79a"/>
+ <path d="M37 60 Q36 32 65 30 Q94 32 93 60 Q90 44 65 44 Q40 44 37 60Z" fill="#D77F28"/>
+ <path d="M34 52 Q65 20 96 52 L96 44 Q65 10 34 44Z" fill="#00A7B2"/><circle cx="65" cy="26" r="6" fill="#FAA71C"/>
+ <g class="blink"><path d="M52 66 q5 -5 10 0 M68 66 q5 -5 10 0" stroke="#1d1d1f" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+ <path d="M56 80 Q65 86 74 80" stroke="#1d1d1f" stroke-width="3" fill="none" stroke-linecap="round"/>
+ <circle cx="46" cy="76" r="4" fill="#FAA71C"/><circle cx="84" cy="76" r="4" fill="#FAA71C"/>
+ <g class="orb"><circle cx="65" cy="118" r="18" fill="#d6f4f6" stroke="#00A7B2" stroke-width="3"/><circle cx="59" cy="112" r="5" fill="#fff" opacity=".9"/><text x="65" y="124" text-anchor="middle" font-size="12" font-weight="800" fill="#00A7B2">R?</text></g>
+</g></svg></div></div><svg class="ridge" viewBox="0 0 1000 46" preserveAspectRatio="none"><path d="M0 0 h50 l-25 30z" fill="#C92426"/><path d="M50 0 h50 l-25 30z" fill="#FAA71C"/><path d="M100 0 h50 l-25 30z" fill="#00A7B2"/><path d="M150 0 h50 l-25 30z" fill="#C92426"/><path d="M200 0 h50 l-25 30z" fill="#FAA71C"/><path d="M250 0 h50 l-25 30z" fill="#00A7B2"/><path d="M300 0 h50 l-25 30z" fill="#C92426"/><path d="M350 0 h50 l-25 30z" fill="#FAA71C"/><path d="M400 0 h50 l-25 30z" fill="#00A7B2"/><path d="M450 0 h50 l-25 30z" fill="#C92426"/><path d="M500 0 h50 l-25 30z" fill="#FAA71C"/><path d="M550 0 h50 l-25 30z" fill="#00A7B2"/><path d="M600 0 h50 l-25 30z" fill="#C92426"/><path d="M650 0 h50 l-25 30z" fill="#FAA71C"/><path d="M700 0 h50 l-25 30z" fill="#00A7B2"/><path d="M750 0 h50 l-25 30z" fill="#C92426"/><path d="M800 0 h50 l-25 30z" fill="#FAA71C"/><path d="M850 0 h50 l-25 30z" fill="#00A7B2"/><path d="M900 0 h50 l-25 30z" fill="#C92426"/><path d="M950 0 h50 l-25 30z" fill="#FAA71C"/></svg>
+</header>
+<div class="book"><nav class="tabs" id="tabs" aria-label="Pages"></nav><section class="page" id="page"></section></div>
+<p class="foot">MyMasteryLab · Remainder Carnival</p>
+<script>/* MML Unit 4 question engine: mcq, multi, fill, sort (drag & drop), match.
+   Modes: "practice" (check + hints + retry), "test" (graded on submit), "diagnostic" (no feedback). */
+const MML = (() => {
+  const h = (tag, attrs = {}, ...kids) => {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'html') el.innerHTML = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat()) {
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  };
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const pick = (a, n) => shuffle(a).slice(0, n);
+  const rint = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+
+  const norm = (s) => {
+    let t = String(s ?? '').trim().toLowerCase();
+    t = t.replace(/[✗✘×]/g, (m) => (m === '×' ? 'x' : 'x'));
+    if (['-', '—', 'no', 'none', 'n', 'not', 'nope'].includes(t)) t = 'x';
+    return t.replace(/[\s,]/g, '');
+  };
+  const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
+
+  /* Rich text: **bold**, `chip` and line breaks */
+  const rich = (s) => String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/`(.+?)`/g, '<span class="q-chip">$1</span>')
+    .replace(/\n/g, '<br>');
+
+  /* ---------- individual question widgets ---------- */
+  function mcq(q, multi) {
+    const order = q.keepOrder ? q.options.map((_, i) => i) : shuffle(q.options.map((_, i) => i));
+    const sel = new Set();
+    const box = h('div', { class: 'q-options' + (q.options.length > 4 && q.options.every((o) => String(o).length <= 5) ? ' many' : '') + (q.wide ? ' wide' : '') });
+    const btns = {};
+    order.forEach((i) => {
+      const b = h('button', { class: 'q-opt', type: 'button', html: rich(q.options[i]),
+        onclick: () => {
+          if (box.classList.contains('locked')) return;
+          if (multi) { sel.has(i) ? sel.delete(i) : sel.add(i); }
+          else { sel.clear(); sel.add(i); }
+          Object.entries(btns).forEach(([k, el]) => el.classList.toggle('on', sel.has(+k)));
+          api.onChange && api.onChange();
+        } });
+      btns[i] = b; box.append(b);
+    });
+    const ans = multi ? q.answer : [q.answer];
+    const api = {
+      el: box,
+      answered: () => sel.size > 0,
+      check() {
+        const picked = [...sel];
+        if (!multi) return picked[0] === q.answer ? 1 : 0;
+        const right = picked.filter((x) => ans.includes(x)).length;
+        const wrong = picked.length - right;
+        return Math.max(0, (right - wrong) / ans.length);
+      },
+      mark() { Object.entries(btns).forEach(([k, el]) => {
+        const isAns = ans.includes(+k), on = sel.has(+k);
+        el.classList.toggle('good', isAns && on); el.classList.toggle('bad', !isAns && on); el.classList.toggle('missed', isAns && !on);
+      }); },
+      clearMarks() { Object.values(btns).forEach((el) => el.classList.remove('good', 'bad', 'missed')); },
+      reveal() { sel.clear(); ans.forEach((a) => sel.add(a)); Object.entries(btns).forEach(([k, el]) => el.classList.toggle('on', sel.has(+k))); api.mark(); },
+      lock() { box.classList.add('locked'); },
+      value: () => [...sel].map((i) => q.options[i]).join(', '),
+    };
+    return api;
+  }
+
+  function fill(q) {
+    const wrap = h('div', { class: 'q-fill' });
+    const inputs = [];
+    const parts = String(q.text).split('[]');
+    const answers = q.answers.map((a) => (Array.isArray(a) ? a : [a]).map(norm));
+    parts.forEach((p, i) => {
+      if (p) wrap.append(h('span', { html: rich(p) }));
+      if (i < parts.length - 1) {
+        const accept = answers[i] || [''];
+        const numeric = accept.every((a) => /^\d+$/.test(a) || a === 'x');
+        const w = Math.max(2.4, Math.max(...accept.map((a) => a.length)) * 0.75 + 1.4);
+        const inp = h('input', { class: 'q-blank', type: 'text', autocomplete: 'off', spellcheck: 'false',
+          inputmode: numeric && !accept.includes('x') ? 'numeric' : 'text', 'aria-label': 'answer ' + (i + 1),
+          style: `width:${q.width || w}em`, oninput: () => { inp.classList.remove('good', 'bad'); api.onChange && api.onChange(); } });
+        inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const nx = inputs[inputs.indexOf(inp) + 1]; nx ? nx.focus() : api.onEnter && api.onEnter(); } });
+        inputs.push(inp); wrap.append(inp);
+      }
+    });
+    const ok = (i) => answers[i].includes(norm(inputs[i].value));
+    const api = {
+      el: wrap,
+      answered: () => inputs.every((x) => x.value.trim() !== ''),
+      check() { if (q.anyOrder) { const vals = inputs.map((x) => norm(x.value)); const pool = answers.map((a) => a[0]); let n = 0; const used = []; vals.forEach((v) => { const k = pool.findIndex((p, j) => p === v && !used.includes(j)); if (k > -1) { used.push(k); n++; } }); return n / inputs.length; }
+        return inputs.filter((_, i) => ok(i)).length / inputs.length; },
+      mark() { if (q.anyOrder) { const pool = answers.map((a) => a[0]); const used = []; inputs.forEach((x) => { const k = pool.findIndex((p, j) => p === norm(x.value) && !used.includes(j)); if (k > -1) used.push(k); x.classList.toggle('good', k > -1); x.classList.toggle('bad', k < 0); }); return; }
+        inputs.forEach((x, i) => { x.classList.toggle('good', ok(i)); x.classList.toggle('bad', !ok(i)); }); },
+      clearMarks() { inputs.forEach((x) => x.classList.remove('good', 'bad')); },
+      reveal() { inputs.forEach((x, i) => { const raw = (Array.isArray(q.answers[i]) ? q.answers[i][0] : q.answers[i]); x.value = raw === 'x' ? '✗' : raw; }); api.mark(); },
+      lock() { inputs.forEach((x) => (x.readOnly = true)); },
+      focus() { inputs[0] && inputs[0].focus(); },
+      value: () => inputs.map((x) => x.value.trim() || '·').join(' | '),
+    };
+    return api;
+  }
+
+  /* Drag & drop sort with pointer drag + tap-to-place */
+  let dragSel = null;
+  function sort(q) {
+    const wrap = h('div', { class: 'q-sort' });
+    const tray = h('div', { class: 'q-tray', 'data-bin': '-1' });
+    const bins = q.bins.map((b, i) => h('div', { class: 'q-bin', 'data-bin': i }, h('div', { class: 'q-bin-title', html: rich(b) }), h('div', { class: 'q-bin-body' })));
+    const chips = shuffle(q.items.map((it, i) => ({ ...it, i }))).map((it) => {
+      const c = h('button', { class: 'q-dchip', type: 'button', 'data-i': it.i, html: rich(it.label) });
+      c._bin = -1; return c;
+    });
+    chips.forEach((c) => tray.append(c));
+    const binRow = h('div', { class: 'q-bins n' + q.bins.length }, ...bins);
+    wrap.append(tray, binRow);
+    const place = (chip, bi) => {
+      if (wrap.classList.contains('locked')) return;
+      chip._bin = bi; chip.classList.remove('good', 'bad', 'picked');
+      (bi < 0 ? tray : bins[bi].querySelector('.q-bin-body')).append(chip);
+      dragSel = null; wrap.querySelectorAll('.q-dchip.picked').forEach((x) => x.classList.remove('picked'));
+      api.onChange && api.onChange();
+      wrap.classList.toggle('tray-empty', chips.every((c) => c._bin >= 0));
+    };
+    [tray, ...bins].forEach((z) => z.addEventListener('click', (e) => {
+      if (e.target.closest('.q-dchip')) return;
+      if (dragSel && wrap.contains(dragSel)) place(dragSel, +z.dataset.bin);
+    }));
+    chips.forEach((c) => {
+      let sx, sy, ghost = null, moved = false;
+      c.addEventListener('pointerdown', (e) => {
+        if (wrap.classList.contains('locked')) return;
+        sx = e.clientX; sy = e.clientY; moved = false; c.setPointerCapture(e.pointerId);
+      });
+      c.addEventListener('pointermove', (e) => {
+        if (sx == null) return;
+        if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 6) {
+          moved = true; ghost = c.cloneNode(true); ghost.classList.add('q-ghost'); document.body.append(ghost); c.classList.add('dragging');
+        }
+        if (ghost) { ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+          const t = document.elementFromPoint(e.clientX, e.clientY); [tray, ...bins].forEach((z) => z.classList.toggle('hover', z.contains(t))); }
+      });
+      const end = (e) => {
+        if (sx == null) return; sx = null;
+        if (ghost) {
+          ghost.remove(); ghost = null; c.classList.remove('dragging');
+          [tray, ...bins].forEach((z) => z.classList.remove('hover'));
+          const t = document.elementFromPoint(e.clientX, e.clientY);
+          const z = t && t.closest('[data-bin]');
+          if (z && wrap.contains(z)) place(c, +z.dataset.bin);
+        } else if (!moved) {
+          if (wrap.classList.contains('locked')) return;
+          if (dragSel && dragSel !== c && wrap.contains(dragSel) && c._bin !== dragSel._bin) { place(dragSel, c._bin); return; }
+          const was = c.classList.contains('picked');
+          wrap.querySelectorAll('.q-dchip.picked').forEach((x) => x.classList.remove('picked'));
+          if (!was) { c.classList.add('picked'); dragSel = c; } else dragSel = null;
+        }
+      };
+      c.addEventListener('pointerup', end); c.addEventListener('pointercancel', () => { sx = null; if (ghost) { ghost.remove(); ghost = null; c.classList.remove('dragging'); } });
+    });
+    const api = {
+      el: wrap,
+      answered: () => chips.every((c) => c._bin >= 0),
+      check: () => chips.filter((c) => c._bin === q.items[+c.dataset.i].bin).length / chips.length,
+      mark() { chips.forEach((c) => { const ok = c._bin === q.items[+c.dataset.i].bin; c.classList.toggle('good', ok); c.classList.toggle('bad', !ok); }); },
+      clearMarks() { chips.forEach((c) => c.classList.remove('good', 'bad')); },
+      reveal() { chips.forEach((c) => place(c, q.items[+c.dataset.i].bin)); api.mark(); },
+      lock() { wrap.classList.add('locked'); },
+      value: () => q.bins.map((b, i) => b.replace(/\*|`/g, '') + ': ' + chips.filter((c) => c._bin === i).map((c) => q.items[+c.dataset.i].label).join(' ')).join('; '),
+      // for programmatic tests
+      _place: (label, bi) => { const c = chips.find((x) => q.items[+x.dataset.i].label === label); place(c, bi); },
+    };
+    return api;
+  }
+
+  const PAIR_COLORS = ['#00A7B2', '#FAA71C', '#047857', '#C92426', '#D77F28', '#66A34E', '#7a5cc4'];
+  function match(q) {
+    const wrap = h('div', { class: 'q-match' });
+    const L = h('div', { class: 'q-mcol' }), R = h('div', { class: 'q-mcol' });
+    const rOrder = shuffle(q.right.map((_, i) => i));
+    const pairs = {}; // left i -> right j
+    let selL = null;
+    const lEls = q.left.map((t, i) => h('button', { class: 'q-mitem', type: 'button', html: rich(t), onclick: () => { if (wrap.classList.contains('locked')) return; selL = selL === i ? null : i; draw(); } }));
+    const rEls = {};
+    rOrder.forEach((j) => { rEls[j] = h('button', { class: 'q-mitem r', type: 'button', html: rich(q.right[j]), onclick: () => {
+      if (wrap.classList.contains('locked')) return;
+      if (selL == null) { const owner = Object.keys(pairs).find((k) => pairs[k] === j); if (owner != null) { delete pairs[owner]; draw(); } return; }
+      Object.keys(pairs).forEach((k) => { if (pairs[k] === j) delete pairs[k]; });
+      pairs[selL] = j; selL = null; draw(); api.onChange && api.onChange(); } }); });
+    lEls.forEach((e) => L.append(e)); rOrder.forEach((j) => R.append(rEls[j]));
+    wrap.append(L, h('div', { class: 'q-mmid', 'aria-hidden': 'true' }), R);
+    function draw() {
+      lEls.forEach((e, i) => {
+        e.classList.toggle('sel', selL === i);
+        const has = pairs[i] != null; e.style.setProperty('--pc', has ? PAIR_COLORS[i % PAIR_COLORS.length] : 'transparent');
+        e.classList.toggle('paired', has); e.dataset.tag = has ? String.fromCharCode(65 + i) : '';
+      });
+      Object.entries(rEls).forEach(([j, e]) => {
+        const owner = Object.keys(pairs).find((k) => pairs[k] === +j);
+        e.style.setProperty('--pc', owner != null ? PAIR_COLORS[owner % PAIR_COLORS.length] : 'transparent');
+        e.classList.toggle('paired', owner != null); e.dataset.tag = owner != null ? String.fromCharCode(65 + +owner) : '';
+      });
+    }
+    draw();
+    const api = {
+      el: wrap,
+      answered: () => Object.keys(pairs).length === q.left.length,
+      check: () => q.left.filter((_, i) => pairs[i] === q.answer[i]).length / q.left.length,
+      mark() { lEls.forEach((e, i) => { const ok = pairs[i] === q.answer[i]; e.classList.toggle('good', ok); e.classList.toggle('bad', !ok); }); },
+      clearMarks() { lEls.forEach((e) => e.classList.remove('good', 'bad')); },
+      reveal() { q.left.forEach((_, i) => (pairs[i] = q.answer[i])); draw(); api.mark(); },
+      lock() { wrap.classList.add('locked'); },
+      value: () => q.left.map((l, i) => l + '→' + (pairs[i] != null ? q.right[pairs[i]] : '?')).join('; '),
+      _pair: (i, j) => { pairs[i] = j; draw(); },
+    };
+    return api;
+  }
+
+  function widget(q) {
+    if (q.type === 'mcq') return mcq(q, false);
+    if (q.type === 'multi') return mcq(q, true);
+    if (q.type === 'fill') return fill(q);
+    if (q.type === 'sort') return sort(q);
+    if (q.type === 'match') return match(q);
+    if (q.type === 'custom') return q.build(q);
+    throw new Error('unknown type ' + q.type);
+  }
+  const TYPE_LABEL = { mcq: 'Choose one', multi: 'Choose all that apply', fill: 'Fill in', sort: 'Drag and drop', match: 'Match the columns', custom: '' };
+
+  /* A question card. opts.mode: practice | test | diagnostic */
+  function card(q, opts = {}) {
+    const mode = opts.mode || 'practice';
+    const w = widget(q);
+    const fb = h('div', { class: 'q-fb', role: 'status', 'aria-live': 'polite' });
+    const head = h('div', { class: 'q-head' },
+      opts.num != null ? h('span', { class: 'q-num' }, opts.num) : null,
+      h('span', { class: 'q-type' }, q.typeLabel || TYPE_LABEL[q.type] || ''));
+    const prompt = q.prompt ? h('div', { class: 'q-prompt', html: rich(q.prompt) }) : null;
+    const el = h('div', { class: 'q-card t-' + q.type }, head, prompt, q.visual ? h('div', { class: 'q-visual', html: q.visual }) : null, w.el);
+    const state = { tries: 0, done: false, score: 0, firstTry: false };
+    let btn, showBtn;
+    if (mode === 'practice') {
+      btn = h('button', { class: 'q-check', type: 'button', onclick: () => doCheck() }, opts.checkLabel || 'Check');
+      showBtn = h('button', { class: 'q-show', type: 'button', hidden: true, onclick: () => { w.reveal(); w.lock(); finish(false, true); } }, 'Show me');
+      el.append(h('div', { class: 'q-actions' }, btn, showBtn), fb);
+      w.onEnter = () => doCheck();
+    } else el.append(fb);
+    function finish(ok, shown) {
+      state.done = true; btn && (btn.hidden = true); showBtn && (showBtn.hidden = true);
+      el.classList.add(ok ? 'is-right' : 'is-shown');
+      if (ok) fb.innerHTML = '<span class="ok">' + rich(q.praise || pickPraise()) + '</span>' + (q.explain ? '<div class="why">' + rich(q.explain) + '</div>' : '');
+      else if (shown) fb.innerHTML = '<span class="info">Here is the answer. ' + (q.explain ? rich(q.explain) : '') + '</span>';
+      opts.onDone && opts.onDone({ correct: ok, firstTry: ok && state.tries === 1, shown });
+    }
+    function doCheck() {
+      if (state.done) return;
+      if (!w.answered()) { fb.innerHTML = '<span class="info">' + (q.type === 'sort' ? 'Place every card first.' : q.type === 'match' ? 'Match every item first.' : 'Answer every part first.') + '</span>'; return; }
+      state.tries++;
+      const s = w.check(); w.mark();
+      if (s >= 0.999) { w.lock(); state.score = 1; finish(true); }
+      else {
+        fb.innerHTML = '<span class="bad">Not yet. ' + rich(q.hint || 'Look at the orange ones and try again.') + '</span>';
+        el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+        if (state.tries >= 2) showBtn.hidden = false;
+        setTimeout(() => w.clearMarks(), 1800);
+      }
+    }
+    return {
+      el, q, w, state,
+      grade() { const s = w.answered() ? w.check() : (w.check ? w.check() : 0); state.score = s; return s; },
+      showResult() { w.mark(); w.lock(); const s = state.score;
+        el.classList.add(s >= 0.999 ? 'is-right' : 'is-wrong');
+        fb.innerHTML = s >= 0.999 ? '<span class="ok">Correct</span>' : '<span class="bad">' + (s > 0 ? 'Partly right' : 'Not quite') + '.</span> <button class="q-peek" type="button">See answer</button>' + (q.explain ? '<div class="why">' + rich(q.explain) + '</div>' : '');
+        const pk = fb.querySelector('.q-peek'); pk && pk.addEventListener('click', () => { w.reveal(); pk.remove(); }); },
+      value: () => w.value(),
+      answered: () => w.answered(),
+    };
+  }
+  const PRAISES = ['Nailed it!', 'Spot on!', 'Gold!', 'Brilliant thinking!', 'Exactly right!', 'You cracked it!'];
+  const pickPraise = () => PRAISES[Math.floor(Math.random() * PRAISES.length)];
+
+  /* ---------- share panel ---------- */
+  function sharePanel({ title, getName, getSummary }) {
+    const status = h('div', { class: 's-status', role: 'status' });
+    const build = () => {
+      const name = (getName() || '').trim() || 'Learner';
+      return getSummary(name);
+    };
+    const say = (t) => { status.textContent = t; setTimeout(() => (status.textContent = ''), 3500); };
+    const copy = async (txt) => {
+      try { await navigator.clipboard.writeText(txt); say('Performance report copied. Paste it into a message to your mentor.'); }
+      catch (e) { const ta = h('textarea', {}); ta.value = txt; document.body.append(ta); ta.select(); try { document.execCommand('copy'); say('Copied.'); } catch (_) { say('Select the text in the box and copy it.'); } ta.remove(); }
+    };
+    const panel = h('div', { class: 's-panel' },
+      h('div', { class: 's-row' },
+        h('button', { class: 's-btn s-main', type: 'button', onclick: async () => {
+          const txt = build();
+          await copy(txt);
+          if (navigator.share) { try { await navigator.share({ title, text: txt }); } catch (e) { /* closed or blocked: report is already copied */ } }
+        } }, 'Share results')),
+      status);
+    return panel;
+  }
+
+  function fmtTime(ms) { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ' min ' + (s % 60) + ' s'; }
+
+  return { h, shuffle, pick, rint, rich, norm, card, widget, sharePanel, fmtTime, sameSet };
+})();
+
+/* ---------- number helpers for generators ---------- */
+const NT = {
+  factors(n) { const f = []; for (let i = 1; i <= n; i++) if (n % i === 0) f.push(i); return f; },
+  pairs(n) { const p = []; for (let i = 1; i * i <= n; i++) if (n % i === 0) p.push([i, n / i]); return p; },
+  isPrime(n) { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; },
+  kind(n) { return n < 2 ? 2 : NT.isPrime(n) ? 0 : 1; },
+  primesBetween(a, b) { const r = []; for (let i = a; i <= b; i++) if (NT.isPrime(i)) r.push(i); return r; },
+  smallestPF(n) { for (let i = 2; i <= n; i++) if (n % i === 0) return i; return n; },
+  digitSum(n) { return String(n).split('').reduce((s, d) => s + +d, 0); },
+};
+</script>
+<script>/* Test kit: builds graded sections, keeps scores, writes the share summary. */
+const TK = (() => {
+  const { h, card } = MML;
+  function Section(def, idx) {
+    const s = { def, idx, cards: [], graded: false, score: 0, total: def.questions.length };
+    s.render = (mount) => {
+      mount.innerHTML = '';
+      if (!s.cards.length) s.cards = def.questions.map((q, k) => card(q, { mode: 'test', num: def.key + (k + 1) }));
+      s.cards.forEach((c) => mount.append(c.el));
+    };
+    s.unanswered = () => s.cards.filter((c) => !c.answered()).length;
+    s.grade = () => {
+      s.score = 0;
+      s.cards.forEach((c) => { const v = c.grade(); if (v >= 0.999) s.score++; c.showResult(); });
+      s.graded = true; return s.score;
+    };
+    s.answers = () => s.cards.map((c, k) => def.key + (k + 1) + ' ' + (c.state.score >= 0.999 ? '✓' : '✗'));
+    return s;
+  }
+  function summary({ title, name, sections, ms, extra }) {
+    const done = sections.filter((s) => s.graded);
+    const sc = done.reduce((a, s) => a + s.score, 0), tot = sections.reduce((a, s) => a + s.total, 0);
+    const pct = tot ? Math.round((sc / tot) * 100) : 0;
+    const lines = [
+      'MyMasteryLab · ' + title,
+      'Learner: ' + name,
+      'Date: ' + new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }),
+      'Score: ' + sc + ' / ' + tot + ' (' + pct + '%)',
+      'Time: ' + MML.fmtTime(ms),
+      '',
+      ...sections.map((s) => s.def.key + '. ' + s.def.title + ': ' + (s.graded ? s.score + '/' + s.total : 'not checked')),
+      '',
+      'Question by question: ' + done.flatMap((s) => s.answers()).join(', '),
+    ];
+    if (extra) lines.push('', extra);
+    return { text: lines.join('\n'), sc, tot, pct };
+  }
+  return { Section, summary };
+})();
+</script>
+<script>/* seeded random + drawing from generator pools */
+const KIT = (() => {
+  function withSeed(seed, fn) { const orig = Math.random; let a = seed; Math.random = function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; try { return fn(); } finally { Math.random = orig; } }
+  function uniq(gens, n = 20) {
+    const out = [], seen = new Set(); let guard = 0;
+    while (out.length < n && guard++ < 800) {
+      const g = out.length % gens.length; const q = gens[g](); q._g = g;
+      const key = q.prompt + '|' + (q.text || '') + '|' + (q.options || q.items || q.left || []).map((x) => x.label ?? x).join(',');
+      if (!seen.has(key)) { seen.add(key); out.push(q); }
+    }
+    return out;
+  }
+  function draw(pool, n) {
+    const sh = MML.shuffle(pool), out = [], seen = new Set();
+    sh.forEach((q) => { if (out.length < n && !seen.has(q._g)) { seen.add(q._g); out.push(q); } });
+    sh.forEach((q) => { if (out.length < n && !out.includes(q)) out.push(q); });
+    return out.sort((a, b) => a._g - b._g);
+  }
+  const pick1 = (a) => a[Math.floor(Math.random() * a.length)];
+  return { withSeed, uniq, draw, pick1 };
+})();
+</script>
+<script>const GEN = (() => {
+  const { shuffle, rint } = MML; const P = (a) => KIT.pick1(a); const U = KIT.uniq;
+  const make = (d, lo, hi, needR = true) => { let q = rint(lo, hi), r = needR ? rint(1, d - 1) : 0; return [d * q + r, q, r]; };
+  const FR = { 2: ['1/2', '½', '.5'], 4: ['1/4', '¼', '.25'], 3: ['1/3', '⅓'] };
+  const ROUND = [['children', 'cars', 'seats'], ['campers', 'tents', 'sleep'], ['books', 'shelves', 'fit'], ['guests', 'tables', 'sit'], ['players', 'teams', 'play'], ['eggs', 'boxes', 'pack']];
+  function A() {
+    return U([
+      () => { const d = rint(3, 9); const [n, q, r] = make(d, 3, 12); return { type: 'fill', prompt: 'Divide.', text: `${n} ÷ ${d} = [] R []`, answers: [String(q), String(r)] }; },
+      () => { const d = rint(3, 9); const [n, q, r] = make(d, 10, 40); return { type: 'fill', prompt: 'Divide.', text: `${n} ÷ ${d} = [] R []`, answers: [String(q), String(r)] }; },
+      () => { const d = rint(3, 10); const o = [d - 1, d, d + 1, d + 3].map(String); return { type: 'mcq', prompt: `Which **is** a possible remainder when dividing by **${d}**?`, options: o, answer: 0, keepOrder: true }; },
+      () => { const d = rint(3, 9); const [n, q, r] = make(d, 4, 15); return { type: 'fill', prompt: 'Check the division.', text: `${q} × ${d} + ${r} = []`, answers: [String(n)] }; },
+    ]);
+  }
+  function B() {
+    return U([
+      () => { const [it, gr] = P([['scoops', 'bags'], ['beads', 'necklaces'], ['tickets', 'books'], ['cards', 'packs']]); const d = rint(4, 9); const [n, q] = make(d, 3, 15);
+        return { type: 'fill', prompt: `**${n}** ${it}. Each ${gr.slice(0, -1)} needs **${d}**. How many **full** ${gr}?`, text: `[] ${gr}`, answers: [String(q)], explain: `${n} ÷ ${d} = ${q} R ${n % d}. Drop the leftovers.` }; },
+      () => { const c = rint(2, 9); const m = c * rint(3, 9) + rint(1, c - 1); const q = Math.floor(m / c);
+        return { type: 'fill', prompt: `A ride costs **$${c}**. You have **$${m}**. How many rides can you buy?`, text: '[] rides', answers: [String(q)], explain: `${m} ÷ ${c} = ${q} R ${m % c}. Not enough for another ride.` }; },
+      () => { const [it, gr, v] = P(ROUND); const d = rint(4, 10); const [n, q] = make(d, 3, 14);
+        return { type: 'fill', prompt: `**${n}** ${it}, **${d}** in each of the ${gr}. How many ${gr} are needed for all of them?`, text: `[] ${gr}`, answers: [String(q + 1)], explain: `${n} ÷ ${d} = ${q} R ${n % d}. Round up: ${q + 1}.` }; },
+      () => { const d = rint(4, 9); const [n, q, r] = make(d, 3, 12); const o = shuffle([`Boxes needed to pack all ${n} prizes, ${d} per box`, `Full boxes of ${d} from ${n} prizes`, `Prizes left after filling boxes of ${d}`, `Money left after buying $${d} prizes with $${n}`]);
+        return { type: 'mcq', prompt: 'Which story needs you to **round up**?', options: o, answer: o.indexOf(`Boxes needed to pack all ${n} prizes, ${d} per box`) }; },
+      () => { const d = rint(5, 9); const n = d * rint(3, 9); return { type: 'fill', prompt: `**${n}** riders, **${d}** per car. How many cars are needed?`, text: '[] cars', answers: [String(n / d)], explain: 'No remainder, so no extra car is needed.' }; },
+    ]);
+  }
+  function C() {
+    return U([
+      () => { const d = rint(4, 9); const [n, q, r] = make(d, 3, 12); const [it, g] = P([['balloons', 'bunches'], ['stickers', 'pages'], ['marbles', 'bags'], ['flowers', 'vases']]);
+        return { type: 'fill', prompt: `**${n}** ${it} are put into ${g} of **${d}**. How many ${it} are **left over**?`, text: `[] ${it}`, answers: [String(r)] }; },
+      () => { const d = P([2, 4]); const q = rint(2, 9); const n = d * q + 1; const f = FR[d];
+        return { type: 'fill', prompt: `**${n}** pies are shared equally by **${d}** friends. How much does each get? (Write like 3 1/2.)`, text: '[] pies each', answers: [[`${q} ${f[0]}`, `${q}${f[1]}`, `${q}${f[2]}`]], explain: `${n} ÷ ${d} = ${q} R 1, and the last pie is cut into ${d === 2 ? 'halves' : 'quarters'}.` }; },
+      () => { const n = rint(5, 15) * 2 + 1; const q = (n - 1) / 2; return { type: 'fill', prompt: `**${n}** metres of ribbon cut into **2** equal pieces.`, text: '[] metres each', answers: [[`${q} 1/2`, `${q}½`, `${q}.5`]] }; },
+      () => { const o = shuffle(['How many are left over?', 'How many full groups?', 'How many groups are needed?', 'How much does each get?']); return { type: 'mcq', prompt: 'Which question wants the **remainder** as the answer?', options: o, answer: o.indexOf('How many are left over?'), keepOrder: true }; },
+      () => { const d = rint(3, 8); const [n, q, r] = make(d, 5, 15); return { type: 'fill', prompt: `**${n}** pencils are shared by **${d}** clowns. How many does each get, and how many are left for the ringmaster?`, text: '[] each, [] left', answers: [String(q), String(r)] }; },
+    ]);
+  }
+  const BOOTHS = ['Drop It', 'Round Up', 'Remainder is the answer', 'Share it'];
+  const STORIES = [
+    ['Full packs of 6 from 40 juice boxes', 0], ['$5 rides you can buy with $23', 0], ['Full teams of 7 from 30 players', 0], ['Complete necklaces of 9 beads from 50 beads', 0],
+    ['Vans needed for 30 kids, 8 per van', 1], ['Shelves for 41 books, 10 per shelf', 1], ['Tents for 25 campers, 4 per tent', 1], ['Boxes to pack 50 eggs, 12 per box', 1],
+    ['Cookies left after bags of 5 from 33', 2], ['Pencils left after sharing 29 by 4', 2], ['Cards left over after dealing 50 to 6 players', 2], ['Spare seats left after 7 rows of 9 from 66', 2],
+    ['Pizza each when 9 pizzas are shared by 4', 3], ['Ribbon each when 10 m is cut for 4 bows', 3], ['Pie each when 5 pies are shared by 2', 3], ['Juice each when 7 litres are shared by 2', 3]];
+  function D() {
+    return U([
+      () => { const [s, b] = P(STORIES); return { type: 'mcq', prompt: `Which booth? **${s}**`, options: BOOTHS, answer: b, keepOrder: true }; },
+      () => { const pick = shuffle([0, 1, 2, 3].flatMap((b) => shuffle(STORIES.filter((x) => x[1] === b)).slice(0, 1))); return { type: 'sort', prompt: 'Sort each story into its booth.', bins: BOOTHS, items: pick.map(([l, b]) => ({ label: l, bin: b })) }; },
+      () => { const pairs = shuffle([0, 1, 2, 3]).map((b) => P(STORIES.filter((x) => x[1] === b))); return { type: 'match', prompt: 'Match each story to its booth.', left: pairs.map((p) => p[0]), right: BOOTHS, answer: pairs.map((p) => p[1]) }; },
+      () => { const d = rint(5, 9); const [n, q, r] = make(d, 3, 9); return { type: 'mcq', prompt: `Zippy says **${n} kids, ${d} per van: "${q} R ${r} vans"**. What should he say?`, options: [`${q + 1} vans`, `${q} vans`, `${q + 2} vans`, `${q} R ${r} vans is fine`], answer: 0, keepOrder: true }; },
+    ]);
+  }
+  const CLAIMS = [['You should always round up a remainder.', false, 'Only when everyone or everything must fit.'], ['If the question asks for full groups, drop the remainder.', true, 'Leftovers do not make a full group.'],
+    ['"How many are left?" means the remainder is the answer.', true, 'That is Booth 3.'], ['People can be shared into halves.', false, 'People cannot be split; round up or drop.'],
+    ['After dividing, you must decide what the remainder means.', true, 'The story tells you.'], ['A story answer can be "6 R 2 buses".', false, 'Buses come in whole numbers: round up to 7.']];
+  function E() {
+    return U([
+      () => { const [c, t, w] = P(CLAIMS); return { type: 'mcq', prompt: `Zippy says: **"${c}"**`, options: ['True', 'False'], answer: t ? 0 : 1, keepOrder: true, explain: w }; },
+      () => { const d = rint(5, 9); const [n, q, r] = make(d, 8, 20); return { type: 'fill', prompt: `**${n}** guests, tables of **${d}**. How many tables, and how many **empty seats** at the last table?`, text: '[] tables, [] empty seats', answers: [String(q + 1), String(d - r)], explain: `${n} ÷ ${d} = ${q} R ${r}. ${q + 1} tables; the last has ${r} guests and ${d - r} empty seats.` }; },
+      () => { const c = rint(3, 9); const m = c * rint(4, 9) + rint(1, c - 1); return { type: 'fill', prompt: `Hot dogs cost **$${c}**. Leo has **$${m}**. How many can he buy and how much money is left?`, text: '[] hot dogs, $[] left', answers: [String(Math.floor(m / c)), String(m % c)] }; },
+      () => { const d = rint(3, 6); const per = rint(4, 8); const n = d * per * 2 + rint(1, d - 1); return { type: 'fill', prompt: `**${n}** prizes are packed **${d}** to a bag. Each crate holds **${per}** bags. How many crates of **full bags** can be filled?`, text: '[] crates', answers: [String(Math.floor(Math.floor(n / d) / per))], explain: `${Math.floor(n / d)} full bags; ÷ ${per} = ${Math.floor(Math.floor(n / d) / per)} full crates.` }; },
+    ]);
+  }
+  const SECTIONS = [
+    { key: 'A', title: 'Remainder Warm-up', short: 'Warm-up', station: 'Ticket Gate', who: 'marbles', say: 'Divide, find the remainder, and check by multiplying.', make: A },
+    { key: 'B', title: 'Drop It or Round Up', short: 'Drop/Round', station: 'Bumper Cars', who: 'rosa', say: 'Full groups only? Drop it. Must everyone fit? Round up.', make: B },
+    { key: 'C', title: 'Remainder or Share It', short: 'Left/Share', station: 'Pie Stand', who: 'rosa', say: 'Asked what is left? That is the answer. Can it be cut? Share it.', make: C },
+    { key: 'D', title: 'Which Booth?', short: 'Booths', station: 'Fortune Tent', who: 'marbles', say: 'Read the question and choose the booth.', make: D },
+    { key: 'E', title: 'Carnival Thinking', short: 'Think', station: 'Big Top', who: 'zippy', say: 'Two-step stories and tricky claims. Do not copy me!', make: E },
+  ];
+  return { SECTIONS };
+})();
+</script>
+<script>
+const ART = {"rosa": "<svg class=\"chr rosa\" viewBox=\"0 0 120 150\" role=\"img\" aria-label=\"Ringmaster Rosa\">\n<ellipse cx=\"60\" cy=\"146\" rx=\"32\" ry=\"4\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"bob\">\n <path d=\"M30 100 Q60 90 90 100 L96 142 L24 142Z\" fill=\"#C92426\"/><path d=\"M54 98 L60 142 L66 98Z\" fill=\"#fff\"/>\n <circle cx=\"44\" cy=\"112\" r=\"3\" fill=\"#FAA71C\"/><circle cx=\"76\" cy=\"112\" r=\"3\" fill=\"#FAA71C\"/><circle cx=\"44\" cy=\"126\" r=\"3\" fill=\"#FAA71C\"/><circle cx=\"76\" cy=\"126\" r=\"3\" fill=\"#FAA71C\"/>\n <g class=\"wave\"><rect x=\"88\" y=\"98\" width=\"11\" height=\"28\" rx=\"5\" fill=\"#C92426\" transform=\"rotate(-40 94 102)\"/><path d=\"M106 86 l12 -20\" stroke=\"#1d1d1f\" stroke-width=\"4\" stroke-linecap=\"round\"/><circle cx=\"118\" cy=\"66\" r=\"4\" fill=\"#fff\"/><circle cx=\"104\" cy=\"88\" r=\"6\" fill=\"#c98a5c\"/></g>\n <circle cx=\"60\" cy=\"68\" r=\"28\" fill=\"#c98a5c\"/>\n <path d=\"M32 66 Q30 40 60 38 Q90 40 88 66 Q86 50 60 50 Q34 50 32 66Z\" fill=\"#1d1d1f\"/>\n <g class=\"blink\"><ellipse cx=\"50\" cy=\"70\" rx=\"4\" ry=\"5\" fill=\"#1d1d1f\"/><ellipse cx=\"70\" cy=\"70\" rx=\"4\" ry=\"5\" fill=\"#1d1d1f\"/><circle cx=\"51.3\" cy=\"68.5\" r=\"1.4\" fill=\"#fff\"/><circle cx=\"71.3\" cy=\"68.5\" r=\"1.4\" fill=\"#fff\"/></g>\n <path d=\"M50 84 Q60 92 70 84\" stroke=\"#1d1d1f\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/>\n <rect x=\"40\" y=\"12\" width=\"40\" height=\"30\" rx=\"3\" fill=\"#1d1d1f\"/><rect x=\"40\" y=\"30\" width=\"40\" height=\"6\" fill=\"#C92426\"/><ellipse cx=\"60\" cy=\"42\" rx=\"32\" ry=\"6\" fill=\"#1d1d1f\"/>\n</g></svg>", "zippy": "<svg class=\"chr zippy\" viewBox=\"0 0 120 150\" role=\"img\" aria-label=\"Zippy the clown\">\n<ellipse cx=\"60\" cy=\"146\" rx=\"30\" ry=\"4\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"juggle\">\n <path d=\"M30 104 Q60 92 90 104 L92 142 L28 142Z\" fill=\"#00A7B2\"/><circle cx=\"46\" cy=\"118\" r=\"6\" fill=\"#FAA71C\"/><circle cx=\"74\" cy=\"126\" r=\"6\" fill=\"#C92426\"/><circle cx=\"58\" cy=\"134\" r=\"5\" fill=\"#66A34E\"/>\n <path d=\"M40 98 L60 108 L80 98 L60 92Z\" fill=\"#FAA71C\"/>\n <circle cx=\"60\" cy=\"66\" r=\"28\" fill=\"#fff\"/>\n <circle cx=\"32\" cy=\"58\" r=\"12\" fill=\"#ff6600\"/><circle cx=\"88\" cy=\"58\" r=\"12\" fill=\"#ff6600\"/><circle cx=\"36\" cy=\"44\" r=\"10\" fill=\"#ff6600\"/><circle cx=\"84\" cy=\"44\" r=\"10\" fill=\"#ff6600\"/>\n <g class=\"blink\"><circle cx=\"50\" cy=\"64\" r=\"4\" fill=\"#1d1d1f\"/><circle cx=\"70\" cy=\"64\" r=\"4\" fill=\"#1d1d1f\"/></g>\n <path d=\"M44 56 l10 2 M76 56 l-10 2\" stroke=\"#1d1d1f\" stroke-width=\"2\"/>\n <circle cx=\"60\" cy=\"74\" r=\"7\" fill=\"#C92426\" class=\"nose\"/>\n <path d=\"M44 82 Q60 98 76 82\" stroke=\"#C92426\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/>\n <path d=\"M44 38 L60 4 L76 38Z\" fill=\"#C92426\"/><circle cx=\"60\" cy=\"4\" r=\"5\" fill=\"#FAA71C\"/>\n <g class=\"balls\"><circle cx=\"22\" cy=\"20\" r=\"6\" fill=\"#FAA71C\"/><circle cx=\"98\" cy=\"24\" r=\"6\" fill=\"#00A7B2\"/><circle cx=\"104\" cy=\"2\" r=\"6\" fill=\"#66A34E\"/></g>\n</g></svg>", "marbles": "<svg class=\"chr marbles\" viewBox=\"0 0 130 150\" role=\"img\" aria-label=\"Madame Marbles\">\n<ellipse cx=\"65\" cy=\"146\" rx=\"40\" ry=\"4\" fill=\"#000\" opacity=\".08\"/>\n<g class=\"bob\">\n <path d=\"M28 108 Q65 90 102 108 L110 144 L20 144Z\" fill=\"#047857\"/><path d=\"M28 108 Q65 126 102 108\" stroke=\"#FAA71C\" stroke-width=\"4\" fill=\"none\"/>\n <circle cx=\"65\" cy=\"66\" r=\"26\" fill=\"#f2c79a\"/>\n <path d=\"M37 60 Q36 32 65 30 Q94 32 93 60 Q90 44 65 44 Q40 44 37 60Z\" fill=\"#D77F28\"/>\n <path d=\"M34 52 Q65 20 96 52 L96 44 Q65 10 34 44Z\" fill=\"#00A7B2\"/><circle cx=\"65\" cy=\"26\" r=\"6\" fill=\"#FAA71C\"/>\n <g class=\"blink\"><path d=\"M52 66 q5 -5 10 0 M68 66 q5 -5 10 0\" stroke=\"#1d1d1f\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/></g>\n <path d=\"M56 80 Q65 86 74 80\" stroke=\"#1d1d1f\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/>\n <circle cx=\"46\" cy=\"76\" r=\"4\" fill=\"#FAA71C\"/><circle cx=\"84\" cy=\"76\" r=\"4\" fill=\"#FAA71C\"/>\n <g class=\"orb\"><circle cx=\"65\" cy=\"118\" r=\"18\" fill=\"#d6f4f6\" stroke=\"#00A7B2\" stroke-width=\"3\"/><circle cx=\"59\" cy=\"112\" r=\"5\" fill=\"#fff\" opacity=\".9\"/><text x=\"65\" y=\"124\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"800\" fill=\"#00A7B2\">R?</text></g>\n</g></svg>", "token": "<g><path d=\"M-14 -8 h28 v5 a3 3 0 0 0 0 6 v5 h-28 v-5 a3 3 0 0 0 0 -6z\" fill=\"#FAA71C\" stroke=\"#C92426\" stroke-width=\"2\"/><path d=\"M-4 -8 v16\" stroke=\"#C92426\" stroke-dasharray=\"2 2\"/></g>"};
+const CFG = {"names": {"rosa": "Ringmaster Rosa", "zippy": "Zippy", "marbles": "Madame Marbles"}, "wsSeed": 2901, "pdfSeed": 2999, "pageWord": "Page", "stopWord": "Ride", "defaultName": "Carnival star", "wsTitle": "Remainder Carnival \u00b7 Booth Book", "allDone": "Every page checked. What a show!", "hwTitle": "Remainder Carnival \u00b7 Midway Train homework", "finishBtn": "Get my prize ticket", "nextBtn": "Ride to the next stop", "ticketWord": "prize ticket"};
+const { h } = MML;
+const T0 = Date.now();
+const DEFS = KIT.withSeed(CFG.wsSeed, () => GEN.SECTIONS.map((sec) => ({ key: sec.key, title: sec.title, short: sec.short, who: sec.who, say: sec.say, questions: KIT.draw(sec.make(), 4) })));
+const NAMES = CFG.names;
+const secs = DEFS.map((d, i) => TK.Section(d, i));
+let cur = 0;
+const tabs = document.getElementById('tabs'), page = document.getElementById('page');
+function drawTabs() {
+  tabs.innerHTML = '';
+  secs.forEach((s, i) => {
+    const st = s.graded ? h('span', { class: 'stamp ' + (s.score / s.total >= 0.8 ? '' : s.score / s.total >= 0.5 ? 'mid' : 'low') }, s.score + '/' + s.total) : null;
+    tabs.append(h('button', { class: 'tab' + (cur === i ? ' on' : ''), type: 'button', onclick: () => go(i) }, h('b', {}, s.def.key), h('small', {}, s.def.short), st));
+  });
+  tabs.append(h('button', { class: 'tab' + (cur === 5 ? ' on' : ''), type: 'button', onclick: () => go(5) }, h('b', {}, '★'), h('small', {}, 'Results')));
+}
+function go(i) { cur = i; drawTabs(); i === 5 ? results() : drawPage(); page.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+function drawPage() {
+  const s = secs[cur], d = s.def;
+  page.innerHTML = '';
+  page.append(h('div', { class: 'phead' }, h('div', { class: 'let' }, d.key), h('div', {}, h('h2', {}, d.title), h('p', {}, '' + CFG.pageWord + ' ' + (cur + 1) + ' of 5 · ' + d.questions.length + ' questions'))));
+  page.append(h('div', { class: 'note' }, h('span', { class: 'face', html: ART[d.who] }), h('div', {}, h('b', { class: 'who' }, NAMES[d.who] + ' '), d.say)));
+  const mount = h('div'); page.append(mount); s.render(mount);
+  const msg = h('span');
+  const foot = h('div', { class: 'pfoot' });
+  if (!s.graded) foot.append(h('button', { class: 'btn main', type: 'button', onclick: (e) => {
+    const un = s.unanswered();
+    if (un && !e.currentTarget.dataset.sure) { e.currentTarget.dataset.sure = 1; msg.className = 'warn'; msg.textContent = un + (un > 1 ? ' questions are' : ' question is') + ' not finished. Press again to check anyway.'; return; }
+    s.grade(); drawTabs(); drawPage(); } }, 'Check this ' + CFG.pageWord.toLowerCase()), msg);
+  else foot.append(h('span', { class: 'pscore' }, CFG.pageWord + ' score: ' + s.score + ' / ' + s.total));
+  foot.append(h('button', { class: 'btn gold', type: 'button', onclick: () => go(cur + 1) }, cur === 4 ? 'See my results' : 'Next ' + CFG.pageWord.toLowerCase()));
+  page.append(foot);
+}
+function results() {
+  const name = document.getElementById('nm').value.trim() || CFG.defaultName;
+  const sum = TK.summary({ title: CFG.wsTitle, name, sections: secs, ms: Date.now() - T0 });
+  page.innerHTML = '';
+  const unchecked = secs.filter((s) => !s.graded).length;
+  const r = h('div', { class: 'results' },
+    h('div', { class: 'phead' }, h('div', { class: 'let' }, '★'), h('div', {}, h('h2', {}, name + "'s results"), h('p', {}, unchecked ? unchecked + ' ' + CFG.pageWord.toLowerCase() + '(s) not checked yet. Unchecked ones count as 0.' : CFG.allDone))),
+    h('div', { class: 'seal' }, h('div', {}, h('b', {}, sum.sc + '/' + sum.tot), sum.pct + '%')),
+    h('table', { class: 'rtable' }, h('tr', {}, h('th', {}, CFG.pageWord), h('th', {}, 'Score'), h('th', {}, '')),
+      ...secs.map((s) => h('tr', {}, h('td', {}, s.def.key + '. ' + s.def.title), h('td', {}, s.graded ? s.score + ' / ' + s.total : 'not checked'), h('td', {}, h('div', { class: 'bar' }, h('i', { style: 'width:' + (s.graded ? (100 * s.score) / s.total : 0) + '%' })))))),
+    h('p', {}, 'Time spent: ' + MML.fmtTime(Date.now() - T0)),
+    MML.sharePanel({ title: CFG.wsTitle + ' results', getName: () => name, getSummary: () => TK.summary({ title: CFG.wsTitle, name, sections: secs, ms: Date.now() - T0 }).text }));
+  page.append(r);
+}
+drawTabs(); drawPage();
+
+</script>
+</body>
+</html>
